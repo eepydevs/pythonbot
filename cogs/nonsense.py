@@ -26,14 +26,19 @@ class Nonsense(commands.Cog):
   async def eval(self, ctx, *, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
     try:
-      if any(i in code for i in blacklist):
-        e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
-        await ctx.message.add_reaction("❌")
-      else:
-        e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})}", color = random.randint(0, 16777215))
+      if ctx.author.id == ctx.bot.owner.id:
+        e = discord.Embed(title = "Eval:", description = f"{eval(code)}") 
         await ctx.send(embed = e)
         await ctx.message.add_reaction("✅")
+      else:
+        if any(i in code for i in blacklist):
+          e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+          await ctx.message.add_reaction("❌")
+        else:
+          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})}", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+          await ctx.message.add_reaction("✅")
     except Exception as error:
       e = discord.Embed(title = "Error", description = error, color = random.randint(0, 16777215))
       await ctx.send(embed = e)
