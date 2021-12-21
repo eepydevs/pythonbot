@@ -284,7 +284,7 @@ class Utility(commands.Cog):
       e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
 
-  @note.command(help = "Reads selected note but text is `text`")
+  @note.command(help = "Reads selected note but **text** is \**text\**")
   async def readraw(self, ctx, name = None):
     if str(ctx.author.id) in db["notes"]:
       if name in db["notes"][str(ctx.author.id)]:
