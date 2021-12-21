@@ -4,7 +4,6 @@ import random
 import os
 import datetime, time
 from replit import db
-import disnake as discord
 from disnake.ext import commands
 from server import keep_alive
 
