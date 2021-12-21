@@ -599,7 +599,7 @@ class Economy(commands.Cog):
           if "Smartphone" in db["inventory"][str(member.id)]:
             e = discord.Embed(title = "New mail", description = text, color = random.randint(0, 16777215))
             e.set_author(name = str(ctx.author), icon_url = str(ctx.author.avatar)[:-10])
-            e.set_footer(text = "You have 60 seconds to respond")
+            e.set_footer(text = "You have 5 minutes to respond")
             if ctx.message.attachments:
               e.set_image(url = str(ctx.message.attachments).split(" ")[3][5:-1])
             await member.send(embed = e)
@@ -607,7 +607,7 @@ class Economy(commands.Cog):
             e = discord.Embed(title = "Success", description = f"Sent `{text}` to `{member}`!", color = random.randint(0, 16777215))
             await ctx.send(embed = e)
             try:
-              message = await self.bot.wait_for("message", check = lambda message: message.author == member and message.channel == member.dm_channel, timeout = 60)
+              message = await self.bot.wait_for("message", check = lambda message: message.author == member and message.channel == member.dm_channel, timeout = 300)
               await message.add_reaction("✅")
               e = discord.Embed(title = f"Response from mailed user ({member})", description = message.content, color = random.randint(0, 16777215))
               if message.attachments:
