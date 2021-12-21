@@ -27,7 +27,7 @@ class Nonsense(commands.Cog):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
     try:
       if ctx.author.id == ctx.bot.owner.id:
-        e = discord.Embed(title = "Eval:", description = f"{eval(code)}") 
+        e = discord.Embed(title = "Eval:", description = f"{eval(code)}", color = random.randint(0, 16777215)) 
         await ctx.send(embed = e)
         await ctx.message.add_reaction("✅")
       else:
