@@ -57,6 +57,7 @@ class Nonsense(commands.Cog):
   async def embed2(self, ctx, *, options = ""):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
     list = options.split("/ ")
+    errornum = 0
     num = 0
     num2 = 1
     title = ""
@@ -72,7 +73,7 @@ class Nonsense(commands.Cog):
             num2 = 1
             while num2 < int(len(codelist) - 1):
               if any(i in codelist[num2] for i in blacklist):
-                error = 1
+                errornum = 1
                 e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
                 await ctx.send(embed = e)
                 break
@@ -94,7 +95,7 @@ class Nonsense(commands.Cog):
             num2 = 1
             while num2 < int(len(codelist) - 1):
               if any(i in codelist[num2] for i in blacklist):
-                error = 1
+                errornum = 1
                 e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
                 await ctx.send(embed = e)
                 break
@@ -116,7 +117,7 @@ class Nonsense(commands.Cog):
             num2 = 1
             while num2 < int(len(codelist) - 1):
               if any(i in codelist[num2] for i in blacklist):
-                error = 1
+                errornum = 1
                 e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
                 await ctx.send(embed = e)
                 break
@@ -136,7 +137,7 @@ class Nonsense(commands.Cog):
       elif "thumblink:" in list[num]:
         thumblink = str(list[num])[10:]
       num += 1
-    if not error == 1:
+    if not errornum == 1:
       e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
       e.set_author(name = ctx.author.name, icon_url = ctx.author.avatar)
       e.set_image(url = imagelink)
