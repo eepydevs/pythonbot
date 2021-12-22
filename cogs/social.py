@@ -18,7 +18,7 @@ class Social(commands.Cog):
 
   #add account command
   @commands.command(aliases = ["addacc"], help = "BETA")
-  async def addaccount(self, ctx, name = None):
+  async def addaccount(self, ctx):
     if str(ctx.author.id) not in db["account"]:
       db["account"][str(ctx.author.id)] = {}
       db["subs"][str(ctx.author.id)] = []
@@ -45,14 +45,14 @@ class Social(commands.Cog):
 
   #remove post command
   @commands.command(aliases = ["rpost"], help = "BETA")
-  async def removepost(self, ctx, name = None):
+  async def removepost(self, ctx, *, name = None):
     if str(ctx.author.id) in db["account"]:
       if name != None or name not in db["account"][str(ctx.author.id)]:
         updatedict = db["account"][str(ctx.author.id)]
         e = discord.Embed(title = "Success", description = f"Post named `{name}` is deleted!", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
         updatedict.pop(name)
-        db["notes"][str(ctx.author.id)] = updatedict
+        db["account"][str(ctx.author.id)] = updatedict
       else:
         e = discord.Embed(title = "Error", description = f"Post named `{name}` doesn't exist!", color = random.randint(0, 16777215))
         await ctx.send(embed = e)

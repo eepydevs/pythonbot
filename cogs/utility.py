@@ -256,7 +256,7 @@ class Utility(commands.Cog):
       await ctx.send(embed = e)
   
   @note.command(help = "Reads selected note")
-  async def read(self, ctx, name = None):
+  async def read(self, ctx, *, name = None):
     if name in db["notes"][str(ctx.author.id)]:
       e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(ctx.author.id)].get(name)}", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
