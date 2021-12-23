@@ -9,6 +9,10 @@ from replit import db
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392]
 
+def shuffle(x):
+  return random.sample(x, len(x))
+
+
 class Nonsense(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
@@ -36,7 +40,7 @@ class Nonsense(commands.Cog):
           await ctx.send(embed = e)
           await ctx.message.add_reaction("❌")
         else:
-          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x))})}", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
           await ctx.message.add_reaction("✅")
     except Exception as error:
