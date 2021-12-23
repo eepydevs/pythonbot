@@ -7,7 +7,7 @@ from replit import db
 
 botbuild = "4b.78.25" # major.sub.fix
 pyver = "3.8.2"
-dnver = "2.2.2"
+dnver = "2.3.0"
 
 waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro"]
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]

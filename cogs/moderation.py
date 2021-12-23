@@ -44,6 +44,24 @@ class Moderation(commands.Cog):
     e = discord.Embed(title = "Success", description = f"Successfully banned {member.mention}! {bquote}", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
 
+  #timeout command
+  @commands.command(aliases = ["mute"], help = "Mute/Timeout mentioned member", description = "This command is for admins only\nYou can mute/timeout members with this command\nUsage: pb!timeout (user) (duration)")
+  @commands.has_permissions(kick_members = True)
+  async def timeout(self, ctx, member: discord.Member = None, duration = "1d"):
+    if member != None:
+      if duration.endswith("d"):
+        timeoutduration = 86400 * int(duration[:-1])
+        await member.timeout(duration = timeoutduration)
+      elif duration.endswith("s"):
+        timeoutduration = int(duration[:-1])
+        await member.timeout(duration = timeoutduration)
+      elif duration.endswith("h"):
+        timeoutduration = 3600 * int(duration[:-1])
+        await member.timeout(duration = timeoutduration)
+    else:
+      e = discord.Embed(title = "Error", description = "Mention a member!", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+
   #unban command
   @commands.command(help = "Unban mentioned member", description = "This command is for admins only\nYou can unban members with this command\nUsage: pb!unban (user) [reason]")
   @commands.has_permissions(ban_members = True)
