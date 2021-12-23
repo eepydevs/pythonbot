@@ -58,5 +58,11 @@ class Text(commands.Cog):
     modtext = text[::-1]
     await ctx.send(modtext)
 
+  #mixcase command
+  @commands.command(aliases = ["mixc", "shufflecase"], help = "Mix your inputted text!", description = "Usage: pb!mixcase 'hello world'\nOutput: hleoe wrold!")
+  async def mixcase(self, ctx, *, text):
+    modtext = " ".join(str().join(random.sample(i, len(i))) for i in text.split())
+    await ctx.send(modtext)
+
 def setup(bot):
   bot.add_cog(Text(bot))

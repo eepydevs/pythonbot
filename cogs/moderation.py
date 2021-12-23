@@ -46,7 +46,7 @@ class Moderation(commands.Cog):
 
   #timeout command
   @commands.command(aliases = ["mute"], help = "Mute/Timeout mentioned member", description = "This command is for admins only\nYou can mute/timeout members with this command\nUsage: pb!timeout (user) (duration)")
-  @commands.has_permissions(kick_members = True)
+  @commands.has_permissions(moderate_members = True)
   async def timeout(self, ctx, member: discord.Member = None, duration = "1d"):
     if member != None:
       if duration.endswith("d"):

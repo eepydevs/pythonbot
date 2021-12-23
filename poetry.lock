@@ -95,14 +95,14 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
 name = "disnake"
-version = "2.2.2"
+version = "2.3.0"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
 python-versions = ">=3.8.0"
 
 [package.dependencies]
-aiohttp = ">=3.6.0,<3.8.0"
+aiohttp = ">=3.7.0,<3.9.0"
 
 [package.extras]
 discord = ["discord-disnake"]
@@ -254,7 +254,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "da1a0d995b711575aad2a9eca788f4d21fd48be0d43ea4266a3487260a75c7b1"
+content-hash = "1edac09f8a9bf365acb5972ebf17d8c2ea56aa32862fe883a3b5ee687512f759"
 
 [metadata.files]
 aiohttp = [
@@ -329,8 +329,8 @@ colorama = [
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
 ]
 disnake = [
-    {file = "disnake-2.2.2-py3-none-any.whl", hash = "sha256:0e78dd44aed399e60e7f56b9db28ddca915a60e7d182895a0e9c8566dcc0c112"},
-    {file = "disnake-2.2.2.tar.gz", hash = "sha256:cc0b7bef8e5235b442ee85885373a0b0923c684ceb4960322de25e9e64965508"},
+    {file = "disnake-2.3.0-py3-none-any.whl", hash = "sha256:bc98d577e523d057714611f07782faa3e459c90300c51adb15c44fe0e480acf7"},
+    {file = "disnake-2.3.0.tar.gz", hash = "sha256:fb0d393fdbdcc2bded7f323de7b3c3d2af7c066e039a7292a7ad404c463ff259"},
 ]
 flask = [
     {file = "Flask-2.0.2-py3-none-any.whl", hash = "sha256:cb90f62f1d8e4dc4621f52106613488b5ba826b2e1e10a33eac92f723093ab6a"},
