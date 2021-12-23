@@ -9,7 +9,6 @@ botbuild = "4b.78.25" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.2.2"
 
-waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro"]
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
 if "afk" not in db:
   db["afk"] = {}
@@ -49,56 +48,6 @@ class Utility(commands.Cog):
     e.set_thumbnail(url = str(ctx.guild.icon))
     e.set_footer(text = f"ID: {ctx.guild.id}")
     await ctx.send(embed = e)
-  
-  #member info command
-  @commands.command(aliases = ["mi", "whois", "user", "member"], help = "Shows mentioned member's info", description = "Usage: pb!memberinfo (@mention)")
-  async def memberinfo(self, ctx, member: discord.Member = None):
-    if member != None:
-      role_list = []
-
-      for role in member.roles:
-        if role.name != "@everyone":
-          role_list.append(role.mention)
-
-      b = ",".join(role_list)
-      e = discord.Embed(title = f"Member info: {member}", description = f"Joined server date: <t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-      e.set_thumbnail(url = str(member.avatar))
-      if len(role_list) != 0:
-        e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
-      else:
-        e.add_field(name = "Roles (0)", value = "None")
-      e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
-      if member.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True" , inline = False)
-      else:
-        e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Icon url:", value = str(member.avatar)[:-10], inline = False)
-      e.set_footer(text = f"ID: {member.id}")
-      await ctx.send(embed = e)
-    else:
-      rgwai = waiquotes[random.randint(0, len(waiquotes) - 1)]
-      role_list = []
-
-      for role in ctx.author.roles:
-        if role.name != "@everyone":
-          role_list.append(role.mention)
-
-      b = ",".join(role_list)
-      e = discord.Embed(title = f"Member info: {ctx.author}", description = f"Joined server date: <t:{str(time.mktime(ctx.author.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(ctx.author.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-      e.set_thumbnail(url = str(ctx.author.avatar))
-      if len(role_list) != None:
-        e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
-      else:
-        e.add_field(name = "Roles (0):", value = "None")
-      e.add_field(name = "Top role:", value = ctx.author.top_role.mention, inline = False)
-      if ctx.author.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True" , inline = False)
-      else:
-        e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Icon url:", value = str(ctx.author.avatar)[:-10], inline = False)
-      e.add_field(name = "Quote:", value = f"{rgwai}")
-      e.set_footer(text = f"ID: {ctx.author.id}")
-      await ctx.send(embed = e)
 
   #suggest command
   @commands.command(help = "Suggest an idea", description = "Suggest an idea for server improvement or a bot maker!\nexample: pb!suggest \"hello world\" @Number1#4325\nexample 2: pb!suggest \"hello world\"")
