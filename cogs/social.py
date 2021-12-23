@@ -144,24 +144,28 @@ class Social(commands.Cog):
 
   #subscribe command
   @commands.command(aliases = ["sub"], help = "Subscribe to people", description = "Subscribe to people\nAccount required")
-  async def subscribe(self, ctx, member: discord.Member = None):
-    if member != None:      
-      if str(member.id) in db["account"]:
-        if str(ctx.author.id) in db["account"]:
-          if str(ctx.author.id) not in db["subs"][str(member.id)]:
-            updatelist = db["subs"][str(member.id)]
-            updatelist.append(str(ctx.author.id))
-            db["subs"][str(member.id)] = updatelist
-            e = discord.Embed(title = "Success", description = f"Subscribed to `{member.name}`!", color = random.randint(0, 16777215))
-            await ctx.send(embed = e)
+  async def subscribe(self, ctx, *, member: discord.Member = None):
+    if member != None:
+      if str(member.id) != str(ctx.author.id):
+        if str(member.id) in db["account"]:
+          if str(ctx.author.id) in db["account"]:
+            if str(ctx.author.id) not in db["subs"][str(member.id)]:
+              updatelist = db["subs"][str(member.id)]
+              updatelist.append(str(ctx.author.id))
+              db["subs"][str(member.id)] = updatelist
+              e = discord.Embed(title = "Success", description = f"Subscribed to `{member.name}`!", color = random.randint(0, 16777215))
+              await ctx.send(embed = e)
+            else:
+              e = discord.Embed(title = "Error", description = "You're already subscribed to this person!", color = random.randint(0, 16777215))
+              await ctx.send(embed = e)
           else:
-            e = discord.Embed(title = "Error", description = "You're already subscribed to this person!", color = random.randint(0, 16777215))
+            e = discord.Embed(title = "Error", description = "You have no account...", color = random.randint(0, 16777215))
             await ctx.send(embed = e)
         else:
-          e = discord.Embed(title = "Error", description = "You have no account...", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Error", description = "They have no account...", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
       else:
-        e = discord.Embed(title = "Error", description = "They have no account...", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = "You can't subscribe to yourself", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Mention a person!", color = random.randint(0, 16777215))
@@ -169,24 +173,28 @@ class Social(commands.Cog):
 
   #unsubscribe command
   @commands.command(aliases = ["unsub"], help = "Subscribe to people", description = "Subscribe to people\nAccount required")
-  async def unsubscribe(self, ctx, member: discord.Member = None):
+  async def unsubscribe(self, ctx, *, member: discord.Member = None):
     if member != None:
-      if str(member.id) in db["account"]:
-        if str(ctx.author.id) in db["account"]:
-          if str(ctx.author.id) in db["subs"][str(member.id)]:
-            updatelist = list(db["subs"][str(member.id)])
-            updatelist.remove(str(ctx.author.id))
-            db["subs"][str(member.id)] = updatelist
-            e = discord.Embed(title = "Success", description = f"Unsubscribed from `{member.name}`!", color = random.randint(0, 16777215))
-            await ctx.send(embed = e)
+      if str(member.id) != str(ctx.author.id):
+        if str(member.id) in db["account"]:
+          if str(ctx.author.id) in db["account"]:
+            if str(ctx.author.id) in db["subs"][str(member.id)]:
+              updatelist = list(db["subs"][str(member.id)])
+              updatelist.remove(str(ctx.author.id))
+              db["subs"][str(member.id)] = updatelist
+              e = discord.Embed(title = "Success", description = f"Unsubscribed from `{member.name}`!", color = random.randint(0, 16777215))
+              await ctx.send(embed = e)
+            else:
+              e = discord.Embed(title = "Error", description = "You're already unsubscribed from this person!", color = random.randint(0, 16777215))
+              await ctx.send(embed = e)
           else:
-            e = discord.Embed(title = "Error", description = "You're already unsubscribed from this person!", color = random.randint(0, 16777215))
+            e = discord.Embed(title = "Error", description = "You have no account...", color = random.randint(0, 16777215))
             await ctx.send(embed = e)
         else:
-          e = discord.Embed(title = "Error", description = "You have no account...", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Error", description = "They have no account...", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
       else:
-        e = discord.Embed(title = "Error", description = "They have no account...", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = "You can't unsubscribe from yourself", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Mention a person!", color = random.randint(0, 16777215))
