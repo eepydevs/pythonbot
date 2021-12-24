@@ -7,6 +7,7 @@ from replit import db
 responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definelty.", "You may rely on it.",
   "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", 
   "My sources say no.", "Outlook not so good...", "Very doubtful."]
+coinlist = ["Heads", "Tails"]
 
 
 class Fun(commands.Cog):
@@ -27,6 +28,15 @@ class Fun(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = "Type a question!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
+  
+  #coinflip command
+  @commands.command(aliases = ["coin"], help = "Flip a coin and get `Heads` or `Tails`", description = "Usage: pb!coinflip")
+  async def coinflip(self, ctx):
+    e = discord.Embed(title = "The coin flips...", description = "Wait for result", color = random.randint(0, 16777215))
+    msg = await ctx.send(embed = e)
+    await asyncio.sleep(1)
+    e = discord.Embed(title = "Coin landed", description = f"Results: {coinlist[random.randint(0, 1)]}", color = random.randint(0, 16777215))
+    await  msg.edit(embed = e)
 
   #random command
   @commands.command(aliases = ["rd", "rng"], help = "RNG", description = "You can randomize numbers with this command\nUsage: pb!random (N1) (N2)\nUsage 2: pb!random (N1)")
