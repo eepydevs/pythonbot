@@ -35,7 +35,7 @@ class Utility(commands.Cog):
   @commands.command(help = "Shows bot's info", description = "Usage: pb!botinfo")
   async def botinfo(self, ctx):
     e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by Number1#4325.\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(self.bot.guilds)} servers",  color = random.randint(0, 16777215))
-    e.add_field(name = "Contributors:", value = "icemay#6281 - Helper\nSenjienji#8317 - Helper, Tester\nBricked#7106 - Helper, Tester\nDark dot#5012 - Contributor, Tester\nTjMat#0001 - Contributor\nR3DZ3R#8150 - Contributor\nRage#6456 - Tester", inline = False)
+    e.add_field(name = "Contributors:", value = "icemay#6281 - Helper\nSenjienji#8317 - Helper, Tester\nBricked#7106 - Helper, Tester\nDark dot#5012 - Contributor, Tester\nTjMat#0001 - Contributor\nR3DZ3R#8150 - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
     await ctx.send(embed = e)
 
