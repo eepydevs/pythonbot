@@ -17,7 +17,7 @@ class Social(commands.Cog):
     self.bot = bot  
 
   #add account command
-  @commands.command(aliases = ["addacc"], help = "BETA")
+  @commands.command(aliases = ["addacc"], help = "Create your account in social media of Python Bot")
   async def addaccount(self, ctx):
     if str(ctx.author.id) not in db["account"]:
       db["account"][str(ctx.author.id)] = {}
@@ -29,7 +29,7 @@ class Social(commands.Cog):
       await ctx.send(embed = e)
 
   #post command
-  @commands.command(help = "BETA", description = "Has cooldown of 10 minutes")
+  @commands.command(help = "Post something", description = "Account required\nHas cooldown of 10 minutes")
   @commands.cooldown(rate = 1, per = 600, type = commands.BucketType.user)
   async def post(self, ctx, name = "Sample", *, text = "Sample text"):
     if str(ctx.author.id) in db["account"]:
@@ -44,7 +44,7 @@ class Social(commands.Cog):
       ctx.command.reset_cooldown(ctx)
 
   #remove post command
-  @commands.command(aliases = ["rpost"], help = "BETA")
+  @commands.command(aliases = ["rpost"], help = "Remove your post", description = "Account required")
   async def removepost(self, ctx, *, name = None):
     if str(ctx.author.id) in db["account"]:
       if name != None or name not in db["account"][str(ctx.author.id)]:
@@ -60,8 +60,30 @@ class Social(commands.Cog):
       e = discord.Embed(title = "Error", description = "Make an account!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
 
+  #my subs list command
+  #@commands.command(aliases = ["mysubslist"], help = "See your subscribers", description = "Account required")
+  #async def mysubscriberslist(self, ctx):
+    #if str(ctx.author.id) in db["account"]:
+      #if len(db["subs"][str(ctx.author.id)]) != 0:
+        #sublist = []
+        #sublist = ", ".join(f"{ctx.guild.get_member(list()[]).mention}" for i in list(db["subs"][str(ctx.author.id)]))
+        #dblist = list(db['subs'][str(ctx.author.id)])
+        #for i in range(len(dblist) - 1):
+          #if dblist[i - 1] in ctx.guild.members:
+            #sublist.append(ctx.guild.get_member(dblist[i - 1]))
+            
+        #e = discord.Embed(title = f"{ctx.author.name}'s Subscribers list:", description = f"Total subs counter: {len(sublist)}\n{str(sublist)}", color = random.randint(0, 16777215))
+        #await ctx.send(embed = e)
+      #else:
+        #e = discord.Embed(title = f"{ctx.author.name}'s Subscribers list:", description = "Sorry you have no subscribers :(", color = random.randint(0, 16777215))
+        #await ctx.send(embed = e)
+    #else:
+      #e = discord.Embed(title = "Error", description = "You have no account...", color = random.randint(0, 16777215))
+      #await ctx.send(embed = e)
+
+
   #overview command
-  @commands.command(aliases = ["ov"], help = "BETA")
+  @commands.command(aliases = ["ov"], help = "See people's profile", description = "Account required")
   async def overview(self, ctx, member: discord.Member = None):
     if member != None:
       if str(member.id) in db["account"]:
@@ -73,7 +95,7 @@ class Social(commands.Cog):
           names = list1[-1]
           texts = ""
           texts = list2[-1]
-          e = discord.Embed(title = f"{member.name}'s posts:", description = "posts here", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"{member.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(member.id)])}", color = random.randint(0, 16777215))
           e.add_field(name = names, value = texts)
           for i in range(len(list1) - 1):
             names = f"{list1[-i - 2]}"
@@ -82,7 +104,7 @@ class Social(commands.Cog):
           e.set_thumbnail(url = member.avatar)
           await ctx.send(embed = e)
         else:
-          e = discord.Embed(title = f"{member.name}'s posts:", description = f"Posts here\nSubcribers count: {len(db['subs'][str(member.id)])}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"{member.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(member.id)])}", color = random.randint(0, 16777215))
           e.set_thumbnail(url = member.avatar)
           e.add_field(name = "No posts here", value = "Check later!")
           await ctx.send(embed = e)
@@ -99,7 +121,7 @@ class Social(commands.Cog):
           names = list1[-1]
           texts = ""
           texts = list2[-1]
-          e = discord.Embed(title = f"{ctx.author.name}'s posts:", description = f"Posts here\nSubcribers count: {len(db['subs'][str(ctx.author.id)])}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"{ctx.author.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(ctx.author.id)])}", color = random.randint(0, 16777215))
           e.add_field(name = names, value = texts)
           for i in range(len(list1) - 1):
             names = f"{list1[-i - 2]}"
@@ -108,7 +130,7 @@ class Social(commands.Cog):
           e.set_thumbnail(url = ctx.author.avatar)
           await ctx.send(embed = e)
         else:
-          e = discord.Embed(title = f"{ctx.author.name}'s posts:", description = "posts here", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"{ctx.author.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(ctx.author.id)])}", color = random.randint(0, 16777215))
           e.set_thumbnail(url = ctx.author.avatar)
           e.add_field(name = "No posts here", value = "Check later!")
           await ctx.send(embed = e)
@@ -117,7 +139,7 @@ class Social(commands.Cog):
         await ctx.send(embed = e)
 
   #view command
-  @commands.command(help = "BETA")
+  @commands.command(help = "See people's last post", description = "Account required")
   async def view(self, ctx, member: discord.Member = None):
     if member != None:
       if str(member.id) in db["account"]:
@@ -172,7 +194,7 @@ class Social(commands.Cog):
       await ctx.send(embed = e)
 
   #unsubscribe command
-  @commands.command(aliases = ["unsub"], help = "Subscribe to people", description = "Subscribe to people\nAccount required")
+  @commands.command(aliases = ["unsub"], help = "Unsubscribe from people", description = "Unsubscribe from people\nAccount required")
   async def unsubscribe(self, ctx, *, member: discord.Member = None):
     if member != None:
       if str(member.id) != str(ctx.author.id):
