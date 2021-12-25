@@ -4,7 +4,9 @@ import random
 import asyncio
 from replit import db
 
-responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.",  "My sources say no.", "Outlook not so good...", "Very doubtful.", "Better not to tell you right now"]
+responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definelty.", "You may rely on it.",
+  "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", 
+  "My sources say no.", "Outlook not so good...", "Very doubtful."]
 
 
 class Fun(commands.Cog):
@@ -18,9 +20,9 @@ class Fun(commands.Cog):
 
   #8ball command
   @commands.command(aliases = ["8ball"], help = "Say any question and 8ball will answer!", description = "Usage: pb!eightball (text)")
-  async def eightball(self, ctx, *, text = None):
-    if text != None and text != "_ _" and text != " ឵឵":
-      e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {responselist[random.randint(0, int(len(responselist)))]}", color = random.randint(0, 16777215))
+  async def eightball(self, ctx, *, text = ""):
+    if text != "":
+      e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {responselist[random.randint(0, int(len(responselist) - 1))]}", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Type a question!", color = random.randint(0, 16777215))

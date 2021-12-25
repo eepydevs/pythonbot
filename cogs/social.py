@@ -97,7 +97,7 @@ class Social(commands.Cog):
           texts = list2[-1]
           e = discord.Embed(title = f"{member.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(member.id)])}", color = random.randint(0, 16777215))
           e.add_field(name = names, value = texts)
-          for i in range(len(list1)):
+          for i in range(len(list1) - 1):
             names = f"{list1[-i - 2]}"
             texts = f"{list2[-i - 2]}"
             e.add_field(name = names, value = texts)
@@ -123,7 +123,7 @@ class Social(commands.Cog):
           texts = list2[-1]
           e = discord.Embed(title = f"{ctx.author.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(ctx.author.id)])}", color = random.randint(0, 16777215))
           e.add_field(name = names, value = texts)
-          for i in range(len(list1)):
+          for i in range(len(list1) - 1):
             names = f"{list1[-i - 2]}"
             texts = f"{list2[-i - 2]}"
             e.add_field(name = names, value = texts)
