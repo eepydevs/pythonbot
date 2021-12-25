@@ -120,6 +120,42 @@ class Fun(commands.Cog):
         e = discord.Embed(title = "Incorrect", description = f"The right answer was {answer}", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
 
+  #guess the number command
+  @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave` to stop playing")
+  async def guessthenumber(self, ctx):
+    botnum = random.randint(10, 100)
+    e = discord.Embed(title = "Guess the number!", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
+    while True:
+      message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 30)
+      if message.content.lower() != "stop" or message.content.lower() != "close" or message.content.lower() != "leave":
+        try:
+          if int(message.content) == botnum:
+            rng = random.randint(250, 1000)
+            e = discord.Embed(title = "Correct!", description = f"Congrats you won\nIt was {botnum}", color = random.randint(0, 16777215))
+            await ctx.send(embed = e)
+            break
+          elif int(message.content) < botnum:
+            e = discord.Embed(title = "Incorrect", description = f"Try higher", color = random.randint(0, 1677215))
+            await ctx.send(embed = e)
+          elif int(message.content) > botnum:
+            e = discord.Embed(title = "Incorrect", description = f"Try lower", color = random.randint(0, 1677215))
+            await ctx.send(embed = e)
+        except asyncio.TimeoutError:
+          rng = random.randint(50, 250)
+          db["balance"][str(ctx.author.id)] += rng
+          e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+        except ValueError:
+          rng = random.randint(50, 250)
+          db["balance"][str(ctx.author.id)] += rng
+          e = discord.Embed(title = "Input error: Try again", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+      else:
+        e = discord.Embed(title = "You left", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+        break
+
   #rps command
   @commands.command(help = "Play rock paper scissors", description = "Moves: Rock, Paper, Scissors")
   async def rps(self, ctx):
