@@ -339,9 +339,9 @@ class Economy(commands.Cog):
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
   async def search(self, ctx):
     place = ["Car", "Forest", "House", "Grass", "Bushes", "Pocket", "Space", "Discord", "Castle", "Basement", "Street"]
-    place1 = place.pop(random.randint(0, int(len(place) - 1)))
-    place2 = place.pop(random.randint(0, int(len(place) - 1)))
-    place3 = place.pop(random.randint(0, int(len(place) - 1)))
+    place1 = place.pop(random.randint(0, int(len(place))))
+    place2 = place.pop(random.randint(0, int(len(place))))
+    place3 = place.pop(random.randint(0, int(len(place))))
     view = discord.ui.View(timeout = 30)
     view.add_item(discord.ui.Select(placeholder = "Select an option", options = [discord.SelectOption(label = place1, emoji = "1️⃣", value = place1), discord.SelectOption(label = place2, emoji = "2️⃣", value = place2), discord.SelectOption(label = place3, emoji = "3️⃣", value = place3)]))
     e = discord.Embed(title = "Search", description = "Search one of places below to get some cash!", color = random.randint(0, 16777215))

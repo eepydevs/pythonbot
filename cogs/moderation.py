@@ -27,7 +27,7 @@ class Moderation(commands.Cog):
     await member.send(embed = e)
     
     await member.kick()
-    kquote = modquotes[random.randint(0, len(modquotes) - 1)]
+    kquote = modquotes[random.randint(0, len(modquotes))]
     e = discord.Embed(title = "Success", description = f"Successfully kicked {member.mention}! {kquote}", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
 
@@ -40,7 +40,7 @@ class Moderation(commands.Cog):
     await member.send(embed = e)
 
     await member.ban(reason = reason)
-    bquote = modquotes[random.randint(0, len(modquotes) - 1)]
+    bquote = modquotes[random.randint(0, len(modquotes))]
     e = discord.Embed(title = "Success", description = f"Successfully banned {member.mention}! {bquote}", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
 
@@ -82,7 +82,7 @@ class Moderation(commands.Cog):
       if num1 < 100:
         await ctx.message.delete()
         await ctx.channel.purge(limit = num1)
-        pquote = purgequotes[random.randint(0, len(purgequotes) - 1)]
+        pquote = purgequotes[random.randint(0, len(purgequotes))]
         e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))
         await ctx.send(embed = e, delete_after = 5)
         #await asyncio.sleep(5)
@@ -154,7 +154,7 @@ class Moderation(commands.Cog):
         list = db["warns"][str(member.id)]
         text = ""
         text += f"1. `{list[0]}`"
-        for i in range(len(list) - 1):
+        for i in range(len(list)):
           text += f"\n{i + 2}. `{list[i + 1]}`"
         e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
         await ctx.send(embed = e)

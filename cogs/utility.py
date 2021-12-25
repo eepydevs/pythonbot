@@ -105,7 +105,7 @@ class Utility(commands.Cog):
       e.set_footer(text = f"ID: {member.id}")
       await ctx.send(embed = e)
     else:
-      rgwai = waiquotes[random.randint(0, len(waiquotes) - 1)]
+      rgwai = waiquotes[random.randint(0, len(waiquotes))]
       role_list = []
 
       for role in ctx.author.roles:
@@ -160,7 +160,7 @@ class Utility(commands.Cog):
       msg = await ctx.send(embed = e)
       num = 1
       list = [option1, option2, option3, option4, option5]
-      for i in range(len(pollemojis) - 1):
+      for i in range(len(pollemojis)):
         if not list[i] == "": await msg.add_reaction(pollemojis[i])
         num += 1
     else:
