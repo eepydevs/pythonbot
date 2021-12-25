@@ -6,7 +6,7 @@ from replit import db
 
 responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definelty.", "You may rely on it.",
   "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", 
-  "My sources say no.", "Outlook not so good...", "Very doubtful."]
+  "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly.."]
 
 
 class Fun(commands.Cog):
