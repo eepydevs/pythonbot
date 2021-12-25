@@ -124,6 +124,7 @@ class Fun(commands.Cog):
   @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave` to stop playing")
   async def guessthenumber(self, ctx):
     botnum = random.randint(10, 100)
+    tries = 1
     e = discord.Embed(title = "Guess the number!", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
     while True:
@@ -131,16 +132,22 @@ class Fun(commands.Cog):
       if message.content.lower() != "stop" or message.content.lower() != "close" or message.content.lower() != "leave":
         try:
           if int(message.content) == botnum:
+            tries += 1
             rng = random.randint(250, 1000)
             e = discord.Embed(title = "Correct!", description = f"Congrats you won\nIt was {botnum}", color = random.randint(0, 16777215))
+            e.set_footer(text = f"Took you: {tries} tries")
             await ctx.send(embed = e)
             break
           elif int(message.content) < botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try higher", color = random.randint(0, 1677215))
+            e.set_footer(text = f"{tries} Tries")
             await ctx.send(embed = e)
+            tries += 1
           elif int(message.content) > botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try lower", color = random.randint(0, 1677215))
+            e.set_footer(text = f"{tries} Tries")
             await ctx.send(embed = e)
+            tries += 1
         except asyncio.TimeoutError:
           rng = random.randint(50, 250)
           db["balance"][str(ctx.author.id)] += rng
