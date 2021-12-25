@@ -21,6 +21,7 @@ class Moderation(commands.Cog):
   #kick command
   @commands.command(help = "Kick mentioned member", description = "This command is for admins only\nYou can kick members with this command\nUsage: pb!kick (@mention)")
   @commands.has_permissions(kick_members = True)
+  @commands.bot_has_permissions(kick_members = True)
   async def kick(self, ctx, member: discord.Member): 
     e = discord.Embed(title = "Pwned!", description = f"You were kicked from server {ctx.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(ctx.guild.icon))
@@ -34,6 +35,7 @@ class Moderation(commands.Cog):
   #ban command
   @commands.command(help = "Ban mentioned member", description = "This command is for admins only\nYou can ban members with this command\nUsage: pb!ban (@mention) [reason]")
   @commands.has_permissions(ban_members = True)
+  @commands.bot_has_permissions(ban_members = True)
   async def ban(self, ctx, member: discord.Member, *, reason = None):
     e = discord.Embed(title = "Banned!", description = f"You were banned from server {ctx.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(ctx.guild.icon))
@@ -47,6 +49,7 @@ class Moderation(commands.Cog):
   #timeout command
   @commands.command(aliases = ["mute"], help = "Mute/Timeout mentioned member", description = "This command is for admins only\nYou can mute/timeout members with this command\nUsage: pb!timeout (user) (duration)")
   @commands.has_permissions(moderate_members = True)
+  @commands.bot_has_permissions(moderate_members = True)
   async def timeout(self, ctx, member: discord.Member = None, duration = "1d"):
     if member != None:
       if duration.endswith("d"):
@@ -65,6 +68,7 @@ class Moderation(commands.Cog):
   #unban command
   @commands.command(help = "Unban mentioned member", description = "This command is for admins only\nYou can unban members with this command\nUsage: pb!unban (user) [reason]")
   @commands.has_permissions(ban_members = True)
+  @commands.bot_has_permissions(ban_members = True)
   async def unban(self, ctx, member: discord.Member, *, reason = None):
     e = discord.Embed(title = "Unbanned!", description = f"You were unbanned from server {ctx.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(ctx.guild.icon))
@@ -77,6 +81,7 @@ class Moderation(commands.Cog):
   #purge command
   @commands.command(aliases = ["purge", "c"],help = "Purge messages", description = "This command is for admins only\nYou can clear N amount of messages with this command\nUsage: pb!clear (num)")
   @commands.has_permissions(manage_channels = True)
+  @commands.bot_has_permissions(manage_channels = True)
   async def clear(self, ctx, num1: int):
     if num1 > 0:
       if num1 < 100:
@@ -95,6 +100,7 @@ class Moderation(commands.Cog):
   #pin command
   @commands.command(help = "Pin a message", description = "This is useless command don't use it\nUsage: Reply a message and type pb!pin\nUsage 2: pb!pin (message id)")
   @commands.has_permissions(manage_channels = True)
+  @commands.bot_has_permissions(manage_channels = True)
   async def pin(self, ctx, message: discord.Message = None):
     if message == None and ctx.message.reference.resolved != None:
       await ctx.message.reference.resolved.pin()
@@ -127,6 +133,7 @@ class Moderation(commands.Cog):
 
   @commands.command(help = "Warn people (BETA)")
   @commands.has_permissions(kick_members = True)
+  @commands.bot_has_permissions(kick_members = True)
   async def warn(self, ctx, member: discord.Member = None, *, reason = "None"):
     if member != None:
       if str(member.id) not in db["warns"]:
@@ -148,6 +155,7 @@ class Moderation(commands.Cog):
 
   @commands.command(help = "See people's warns (BETA)")
   @commands.has_permissions(kick_members = True)
+  @commands.bot_has_permissions(kick_members = True)
   async def warns(self, ctx, member: discord.Member = None):
     if member != None:
       if str(member.id) in db["warns"] and db["warns"][str(member.id)] != []:
@@ -167,6 +175,7 @@ class Moderation(commands.Cog):
 
   @commands.command(aliases = ["rwarn"], help = "Remove people's warns (BETA)")
   @commands.has_permissions(kick_members = True)
+  @commands.bot_has_permissions(kick_members = True)
   async def removewarn(self, ctx, member: discord.Member, index: int):
     if member != None:
       if str(member.id) in db["warns"] and db["warns"][str(member.id)] != []:
