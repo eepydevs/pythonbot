@@ -13,6 +13,20 @@ whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 6915
 def shuffle(x):
   return random.sample(x, len(x))
 
+def calc(text):
+  check = text.split(" ")
+  whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "=", "(", ")"]
+  for i in range(len(check)):
+    if len(check[i]) < 10:
+      continue
+    else:
+      raise Exception("Maximum amount of characters per spaced string is 10!")
+  if not any(i in text for i in whitelist):
+    raise Exception("Something went wrong... (You may have used non-int)")
+  else:
+    return eval(text)
+
+
 
 class Nonsense(commands.Cog):
   def __init__(self, bot):
@@ -48,6 +62,12 @@ class Nonsense(commands.Cog):
       e = discord.Embed(title = "Error", description = error, color = random.randint(0, 16777215))
       await ctx.send(embed = e)
       await ctx.message.add_reaction("❌")
+  
+  #calculator command
+  @commands.command(aliases = ["calc"], help = "Calculate anything you need! (basic math)", description = "Usage: pb!calculator (equation)\nExample: pb!calculator 1 + 2\nOutput: 3")
+  async def calculator(self, ctx, *, equation):
+    e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
   
   #embed command
   @commands.command(aliases = ["emb"], help = "Makes embed with title, description and footer", description = "You can make embeds with this command\nUsage: `pb!embed (title) (description) (footer)`\nExample: `pb!embed \"Hello title!\" \"Hello description!\" \"Hello footer!\"`")

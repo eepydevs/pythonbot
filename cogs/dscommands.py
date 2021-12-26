@@ -41,10 +41,13 @@ class TestingCommands(commands.Cog):
             await ctx.send(f"{number1} + {number2} = {random.randint(-int(number1), int(number2))}")
         except ValueError:
             await ctx.send("Something went wrong...")
-
+    
+    @commands.command(help="a", description="Usage: pb!a")
+    async def a(self, ctx):
+      await ctx.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 def setup(bot):
     bot.add_cog(TestingCommands(bot))
 
-# Jokes aside, Thanks to Number2D for the bot, and for inspiring me to work on his discord bot, and even have my own command library.
+#DancingSmurf: Jokes aside, Thanks to Number2D for the bot, and for inspiring me to work on his discord bot, and even have my own cog library.
 #number1: its actually called cog/category but okay
 #number1: no problem
