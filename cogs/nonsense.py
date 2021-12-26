@@ -66,8 +66,12 @@ class Nonsense(commands.Cog):
   #calculator command
   @commands.command(aliases = ["calc"], help = "Calculate anything you need! (basic math)", description = "Usage: pb!calculator (equation)\nExample: pb!calculator 1 + 2\nOutput: 3")
   async def calculator(self, ctx, *, equation):
-    e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+    try:
+      e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+    except:
+      e = discord.Embed(title = "Calculator", description = "Something went wrong... (You may have used non-int)", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
   
   #embed command
   @commands.command(aliases = ["emb"], help = "Makes embed with title, description and footer", description = "You can make embeds with this command\nUsage: `pb!embed (title) (description) (footer)`\nExample: `pb!embed \"Hello title!\" \"Hello description!\" \"Hello footer!\"`")
@@ -235,7 +239,8 @@ class Nonsense(commands.Cog):
     await ctx.send(emoji.url)
 
   #create invite command
-  @commands.command(aliases = ["cinvite"], help = "Create an invite for server youre currently in", description = "Send help\nExample: pb!createinvite 1 (after 1 days invite expires) 0 (0 = infinity uses)\nNote: Max days: 7, max uses: 100\nHas cooldown of 1 minute")
+  #fixed annoying spelling mistake
+  @commands.command(aliases = ["cinvite"], help = "Create an invite for server you're currently in", description = "Send help\nExample: pb!createinvite 1 (after 1 days invite expires) 0 (0 = infinity uses)\nNote: Max days: 7, max uses: 100\nHas cooldown of 1 minute")
   @commands.cooldown(rate = 1, per = 60, type = commands.BucketType.user)
   async def createinvite(self, ctx, days: int = 7, uses: int = 0):
     try:

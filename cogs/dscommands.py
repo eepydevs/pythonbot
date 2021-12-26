@@ -46,8 +46,7 @@ class TestingCommands(commands.Cog):
     async def a(self, ctx):
       await ctx.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 def setup(bot):
-    bot.add_cog(TestingCommands(bot))
+    bot.add_cog(dscommands(bot))
 
 #DancingSmurf: Jokes aside, Thanks to Number2D for the bot, and for inspiring me to work on his discord bot, and even have my own cog library.
-#number1: its actually called cog/category but okay
 #number1: no problem
