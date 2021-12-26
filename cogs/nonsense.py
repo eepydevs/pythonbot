@@ -26,8 +26,6 @@ def calc(text):
   else:
     return eval(text)
 
-
-
 class Nonsense(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
@@ -250,6 +248,13 @@ class Nonsense(commands.Cog):
     except ValueError:
       await ctx.send("Error: Alls the arguments must be ints!")
       ctx.command.reset_cooldown(ctx)
+
+  #youare command
+  @commands.command(aliases = ["imare"], help = "See how you are N% _____ (nice, cool for example)", description = "Usage: pb!youare (text)\nExample: `pb!youare Nice`\nOutput: You are 65% Nice")
+  async def youare(self, ctx, *, text = ""):
+    percentage = random.randint(0, 100)
+    e = discord.Embed(title = f"{ctx.author.name},", description = f"You are {percentage}% {text}", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
       
 def setup(bot):
   bot.add_cog(Nonsense(bot))
