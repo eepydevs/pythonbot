@@ -15,7 +15,7 @@ def textSM(text):
 			return f"{text} are good"
 	return f"{text} is good"
 
-class TestingCommands(commands.Cog):
+class dscommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -42,7 +42,7 @@ class TestingCommands(commands.Cog):
         except ValueError:
             await ctx.send("Something went wrong...")
     
-    @commands.command(help="a", description="Usage: pb!a")
+    @commands.command(help="a", description="Usage: pb!aaaa")
     async def a(self, ctx):
       await ctx.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 def setup(bot):

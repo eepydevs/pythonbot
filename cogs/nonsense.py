@@ -15,7 +15,7 @@ def shuffle(x):
 
 def calc(text):
   check = text.split(" ")
-  whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "=", "(", ")"]
+  whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "(", ")"]
   for i in range(len(check)):
     if len(check[i]) < 10:
       continue

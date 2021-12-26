@@ -35,7 +35,7 @@ class Bot(commands.Cog):
         await ctx.send(embed = e)
 
   #add db command
-  @commands.command(aliases = ["adb", "a"], help = "Add database key", description = "bot owner only", hidden = True)
+  @commands.command(aliases = ["adb"], help = "Add database key", description = "bot owner only", hidden = True)
   @commands.is_owner()
   async def adddb(self, ctx, key = None, value = None):
     if key != None:
