@@ -35,7 +35,7 @@ class Utility(commands.Cog):
   @commands.command(help = "Shows bot's info", description = "Usage: pb!botinfo")
   async def botinfo(self, ctx):
     e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by Number1#4325.\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(self.bot.guilds)} servers",  color = random.randint(0, 16777215))
-    e.add_field(name = "Contributors:", value = "icemay#6281 - Helper\nSenjienji#8317 - Helper, Tester\nBricked#7106 - Helper, Tester\nDark dot#5012 - Contributor, Tester\nTjMat#0001 - Contributor\nR3DZ3R#8150 - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", inline = False)
+    e.add_field(name = "Contributors:", value = "DancingSmurf#0444 - Scripter, Contributor\nicemay#6281 - Helper\nSenjienji#8317 - Helper, Tester\nBricked#7106 - Helper, Tester\nDark dot#5012 - Contributor, Tester\nTjMat#0001 - Contributor\nR3DZ3R#8150 - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
     await ctx.send(embed = e)
 
@@ -47,7 +47,8 @@ class Utility(commands.Cog):
     e = discord.Embed(title = f"Server info: {ctx.guild.name}", description = f"Icon url: {str(ctx.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(ctx.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
     e.add_field(name = "Members", value = f"Total: {ctx.guild.member_count}\nHumans: {ctx.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}", inline = False)
     e.add_field(name = "Moderation", value = f"Server owner: {ctx.guild.owner.name}\nVerification level: {str(ctx.guild.verification_level)}\nNumber of roles: {role_count}\nNumber of channels: {len(ctx.guild.channels)}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots), inline = False)
-    e.set_thumbnail(url = str(ctx.guild.icon))
+    if ctx.guild.icon != None:
+      e.set_thumbnail(url = str(ctx.guild.icon))
     e.set_footer(text = f"ID: {ctx.guild.id}")
     await ctx.send(embed = e)
 

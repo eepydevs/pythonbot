@@ -53,7 +53,7 @@ async def on_ready():
   await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python Bot help | Restarted"))
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python bot help | Made on Python 3.8.2!"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python Bot help | Made on Python 3.8.2!"))
 
 #load extension command
 @bot.command(aliases = ["l"], help = "load extension", description = "bot owner only\nusage: ?load (extension)", hidden = True)
@@ -83,5 +83,5 @@ for filename in os.listdir('./cogs'):
   if filename.endswith('.py') and filename not in []:
     bot.load_extension(f'cogs.{filename[:-3]}')
 
-keep_alive()
+keep_alive() # Keeps alive the bot thing
 bot.run(os.getenv('TOKEN'))

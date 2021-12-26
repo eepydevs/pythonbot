@@ -7,7 +7,7 @@ import datetime, time
 from replit import db
 
 
-whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392]
+whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092]
 
 def shuffle(x):
   return random.sample(x, len(x))
@@ -25,7 +25,7 @@ class Nonsense(commands.Cog):
     
 
   #eval command
-  @commands.command(aliases = ["e"], help = "Execute python code (limited)", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST\nExecute python code and see results\nexample: pb!eval random.randint(0, 10)", hidden = True)
+  @commands.command(aliases = ["e"], help = "Execute python code (limited)", description = "ONLY FOR PEOPLE/COMMANDS THAT ARE IN WHITELIST\nExecute python code and see results\nexample: pb!eval random.randint(0, 10)", hidden = True)
   @commands.check(lambda ctx: ctx.author.id in whitelist_id)
   async def eval(self, ctx, *, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]

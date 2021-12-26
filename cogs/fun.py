@@ -19,13 +19,13 @@ class Fun(commands.Cog):
     await ctx.send(f"{text}")
 
   #8ball command
-  @commands.command(aliases = ["8ball"], help = "Say any question and 8ball will answer!", description = "Usage: pb!eightball (text)")
+  @commands.command(aliases = ["8ball"], help = "Say any Y/N question and 8ball will answer!", description = "Usage: pb!eightball (text)")
   async def eightball(self, ctx, *, text = ""):
     if text != "":
       e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {responselist[random.randint(0, int(len(responselist) - 1))]}", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
     else:
-      e = discord.Embed(title = "Error", description = "Type a question!", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Error", description = "Type a Y/N question!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
   
   #coinflip command
@@ -129,10 +129,9 @@ class Fun(commands.Cog):
     await ctx.send(embed = e)
     while True:
       message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 30)
-      if message.content.lower() != "stop" or message.content.lower() != "close" or message.content.lower() != "leave":
+      if message.content.lower() != "stop" and message.content.lower() != "close" and message.content.lower() != "leave":
         try:
           if int(message.content) == botnum:
-            tries += 1
             rng = random.randint(250, 1000)
             e = discord.Embed(title = "Correct!", description = f"Congrats you won\nIt was {botnum}", color = random.randint(0, 16777215))
             e.set_footer(text = f"Took you: {tries} tries")
@@ -149,6 +148,11 @@ class Fun(commands.Cog):
             await ctx.send(embed = e)
             tries += 1
         except asyncio.TimeoutError:
+          rng = random.randint(50, 250)
+          db["balance"][str(ctx.author.id)] += rng
+          e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+        except TimeoutError:
           rng = random.randint(50, 250)
           db["balance"][str(ctx.author.id)] += rng
           e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
