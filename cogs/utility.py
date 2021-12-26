@@ -6,7 +6,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "4.85.27" # major.sub.fix
+botbuild = "4.90.28" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
@@ -306,3 +306,6 @@ class Utility(commands.Cog):
 
 def setup(bot):
   bot.add_cog(Utility(bot))
+
+
+  #DancingSmurf: Explain this, please.

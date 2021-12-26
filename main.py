@@ -80,7 +80,7 @@ async def unload(ctx, extension):
 
 #load cogs
 for filename in os.listdir('./cogs'):   
-  if filename.endswith('.py') and filename not in ["mycommands.py"]:
+  if filename.endswith('.py') and filename not in ["dscommands.py"]:
     bot.load_extension(f'cogs.{filename[:-3]}')
 
 keep_alive() # Keeps alive the bot thing
