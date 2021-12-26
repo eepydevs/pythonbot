@@ -268,7 +268,7 @@ class Utility(commands.Cog):
       await ctx.send(embed = e)
 
   @note.command(help = "Deletes selected note")
-  async def delete(self, ctx, name = None):
+  async def delete(self, ctx, *, name = None):
     if str(ctx.author.id) in db["notes"]:
       if name != None:
         if name in db["notes"][str(ctx.author.id)]:
