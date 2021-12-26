@@ -9,8 +9,8 @@ botbuild = "4.85.27" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
-waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro"]
-pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
+waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro", "You are the best!"]
+pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
 if "afk" not in db:
   db["afk"] = {}
@@ -155,9 +155,9 @@ class Utility(commands.Cog):
 
   #poll command
   @commands.command(help = "Make polls")
-  async def poll(self, ctx, name = None, option1 = "", option2 = "", option3 = "", option4 = "", option5 = ""):
+  async def poll(self, ctx, name = None, option1 = "", option2 = "", option3 = "", option4 = "", option5 = "", option6 = "", option7 = "", option8 = "", option9 = "", option10 = ""):
     if name != None:
-      e = discord.Embed(title = f"Poll from {ctx.author.name}: {name}", description = f"{pollemojis[0] if not option1 == '' else ''} {option1}\n{pollemojis[1] if not option2 == '' else ''} {option2}\n{pollemojis[2] if not option3 == '' else ''} {option3}\n{pollemojis[3] if not option4 == '' else ''} {option4}\n{pollemojis[4] if not option5 == '' else ''} {option5}", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"Poll from {ctx.author.name}: {name}", description = f"{pollemojis[0] if not option1 == '' else ''} {option1}\n{pollemojis[1] if not option2 == '' else ''} {option2}\n{pollemojis[2] if not option3 == '' else ''} {option3}\n{pollemojis[3] if not option4 == '' else ''} {option4}\n{pollemojis[4] if not option5 == '' else ''} {option5}\n{pollemojis[5] if not option6 == '' else ''} {option6}\n{pollemojis[6] if not option7 == '' else ''} {option7}\n{pollemojis[7] if not option8 == '' else ''} {option8}\n{pollemojis[8] if not option9 == '' else ''} {option9}\n{pollemojis[9] if not option10 == '' else ''} {option10}", color = random.randint(0, 16777215))
       msg = await ctx.send(embed = e)
       num = 1
       list = [option1, option2, option3, option4, option5]
