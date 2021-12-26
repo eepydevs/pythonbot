@@ -46,9 +46,10 @@ class dscommands(commands.Cog):
     async def a(self, ctx):
       await ctx.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-    @commands.command(help="Makes your sentence look like it came from someone with dyslexia.", description="Usage: pb!dyslexia")
-    async def b(self, ctx, *, text):
-      await ctx.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    @commands.command(help="Makes your sentence look like it came from someone with dyslexia.", description="Usage: pb!dys text")
+    async def dys(self, ctx, *, text):
+      modtext = " ".join(str().join(random.sample(i, len(i))) for i in text.split())
+      await ctx.send(f"{modtext}")
 
 def setup(bot):
     bot.add_cog(dscommands(bot))
