@@ -32,11 +32,15 @@ class TestingCommands(commands.Cog):
             await ctx.send(f"Testing command! My second ever command.\nAlso {textSM(text)}!")
             
     @commands.command(help="I do not know! Now with a number and text parameter.", description="Usage: pb!nwpttest")
-    async def nwpttest(self, ctx, number, text):
+    async def nwpttest(self, ctx, number, *, text):
         await ctx.send(f"Testing command! My third ever command. {number}, {text}. What do they have in common? They are all typed by {ctx.author.name}!")
-        @commands.command(help="Calculator, but wrong. Addition only supported right now.", description="Usage: pb!calcwrong number number")
-        async def nwpttest(self, ctx,):
-           await ctx.send(f"Testing command! My third ever command. {number}, {text}. What do they have in common? They are all typed by {ctx.author.name}!")
+        
+    @commands.command(help="Calculator, but wrong. Addition only supported right now.", description="Usage: pb!calcwrong number1 number2")
+    async def calcwrong(self, ctx, number1, number2):
+        try:
+            await ctx.send(f"{number1} + {number2} = {random.randint(-int(number1), int(number2))}")
+        except ValueError:
+            await ctx.send("Something went wrong...")
 
 def setup(bot):
     bot.add_cog(TestingCommands(bot))
