@@ -250,7 +250,7 @@ class Nonsense(commands.Cog):
       ctx.command.reset_cooldown(ctx)
 
   #youare command
-  @commands.command(aliases = ["imare"], help = "See how you are N% _____ (nice, cool for example)", description = "Usage: pb!youare (text)\nExample: `pb!youare Nice`\nOutput: You are 65% Nice")
+  @commands.command(aliases = ["imare"], help = "See how you are `N% _____` (nice, cool for example)", description = "Usage: pb!youare (text)\nExample: `pb!youare Nice`\nOutput: You are 65% Nice")
   async def youare(self, ctx, *, text = ""):
     percentage = random.randint(0, 100)
     e = discord.Embed(title = f"{ctx.author.name},", description = f"You are {percentage}% {text}", color = random.randint(0, 16777215))
