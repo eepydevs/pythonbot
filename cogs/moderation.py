@@ -56,12 +56,23 @@ class Moderation(commands.Cog):
       if duration.endswith("d"):
         timeoutduration = 86400 * int(duration[:-1])
         await member.timeout(duration = timeoutduration)
+        e = discord.Embed(title = f"{member.name} Got timeout", description = f"Duration {int(duration[:-1])} days", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
       elif duration.endswith("s"):
         timeoutduration = int(duration[:-1])
         await member.timeout(duration = timeoutduration)
+        e = discord.Embed(title = f"{member.name} Got timeout", description = f"Duration: {int(duration[:-1])} seconds", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
       elif duration.endswith("h"):
         timeoutduration = 3600 * int(duration[:-1])
         await member.timeout(duration = timeoutduration)
+        e = discord.Embed(title = f"{member.name} Got timeout", description = f"Duration: {int(duration[:-1])} hours", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+      elif duration.endswith("m"):
+        timeoutduration = 60 * int(duration[:-1])
+        await member.timeout(duration = timeoutduration)
+        e = discord.Embed(title = f"{member.name} Got timeout", description = f"Duration: {int(duration[:-1])} minutes", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Mention a member!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
