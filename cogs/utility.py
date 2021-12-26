@@ -160,8 +160,8 @@ class Utility(commands.Cog):
       e = discord.Embed(title = f"Poll from {ctx.author.name}: {name}", description = f"{pollemojis[0] if not option1 == '' else ''} {option1}\n{pollemojis[1] if not option2 == '' else ''} {option2}\n{pollemojis[2] if not option3 == '' else ''} {option3}\n{pollemojis[3] if not option4 == '' else ''} {option4}\n{pollemojis[4] if not option5 == '' else ''} {option5}\n{pollemojis[5] if not option6 == '' else ''} {option6}\n{pollemojis[6] if not option7 == '' else ''} {option7}\n{pollemojis[7] if not option8 == '' else ''} {option8}\n{pollemojis[8] if not option9 == '' else ''} {option9}\n{pollemojis[9] if not option10 == '' else ''} {option10}", color = random.randint(0, 16777215))
       msg = await ctx.send(embed = e)
       num = 1
-      list = [option1, option2, option3, option4, option5]
-      for i in range(len(pollemojis) - 1):
+      list = [option1, option2, option3, option4, option5, option6, option7, option8, option9, option10]
+      for i in range(len(pollemojis)):
         if not list[i] == "": await msg.add_reaction(pollemojis[i])
         num += 1
     else:
