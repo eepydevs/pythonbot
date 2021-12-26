@@ -76,8 +76,8 @@ class Economy(commands.Cog):
         await ctx.send(embed = e)
       
 
-  #work command
-  @commands.command(help = "Work and get some cash", description = "Work to get some cash\nHas cooldown of 30 minutes")
+  #work esta- I mean command!
+  @commands.command(help = "Work and get some cash, exactly like capitalism, only virtual and you get very little reward!", description = "Work to get some cash\nHas cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 60 * 30, type = commands.BucketType.user)
   async def work(self, ctx):
     if str(ctx.author.id) in db["balance"]:

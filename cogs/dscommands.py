@@ -44,3 +44,7 @@ class TestingCommands(commands.Cog):
 
 def setup(bot):
     bot.add_cog(TestingCommands(bot))
+
+# Jokes aside, Thanks to Number2D for the bot, and for inspiring me to work on his discord bot, and even have my own command library.
+#number1: its actually called cog/category but okay
+#number1: no problem
