@@ -98,6 +98,7 @@ class Moderation(commands.Cog):
     if num1 > 0:
       if num1 < 100:
         await ctx.message.delete()
+        await asyncio.sleep(1)
         await ctx.channel.purge(limit = num1)
         pquote = purgequotes[random.randint(0, len(purgequotes) - 1)]
         e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))

@@ -24,9 +24,68 @@ if "shop" not in db:
 if "inventory" not in db:
   db["inventory"] = {}
 
+def iteminfo(name):
+  if name == "Computer":
+    return "Usable: hack Command/False\nType: Item\nInfo: You can hack people's data on this"
+  if name == "Laptop":
+    return "Usable: postmeme Command/False\nType: Item\nInfo: You can post memes on this"
+  if name == "Smartphone":
+    return "Usable: mail Command/False\nType: Item\nInfo: You can mail someone with this"
+  if name == "Discount card":
+    return "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!"
+
+
 class Economy(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
+
+  #item group
+  @commands.group(help = "See what you can do with your item")
+  async def item(self, ctx):
+    if ctx.invoked_subcommand == None:
+      e = discord.Embed(title = "This is the item command", description = "Use pb!help item to see the subcommands", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+  
+  #info command
+  @item.command(help = "See what you can do with your item")
+  async def info(self, ctx, itemname = None):
+    if str(ctx.author.id) in db["inventory"]:
+      item = itemname.lower().capitalize()
+      if item != None:
+        if item in db["inventory"][str(ctx.author.id)]:
+          e = discord.Embed(title = f"Item: {item}", description = f"{iteminfo(item)}", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+        else:
+          e = discord.Embed(title = "Error", description = f"You don't have `{itemname}` in your inventory...", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "You can't use nothing!", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You have nothing right now!", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+
+  #use command
+  @item.command(help = "Use an item")
+  async def use(self, ctx, itemname = None):
+    if str(ctx.author.id) in db["inventory"]:
+      item = itemname.lower().capitalize()
+      if item != None:
+        if item in db["inventory"][str(ctx.author.id)]:
+          if item in []:
+            pass
+          else:
+            e = discord.Embed(title = "Error", description = f"Item `{itemname}` can't be used", color = random.randint(0, 16777215))
+            await ctx.send(embed = e)
+        else:
+          e = discord.Embed(title = "Error", description = f"You don't have `{itemname}` in your inventory...", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "You can't use nothing!", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You have nothing right now!", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
 
   #balance command
   @commands.command(aliases = ["bal", "cash", "money"], help = "Look how much cash you have", description = "Youre poor")
