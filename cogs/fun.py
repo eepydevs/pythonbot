@@ -122,7 +122,7 @@ class Fun(commands.Cog):
         await ctx.send(embed = e)
 
   #guess the number command
-  @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave` to stop playing")
+  @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave`/`quit`/`exit` to stop playing")
   async def guessthenumber(self, ctx):
     botnum = random.randint(10, 100)
     tries = 1
@@ -130,7 +130,7 @@ class Fun(commands.Cog):
     await ctx.send(embed = e)
     while True:
       message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 30)
-      if message.content.lower() != "stop" and message.content.lower() != "close" and message.content.lower() != "leave":
+      if message.content.lower() != "stop" and message.content.lower() != "close" and message.content.lower() != "leave" and message.content.lower() != "quit" and message.content.lower() != "exit":
         try:
           if int(message.content) == botnum:
             rng = random.randint(250, 1000)

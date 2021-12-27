@@ -38,7 +38,7 @@ class Nonsense(commands.Cog):
     
 
   #eval command
-  @commands.command(aliases = ["e"], help = "Execute python code (limited)", description = "ONLY FOR PEOPLE/COMMANDS THAT ARE IN WHITELIST\nExecute python code and see results\nexample: pb!eval random.randint(0, 10)", hidden = True)
+  @commands.command(aliases = ["e"], help = "Execute python code (limited)", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST\nExecute python code and see results\nexample: pb!eval random.randint(0, 10)", hidden = True)
   @commands.check(lambda ctx: ctx.author.id in whitelist_id)
   async def eval(self, ctx, *, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
@@ -173,7 +173,7 @@ class Nonsense(commands.Cog):
       await ctx.send(embed = e)
 
   #contains command
-  @commands.command(aliases = ["includes"], help = "See if any word contains selected letter/word", description = "example: pb!contains b abc\nexample 2: ?contains hello \"hello world\"")
+  @commands.command(aliases = ["includes"], help = "See if any word contains selected letter/word", description = "Example: pb!contains b abc\nexample 2: ?contains hello \"hello world\"")
   async def contains(self, ctx, letter_or_word, word):
     result = str(letter_or_word in word)
     e = discord.Embed(title = "Results of ?contains:", description = f"Does {word} contain {letter_or_word}?: {result}", color = random.randint(0, 16777215))
