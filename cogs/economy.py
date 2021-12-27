@@ -493,7 +493,7 @@ class Economy(commands.Cog):
             await ctx.send("You have not enough money")
         else:
           db["balance"][str(ctx.author.id)] = 0
-          await ctx.send("Erorr: Get some money first!")
+          await ctx.send("Error: Get some money first!")
       else:
         await ctx.send("Error: You can't buy nothing!")
     else:
