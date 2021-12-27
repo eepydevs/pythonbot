@@ -40,14 +40,14 @@ class Economy(commands.Cog):
     self.bot = bot
 
   #item group
-  @commands.group(help = "See what you can do with your item")
+  @commands.group(help = "See what you can do with selected item")
   async def item(self, ctx):
     if ctx.invoked_subcommand == None:
       e = discord.Embed(title = "This is the item command", description = "Use pb!help item to see the subcommands", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
   
   #info command
-  @item.command(help = "See what you can do with your item")
+  @item.command(help = "See selected item info")
   async def info(self, ctx, itemname = None):
     if str(ctx.author.id) in db["inventory"]:
       item = itemname.lower().capitalize()
@@ -59,7 +59,7 @@ class Economy(commands.Cog):
           e = discord.Embed(title = "Error", description = f"You don't have `{itemname}` in your inventory...", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
       else:
-        e = discord.Embed(title = "Error", description = "You can't use nothing!", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = "You can't see info of nothing!", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "You have nothing right now!", color = random.randint(0, 16777215))
