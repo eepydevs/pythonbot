@@ -37,6 +37,7 @@ class Utility(commands.Cog):
   async def botinfo(self, ctx):
     e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by Number1#4325.\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(self.bot.guilds)} servers",  color = random.randint(0, 16777215))
     e.add_field(name = "Contributors:", value = "DancingSmurf#0444 - Scripter, dscommands cog owner\nicemay#6281 - Scripter, Helper, Tester\nBricked#7106 - Scripter, Helper, Tester\nSenjienji#8317 - Helper, Tester\nDark dot#5012 - Contributor, Tester\nTjMat#0001 - Contributor\nR3DZ3R#8150 - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", inline = False)
+    e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)")
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
     await ctx.send(embed = e)
 
