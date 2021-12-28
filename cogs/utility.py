@@ -118,7 +118,7 @@ class Utility(commands.Cog):
       b = ",".join(role_list)
       e = discord.Embed(title = f"Member info: {ctx.author}", description = f"Joined server date: <t:{str(time.mktime(ctx.author.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(ctx.author.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
       e.set_thumbnail(url = str(ctx.author.avatar))
-      if len(role_list) != None:
+      if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
         e.add_field(name = "Roles (0):", value = "None")
