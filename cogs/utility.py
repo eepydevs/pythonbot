@@ -22,6 +22,7 @@ if "notes" not in db:
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
+    bot.help_command.cog = self
 
   #ping command
   @commands.command(help = "Shows bot's ping", description = "Usage: pb!ping") 
