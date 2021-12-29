@@ -95,7 +95,8 @@ class Utility(commands.Cog):
 
       b = ",".join(role_list)
       e = discord.Embed(title = f"Member info: {member}", description = f"Joined server date: <t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-      e.set_thumbnail(url = str(member.avatar))
+      if member.avatar != None:
+        e.set_thumbnail(url = str(member.avatar))
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
@@ -106,7 +107,7 @@ class Utility(commands.Cog):
         e.add_field(name = "Administrator?", value = "True" , inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Icon url:", value = str(member.avatar)[:-10], inline = False)
+      e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
       e.set_footer(text = f"ID: {member.id}")
       await ctx.send(embed = e)
     else:
@@ -119,7 +120,8 @@ class Utility(commands.Cog):
 
       b = ",".join(role_list)
       e = discord.Embed(title = f"Member info: {ctx.author}", description = f"Joined server date: <t:{str(time.mktime(ctx.author.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(ctx.author.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-      e.set_thumbnail(url = str(ctx.author.avatar))
+      if ctx.author.avatar != None:
+        e.set_thumbnail(url = str(ctx.author.avatar))
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
@@ -130,7 +132,7 @@ class Utility(commands.Cog):
         e.add_field(name = "Administrator?", value = "True" , inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Icon url:", value = str(ctx.author.avatar)[:-10], inline = False)
+      e.add_field(name = "Icon url:", value = f"[Link here]({str(ctx.author.avatar)[:-10]})", inline = False)
       e.add_field(name = "Quote:", value = f"{rgwai}")
       e.set_footer(text = f"ID: {ctx.author.id}")
       await ctx.send(embed = e)
