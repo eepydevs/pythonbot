@@ -96,7 +96,7 @@ class Moderation(commands.Cog):
   @commands.bot_has_permissions(manage_channels = True)
   async def clear(self, ctx, num1: int):
     if num1 > 0:
-      if num1 < 100:
+      if num1 <= 100:
         await ctx.message.delete()
         await asyncio.sleep(1)
         await ctx.channel.purge(limit = num1)
@@ -211,6 +211,37 @@ class Moderation(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = "You can't delete nobody's warns!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
+
+  #ghost ping detection command
+  @commands.group(help = "See current setting or change it", description = "For people with admin perms only")
+  async def setting(self, ctx):
+    if ctx.invoked_subcommand == None:
+      e = discord.Embed(title = "Error", description = "Type a setting name (check pb!help setting)", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+
+  @setting.command(help = "Ghost ping detection setting")
+  async def gpd(self, ctx, switch = "info"):
+    if switch != "info":
+      if ctx.message.author.guild_permissions.administrator or ctx.author.id == ctx.bot.owner.id:
+        if str(ctx.guild.id) in db["gpd"]:
+          del db["gpd"][str(ctx.guild.id)]
+          e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+        else:
+          db["gpd"][str(ctx.guild.id)] = "True"
+          e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
+          await ctx.send(embed = e)
+    else:
+      if str(ctx.guild.id) in db["gpd"]:
+        e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+      else:
+        e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+
+    
+    
+    
 
 def setup(bot):
   bot.add_cog(Moderation(bot))

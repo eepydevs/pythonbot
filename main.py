@@ -18,6 +18,9 @@ class EmbedMinimalHelp(commands.MinimalHelpCommand):
 
 bot.help_command = EmbedMinimalHelp()
 
+if "gpd" not in db:
+  db["gpd"] = {}
+
 #on message event thing
 @bot.event
 async def on_message(message):
@@ -32,6 +35,15 @@ async def on_message(message):
       e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]}", color = random.randint(0, 16777215))
       await message.channel.send(embed = e)
   await bot.process_commands(message)
+
+@bot.event
+async def on_message_delete(message):
+  if str(message.guild.id) in db["gpd"]:
+    if message.mentions:
+      if message.author.bot != True:
+        e = discord.Embed(title = "Ghost ping detected!", description = f"{message.content}", color = random.randint(0, 16777215))
+        e.set_footer(text = f"Message from: {message.author}")
+        await message.channel.send(embed = e)
 
 #when error event
 @bot.event
