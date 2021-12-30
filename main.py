@@ -7,6 +7,7 @@ from replit import db
 from disnake.ext import commands
 from server import keep_alive
 
+
 bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all())
 
 class EmbedMinimalHelp(commands.MinimalHelpCommand):
