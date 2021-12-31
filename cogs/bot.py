@@ -32,28 +32,17 @@ class Bot(commands.Cog):
   @commands.command(help = "Forgive me discord tos :(", description = "bot owner only", hidden = True)
   @commands.is_owner()
   async def join(self, ctx, id: discord.Guild = None):
-    if id == None:
-      out = {}
-      await ctx.trigger_typing()
-      for guild in self.bot.guilds:
-          try:
-              inv = await guild.invites()
-          except:
-              continue
-          else:
-              out[guild] = inv
-      e = discord.Embed(title = "Invites", description = "\n".join(f"{guild.name}: {' '.join(invite.url for invite in inv)}" for guild, inv in out.items()), color = random.randint(0, 16777215))
-      await ctx.author.send(embed = e)
-    else:
-      out = {}
-      await ctx.trigger_typing()
+    out = {}
+    await ctx.trigger_typing()
+    for guild in self.bot.guilds:
       try:
-        inv = await id.guild.invites()
+        inv = await guild.invites()
       except:
-        inv = None
+        continue
       else:
-        out[id.guild] = inv
-      e = discord.Embed(title = "Invites", description = "\n".join(f"{id.guild.name}: {' '.join(invite.url for invite in inv)}"))
+        out[guild] = inv
+    e = discord.Embed(title = "Invites", description = "\n".join(f"{guild.name}: {' '.join(invite.url for invite in inv)}" for guild, inv in out.items()), color = random.randint(0, 16777215))
+    await ctx.author.send(embed = e)
     
 
 
