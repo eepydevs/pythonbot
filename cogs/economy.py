@@ -15,10 +15,10 @@ if "passive" not in db:
 
 if "shop" not in db:
   db["shop"] = {
-    "Discount card": 20000,
-    "Computer": 6500,
-    "Laptop": 2000,
-    "Smartphone": 500
+    "Discount card": int(20000 * 0.55),
+    "Computer": int(6500 * 0.55),
+    "Laptop": int(2000 * 0.55),
+    "Smartphone": int(500 * 0.55)
   }
 
 if "inventory" not in db:
@@ -513,7 +513,7 @@ class Economy(commands.Cog):
               await ctx.send(embed = e)
             else:
               if db["inventory"][str(ctx.author.id)].get(itemname) >= 2:
-                db["balance"][str(ctx.author.id)] += int(db["shop"].get(itemname) / 2)
+                db["balance"][str(ctx.author.id)] += int(db["shop"].get(itemname) // 2)
                 updateinv = db["inventory"][str(ctx.author.id)]
                 updateinv[itemname] -= 1
                 db["inventory"][str(ctx.author.id)] = updateinv
@@ -522,7 +522,7 @@ class Economy(commands.Cog):
                 e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
                 await ctx.send(embed = e)
               else:
-                db["balance"][str(ctx.author.id)] += int(db["shop"].get(itemname) / 2)
+                db["balance"][str(ctx.author.id)] += int(db["shop"].get(itemname) // 2)
                 updateinv = db["inventory"][str(ctx.author.id)]
                 updateinv.pop(itemname)
                 db["inventory"][str(ctx.author.id)] = updateinv
