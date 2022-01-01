@@ -15,10 +15,10 @@ if "passive" not in db:
 
 if "shop" not in db:
   db["shop"] = {
-    "Discount card": int(20000 * 0.55),
-    "Computer": int(6500 * 0.55),
-    "Laptop": int(2000 * 0.55),
-    "Smartphone": int(500 * 0.55)
+    "Discount card": 20000,
+    "Computer": 6500,
+    "Laptop": 2000,
+    "Smartphone": 500
   }
 
 if "inventory" not in db:
