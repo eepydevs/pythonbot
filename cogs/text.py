@@ -5,6 +5,23 @@ import random
 import asyncio
 import math
 
+def uwuize(text):
+	translation = ""
+	for letter in text:
+		if letter.lower() in "r":
+			if letter.isupper():
+				translation += "W"
+			else:
+				translation += "w"
+		if letter.lower() in "l":
+			if letter.isupper():
+				translation += "W"
+			else:
+				translation += "w"
+		else: 
+			translation += letter
+	return translation
+
 class Text(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
@@ -63,6 +80,13 @@ class Text(commands.Cog):
   @commands.command(aliases = ["mixc", "shufflecase"], help = "Mix your inputted text!", description = "Usage: pb!mixcase 'hello world'\nOutput: hleoe wrold!")
   async def mixcase(self, ctx, *, text):
     modtext = " ".join(str().join(random.sample(i, len(i))) for i in text.split())
+    await ctx.send(modtext)
+  
+  #uwuize
+  @commands.command(aliases = ["furry", "uwu", "owo"], help = "UwUize your inputted text!", description = "Message from creator of PB (Number1#4325): i hate this")
+  async def uwuize(self, ctx, *, text):
+    await ctx.trigger_typing()
+    modtext = uwuize(text)
     await ctx.send(modtext)
 
 def setup(bot):
