@@ -46,14 +46,6 @@ async def on_message_delete(message):
         e.set_footer(text = f"Message from: {message.author}")
         await message.channel.send(embed = e)
 
-#when error event
-@bot.event
-async def on_command_error(ctx, error):
-  if isinstance(error, commands.CommandNotFound):
-    return
-  e = discord.Embed(title = "Error", description = error, color = random.randint(0, 16777215))
-  await ctx.send(embed = e)
-
 #when connected event lol
 @bot.event
 async def on_connection():
