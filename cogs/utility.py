@@ -302,7 +302,14 @@ class Utility(commands.Cog):
       e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
 
-
+  #exec command
+  @commands.command(help = "Execute python code", description = "bot owner only", hidden = True)
+  @commands.is_owner()
+  async def exec(self, ctx, *, code):
+    exec(code)
+    print(f"{code} is executed")
+    e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
 
 def setup(bot):
   bot.add_cog(Utility(bot))
