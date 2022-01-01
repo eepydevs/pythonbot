@@ -122,13 +122,21 @@ class Fun(commands.Cog):
         await ctx.send(embed = e)
 
   #guess the number command
-  @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave`/`quit`/`exit` to stop playing")
-  async def guessthenumber(self, ctx):
-    botnum = random.randint(10, 100)
+  @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave`/`quit`/`exit` to stop playing\nThe `max` argument is used for maximum amount of count\nThe `tries_amt` argument is used for maximum amount of tries\nNote: 0 in `tries_amt` means infinity tries")
+  async def guessthenumber(self, ctx, max: int = 100, tries_amt: int = 0):
+    botnum = random.randint(0, max)
     tries = 1
+    infinity = False
+    if tries_amt == 0:
+      infinity = True
     e = discord.Embed(title = "Guess the number!", color = random.randint(0, 16777215))
+    e.add_field(name = "Settings", value = f"Infinity tries: {infinity}\nMax tries: {tries_amt}")
     await ctx.send(embed = e)
     while True:
+      if infinity == False and tries > tries_amt:
+        e = discord.Embed(title = "You lost", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
+        await ctx.send(embed = e)
+        break
       message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 30)
       if message.content.lower() != "stop" and message.content.lower() != "close" and message.content.lower() != "leave" and message.content.lower() != "quit" and message.content.lower() != "exit":
         try:
