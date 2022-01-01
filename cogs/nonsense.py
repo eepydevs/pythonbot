@@ -15,16 +15,16 @@ def shuffle(x):
 
 def calc(text):
   check = text.split(" ")
-  whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "(", ")"]
+  whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "(", ")", " "]
   for i in range(len(check)):
     if len(check[i]) < 10:
       continue
     else:
       raise Exception("Maximum amount of characters per spaced string is 10!")
-  if not any(i in text for i in whitelist):
-    raise Exception("Something went wrong... (You may have used non-int)")
-  else:
+  if all(i in whitelist for i in text):
     return eval(text)
+  else:
+    raise ValueError("Something went wrong... (You may have used non-int)")
 
 class Nonsense(commands.Cog):
   def __init__(self, bot):
@@ -67,7 +67,7 @@ class Nonsense(commands.Cog):
     try:
       e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
-    except:
+    except ValueError:
       e = discord.Embed(title = "Calculator", description = "Something went wrong... (You may have used non-int)", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
   
