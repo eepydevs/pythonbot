@@ -37,9 +37,13 @@ class Utility(commands.Cog):
   @commands.command(help = "Shows bot's info", description = "Usage: pb!botinfo")
   async def botinfo(self, ctx):
     e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by [Number1#4325](https://github.com/1randomguyspecial).\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(self.bot.guilds)} servers",  color = random.randint(0, 16777215))
-    e.add_field(name = "Contributors", value = "[DancingSmurf#0444](https://replit.com/@EthanSmurf) - Scripter, dscommands cog owner\n[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", inline = False)
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)")
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
+    await ctx.send(embed = e)
+  
+  @commands.command(help = "Shows contributor list", description = "Usage: pb!credits")
+  async def credits(self, ctx):
+    e = discord.Embed(title = "Contributors list", description = "[DancingSmurf#0444](https://replit.com/@EthanSmurf) - Scripter, dscommands cog owner\n[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
 
   #server info command
