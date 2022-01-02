@@ -5,6 +5,7 @@ import random
 import asyncio
 import math
 
+
 def uwuize(text):
 	translation = ""
 	for letter in text:
@@ -83,7 +84,7 @@ class Text(commands.Cog):
     await ctx.send(modtext)
   
   #uwuize
-  @commands.command(aliases = ["furry", "uwu", "owo"], help = "UwUize your inputted text!", description = "Message from creator of PB (Number1#4325): i hate this")
+  @commands.command(aliases = ["furry", "uwuise", "uwu", "owo"], help = "UwUize your inputted text!", description = "Message from creator of PB (Number1#4325): i hate this")
   async def uwuize(self, ctx, *, text):
     await ctx.trigger_typing()
     modtext = uwuize(text)

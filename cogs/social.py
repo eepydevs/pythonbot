@@ -1,5 +1,4 @@
 #cog by Number1#4325
-#+500000 social credit👍
 import asyncio
 import disnake as discord
 import random

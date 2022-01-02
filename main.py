@@ -7,7 +7,6 @@ from replit import db
 from disnake.ext import commands
 from server import keep_alive
 
-
 bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all())
 
 class EmbedMinimalHelp(commands.MinimalHelpCommand):
@@ -18,9 +17,6 @@ class EmbedMinimalHelp(commands.MinimalHelpCommand):
     await destination.send(embed = e)
 
 bot.help_command = EmbedMinimalHelp()
-
-if "gpd" not in db:
-  db["gpd"] = {}
 
 #on message event thing
 @bot.event
@@ -39,7 +35,7 @@ async def on_message(message):
 
 @bot.event
 async def on_message_delete(message):
-  if str(message.guild.id) in db["gpd"]:
+  if str(message.guild.id) in db["serversetting"]["gpd"]:
     if message.mentions:
       if message.author.bot != True:
         e = discord.Embed(title = "Ghost ping detected!", description = f"{message.content}", color = random.randint(0, 16777215))

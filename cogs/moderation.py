@@ -14,6 +14,10 @@ if "prefix" not in db:
 if "warns" not in db:
   db["warns"] = {}
 
+if "serversetting" not in db:
+  db["serversetting"] = {}
+  db["serversetting"]["gpd"] = {}
+  db["serversetting"]["antiscam"] = {}
 
 class Moderation(commands.Cog):
   def __init__(self, bot):
@@ -212,7 +216,7 @@ class Moderation(commands.Cog):
       e = discord.Embed(title = "Error", description = "You can't delete nobody's warns!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
 
-  #ghost ping detection command
+  #setting group
   @commands.group(help = "See current setting or change it", description = "For people with admin perms only")
   async def setting(self, ctx):
     if ctx.invoked_subcommand == None:
@@ -223,16 +227,16 @@ class Moderation(commands.Cog):
   async def gpd(self, ctx, switch = "info"):
     if switch != "info":
       if ctx.message.author.guild_permissions.administrator or ctx.author.id == ctx.bot.owner.id:
-        if str(ctx.guild.id) in db["gpd"]:
-          del db["gpd"][str(ctx.guild.id)]
+        if str(ctx.guild.id) in db["serversetting"]["gpd"]:
+          del db["serversetting"]["gpd"][str(ctx.guild.id)]
           e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
         else:
-          db["gpd"][str(ctx.guild.id)] = "True"
+          db["serversetting"]["gpd"][str(ctx.guild.id)] = "True"
           e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
     else:
-      if str(ctx.guild.id) in db["gpd"]:
+      if str(ctx.guild.id) in db["serversetting"]["gpd"]:
         e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
       else:
