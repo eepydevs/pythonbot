@@ -18,11 +18,34 @@ if "afk" not in db:
 
 if "notes" not in db:
   db["notes"] = {}
+
+if "reminders" not in db:
+  db["reminders"] = {}
   
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
     bot.help_command.cog = self
+
+  #remind command
+  @commands.command(help = "Make a reminder for yourself", description = "Usage: pb!remind (time) (text)\nExample: pb!remind 1d do homework\nNote: `(time)` argument accepts those: N`d`, N`m`, N`s`, N`h`\n`d` = Day, `m` = Minutes, `s` = Seconds, `h` = Hours\nNote 2: `(time)` argument doesn't accept multiple of variations of time: example: pb!remind 1d 3h 43m 32s do homework")
+  async def remind(self, ctx, ctime = "1h", *, text):
+    if ctime[:-1].isnumeric():
+      if ctime[len(ctime) - 1] == "m":
+        rtime = int(time.time()) + 60 * int(ctime[:-1])
+      elif ctime[len(ctime) - 1] == "d":
+        rtime = int(time.time()) + 86400 * int(ctime[:-1])
+      elif ctime[len(ctime) - 1] == "s":
+        rtime = int(time.time()) + int(ctime[:-1])
+      elif ctime[len(ctime) - 1] == "h":
+        rtime = int(time.time()) + 3600 * int(ctime[:-1])
+    else:
+      raise ValueError("Invalid argument: time")
+    ruser = ctx.author.id
+    rtext = text
+    db["reminders"][str(ctx.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
+    e = discord.Embed(title = "Success", description = "Reminder done!", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
 
   #ping command
   @commands.command(help = "Shows bot's ping", description = "Usage: pb!ping") 

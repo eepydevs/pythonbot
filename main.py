@@ -55,6 +55,18 @@ async def on_ready():
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
   await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python Bot help | Made on Python 3.8.2!"))
+  while True:
+    print(f"{int(time.time())}")
+    for i in range(len(db["reminders"])):
+      num = 0
+      if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[num]]["time"]:
+        ruser = db["reminders"][list(db["reminders"].keys())[num]]["rid"]
+        rtext = db["reminders"][list(db["reminders"].keys())[num]]["rtext"]
+        e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
+        await bot.get_user(ruser).send(embed = e)
+        del db["reminders"][list(db["reminders"].keys())[num]]
+        num += 1
+    await asyncio.sleep(10)
 
 #load extension command
 @bot.command(aliases = ["l"], help = "load extension", description = "bot owner only\nusage: ?load (extension)", hidden = True)

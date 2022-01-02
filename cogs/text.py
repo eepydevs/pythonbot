@@ -83,12 +83,13 @@ class Text(commands.Cog):
     modtext = " ".join(str().join(random.sample(i, len(i))) for i in text.split())
     await ctx.send(modtext)
   
-  #uwuize
+  #uwuize command
   @commands.command(aliases = ["furry", "uwuise", "uwu", "owo"], help = "UwUize your inputted text!", description = "Message from creator of PB (Number1#4325): i hate this")
   async def uwuize(self, ctx, *, text):
     await ctx.trigger_typing()
     modtext = uwuize(text)
     await ctx.send(modtext)
+
 
 def setup(bot):
   bot.add_cog(Text(bot))
