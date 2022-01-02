@@ -28,7 +28,7 @@ class Utility(commands.Cog):
     bot.help_command.cog = self
 
   #remind command
-  @commands.command(help = "Make a reminder for yourself", description = "Usage: pb!remind (time) (text)\nExample: pb!remind 1d do homework\nNote: `(time)` argument accepts those: N`d`, N`m`, N`s`, N`h`\n`d` = Day, `m` = Minutes, `s` = Seconds, `h` = Hours\nNote 2: `(time)` argument doesn't accept multiple of variations of time: example: pb!remind 1d 3h 43m 32s do homework")
+  @commands.command(help = "Make a reminder for yourself", description = "Usage: pb!remind (time) (text)\nExample: pb!remind 1d do homework\nNote: `(time)` argument accepts those: N`d`, N`m`, N`s`, N`h`\n`d` = Day, `m` = Minutes, `s` = Seconds, `h` = Hours\nNote 2: `(time)` argument doesn't accept multiple of variations of time: example: pb!remind 1d 3h 43m 32s do homeworknNote 3: You can make only 1 reminder at the time")
   async def remind(self, ctx, ctime = "1h", *, text):
     if ctime[:-1].isnumeric():
       if ctime[len(ctime) - 1] == "m":
