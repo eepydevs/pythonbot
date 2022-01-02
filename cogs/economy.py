@@ -304,6 +304,14 @@ class Economy(commands.Cog):
     leaderboard = "\n".join(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
     e = discord.Embed(title = "Leaderboard", description = leaderboard, color = random.randint(0, 16777215))
     await ctx.send(embed = e)
+  
+  #global leaderboard command
+  @commands.command(aliases = ["glb"], help = "Richest people globally", description = "See other rich people in global leaderboard")
+  async def globalleaderboard(self, ctx):
+    await ctx.trigger_typing()
+    leaderboard = "\n".join(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+    e = discord.Embed(title = "Global leaderboard", description = leaderboard, color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
 
   #rob command
   @commands.command(help = "Rob people and get money", description = "Get jailed\nHas cooldown of 30 seconds\nUsage: pb!rob (@mention)")
@@ -616,7 +624,7 @@ class Economy(commands.Cog):
                     view.stop()
                     break
                   else:
-                    e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+                    e = discord.Embed(title = f"{ctx.author.name} posted: {view.children[0].values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
                     await message.edit(embed = e, view = None)
                     view.stop()
                     break
