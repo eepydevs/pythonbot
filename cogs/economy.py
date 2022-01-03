@@ -126,20 +126,20 @@ class Economy(commands.Cog):
         db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
         if str(ctx.author.id) in db["debug"]:
-          e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
     else:
       if random.randint(0, 100) < 35:
         e = discord.Embed(title = "Fail", description = "You failed!", color = random.randint(0, 16777215))
         if str(ctx.author.id) in db["debug"]:
-          e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       else:
         rng = random.randint(50, 150)
         db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
         if str(ctx.author.id) in db["debug"]:
-          e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       
 
@@ -211,7 +211,7 @@ class Economy(commands.Cog):
       db["balance"][str(ctx.author.id)] += rng
       e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
       if str(ctx.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
+        e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
       await ctx.send(embed = e)
 
   #give command
@@ -230,7 +230,7 @@ class Economy(commands.Cog):
                   db["balance"][str(member.id)] += payment
                   e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
                   if str(ctx.author.id) in db["debug"]:
-                    e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]} ,{db['balance'][str(member.id)]}")
+                    e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}, {db['balance'][str(member.id)]}")
                   await ctx.send(embed = e)
                 else:
                   db["balance"][str(member.id)] = 0
@@ -238,7 +238,7 @@ class Economy(commands.Cog):
                   db["balance"][str(member.id)] += payment
                   e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
                   if str(ctx.author.id) in db["debug"]:
-                    e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]} ,{db['balance'][str(member.id)]}")
+                    e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}, {db['balance'][str(member.id)]}")
                   await ctx.send(embed = e)
               else:
                 e = discord.Embed(title = "Error", description = "Leave peaceful person alone!", color = random.randint(0, 16777215))
@@ -277,7 +277,7 @@ class Economy(commands.Cog):
       db["balance"][str(member.id)] += payment
       e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
       if str(ctx.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(member.id)]} + {payment}")
+        e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(member.id)]}")
       await ctx.send(embed = e)
 
   #gamble command
