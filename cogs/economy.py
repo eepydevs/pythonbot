@@ -337,7 +337,7 @@ class Economy(commands.Cog):
     await ctx.send(embed = e)
   
   #global leaderboard command
-  @commands.command(aliases = ["glb"], help = "Richest people globally", description = "See other rich people in global leaderboard")
+  @commands.command(aliases = ["glb", "globallb"], help = "Richest people globally", description = "See other rich people in global leaderboard")
   async def globalleaderboard(self, ctx):
     await ctx.trigger_typing()
     leaderboard = "\n".join(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
