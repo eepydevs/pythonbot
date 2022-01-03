@@ -1,4 +1,4 @@
-#cog by DancingSmurf#0444
+#cog by AnotherAccount123#0476 (aka DancingSmurf#0444)
 # Auto format this as much as you want!
 import disnake as discord
 from disnake.ext import commands
