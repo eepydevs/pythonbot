@@ -118,20 +118,28 @@ class Economy(commands.Cog):
       db["balance"][str(ctx.author.id)] = 0
       if random.randint(0, 100) < 35:
         e = discord.Embed(title = "Fail", description = "You failed!", color = random.randint(0 , 16777215))
+        if str(ctx.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       else:
         rng = random.randint(50, 150)
         db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+        if str(ctx.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
     else:
       if random.randint(0, 100) < 35:
         e = discord.Embed(title = "Fail", description = "You failed!", color = random.randint(0, 16777215))
+        if str(ctx.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       else:
         rng = random.randint(50, 150)
         db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+        if str(ctx.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       
 
@@ -161,6 +169,8 @@ class Economy(commands.Cog):
         answer = round(firstNum / secondNum)
       
       e = discord.Embed(title = "Math question", description = f"{question} = ?", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}, {answer}")
       await ctx.send(embed = e)
       try:
         message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 60)
@@ -168,30 +178,40 @@ class Economy(commands.Cog):
           rng = random.randint(250, 1000)
           db["balance"][str(ctx.author.id)] += rng
           e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 1677215))
+          if str(ctx.author.id) in db["debug"]:
+            e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
           await ctx.send(embed = e)
         else:
           rng = random.randint(50, 250)
           db["balance"][str(ctx.author.id)] += rng
           e = discord.Embed(title = "Failed", description = f"You got {rng} 💵 !", color = random.randint(0, 1677215))
           e.set_footer(text = f"The right answer was {answer}")
+          if str(ctx.author.id) in db["debug"]:
+            e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
           await ctx.send(embed = e)
       except asyncio.TimeoutError:
         rng = random.randint(50, 250)
         db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Failed", description = f"You got {rng} 💵 !", color = random.randint(0, 1677215))
         e.set_footer(text = f"The right answer was {answer}")
+        if str(ctx.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       except ValueError:
         rng = random.randint(50, 250)
         db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Failed", description = f"You got {rng} 💵 !", color = random.randint(0, 1677215))
         e.set_footer(text = f"The right answer was {answer}")
+        if str(ctx.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
     else:
       db["balance"][str(ctx.author.id)] = 0
       rng = random.randint(250, 1000)
       db["balance"][str(ctx.author.id)] += rng
       e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{rng} ,{db['balance'][str(ctx.author.id)]}")
       await ctx.send(embed = e)
 
   #give command
@@ -209,12 +229,16 @@ class Economy(commands.Cog):
                   db["balance"][str(ctx.author.id)] -= payment
                   db["balance"][str(member.id)] += payment
                   e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
+                  if str(ctx.author.id) in db["debug"]:
+                    e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]} ,{db['balance'][str(member.id)]}")
                   await ctx.send(embed = e)
                 else:
                   db["balance"][str(member.id)] = 0
                   db["balance"][str(ctx.author.id)] -= payment
                   db["balance"][str(member.id)] += payment
                   e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
+                  if str(ctx.author.id) in db["debug"]:
+                    e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]} ,{db['balance'][str(member.id)]}")
                   await ctx.send(embed = e)
               else:
                 e = discord.Embed(title = "Error", description = "Leave peaceful person alone!", color = random.randint(0, 16777215))
@@ -244,11 +268,16 @@ class Economy(commands.Cog):
     if str(member.id) in db["balance"]:
       db["balance"][str(member.id)] += payment
       e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(member.id)]}")
       await ctx.send(embed = e)
+      
     else:
       db["balance"][str(member.id)] = 0
       db["balance"][str(member.id)] += payment
       e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(member.id)]} + {payment}")
       await ctx.send(embed = e)
 
   #gamble command
@@ -294,6 +323,8 @@ class Economy(commands.Cog):
       db["balance"][str(ctx.author.id)] = 0
       db["balance"][str(ctx.author.id)] += 1000
     e = discord.Embed(title = "Daily", description = "You got 1000 💵 !", color = random.randint(0, 16777215))
+    if str(ctx.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}")
     await ctx.send(embed = e)
 
   #leaderboard command
@@ -424,11 +455,15 @@ class Economy(commands.Cog):
               rng = random.randint(100, 500)
               db["balance"][str(ctx.author.id)] += rng
               e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+              if str(ctx.author.id) in db["debug"]:
+                e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
               await message.edit(embed = e, view = None)
               view.stop()
               break
             else:
               e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+              if str(ctx.author.id) in db["debug"]:
+                e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
               await message.edit(embed = e, view = None)
               view.stop()
               break
@@ -437,6 +472,8 @@ class Economy(commands.Cog):
             rng = random.randint(100, 500)
             db["balance"][str(ctx.author.id)] += rng
             e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+            if str(ctx.author.id) in db["debug"]:
+              e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
             await message.edit(embed = e, view = None)
             view.stop()
             break
@@ -580,10 +617,14 @@ class Economy(commands.Cog):
             rng = random.randint(250, 1500)
             db["balance"][str(ctx.author.id)] += rng
             e = discord.Embed(title = "Success", description = f"You hacked people and sold the data\nYou got {rng} 💵 !", color = random.randint(0, 16777215))
+            if str(ctx.author.id) in db["debug"]:
+              e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
             await ctx.send(embed = e)
           else:
             db["balance"][str(ctx.author.id)] -= 2500
             e = discord.Embed(title = "You got caught by police", description = "You lost 2500 💵 !", color = random.randint(0, 16777215))
+            if str(ctx.author.id) in db["debug"]:
+              e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}")
             await ctx.send(embed = e)
         else:
           e = discord.Embed(title = "Error", description = "Buy a computer!", color = random.randint(0, 16777215))
@@ -620,6 +661,8 @@ class Economy(commands.Cog):
                     rng = random.randint(250, 1000)
                     db["balance"][str(ctx.author.id)] += rng
                     e = discord.Embed(title = f"{ctx.author.name} posted: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+                    if str(ctx.author.id) in db["debug"]:
+                      e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
                     await message.edit(embed = e, view = None)
                     view.stop()
                     break
@@ -633,6 +676,8 @@ class Economy(commands.Cog):
                   rng = random.randint(250, 1000)
                   db["balance"][str(ctx.author.id)] += rng
                   e = discord.Embed(title = f"{ctx.author.name} posted: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+                  if str(ctx.author.id) in db["debug"]:
+                      e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
                   await message.edit(embed = e, view = None)
                   view.stop()
                   break

@@ -44,7 +44,9 @@ class Utility(commands.Cog):
     ruser = ctx.author.id
     rtext = text
     db["reminders"][str(ctx.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
-    e = discord.Embed(title = "Success", description = "Reminder done!", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
+    if str(ctx.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(ctx.author.id)])}")
     await ctx.send(embed = e)
 
   #ping command
@@ -54,6 +56,8 @@ class Utility(commands.Cog):
     message = await ctx.send("Pinging...")
     after = time.time()
     e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms\nUp since: <t:{int(self.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    if str(ctx.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{before}, {after}")
     await message.edit(content = None, embed = e)
     
   #bot info command

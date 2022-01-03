@@ -58,14 +58,12 @@ async def on_ready():
   while True:
     print(f"{int(time.time())}")
     for i in range(len(db["reminders"])):
-      num = 0
-      if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[num]]["time"]:
-        ruser = db["reminders"][list(db["reminders"].keys())[num]]["rid"]
-        rtext = db["reminders"][list(db["reminders"].keys())[num]]["rtext"]
+      if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[i]]["time"]:
+        ruser = db["reminders"][list(db["reminders"].keys())[i]]["rid"]
+        rtext = db["reminders"][list(db["reminders"].keys())[i]]["rtext"]
         e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
         await bot.get_user(ruser).send(embed = e)
-        del db["reminders"][list(db["reminders"].keys())[num]]
-        num += 1
+        del db["reminders"][list(db["reminders"].keys())[i]]
     await asyncio.sleep(10)
 
 #load extension command

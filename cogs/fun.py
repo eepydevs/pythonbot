@@ -24,6 +24,8 @@ class Fun(commands.Cog):
   async def eightball(self, ctx, *, text = ""):
     if text != "":
       e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {responselist[random.randint(0, int(len(responselist) - 1))]}", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")
       await ctx.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Type a Y/N question!", color = random.randint(0, 16777215))
@@ -98,6 +100,8 @@ class Fun(commands.Cog):
         answer = round(firstNum / secondNum)
       
       e = discord.Embed(title = "Math question", description = f"{question} = ?", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{answer}")
       await ctx.send(embed = e)
       try:
         message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 60)
@@ -131,6 +135,8 @@ class Fun(commands.Cog):
       infinity = True
     e = discord.Embed(title = "Guess the number!", color = random.randint(0, 16777215))
     e.add_field(name = "Settings", value = f"Infinity tries: {infinity}\nMax tries: {tries_amt}")
+    if str(ctx.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
     await ctx.send(embed = e)
     while True:
       if infinity == False and tries > tries_amt:
@@ -148,11 +154,15 @@ class Fun(commands.Cog):
             break
           elif int(message.content) < botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try higher", color = random.randint(0, 1677215))
+            if str(ctx.author.id) in db["debug"]:
+              e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
             e.set_footer(text = f"{tries} Tries")
             await ctx.send(embed = e)
             tries += 1
           elif int(message.content) > botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try lower", color = random.randint(0, 1677215))
+            if str(ctx.author.id) in db["debug"]:
+              e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
             e.set_footer(text = f"{tries} Tries")
             await ctx.send(embed = e)
             tries += 1
@@ -170,6 +180,8 @@ class Fun(commands.Cog):
           rng = random.randint(50, 250)
           db["balance"][str(ctx.author.id)] += rng
           e = discord.Embed(title = "Input error: Try again", color = random.randint(0, 16777215))
+          if str(ctx.author.id) in db["debug"]:
+            e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
           await ctx.send(embed = e)
       else:
         e = discord.Embed(title = "You left", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
