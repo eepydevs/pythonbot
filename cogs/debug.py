@@ -19,7 +19,10 @@ class Debug(commands.Cog):
   async def on_command_error(self, ctx, error):
     if isinstance(error, commands.CommandNotFound):
       return
-    e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)[29:]}```", color = random.randint(0, 16777215))
+    if not "Command raised an exception:" in str(error):
+      e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)}```", color = random.randint(0, 16777215))
+    else:
+      e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)[29:]}```", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
 
   #debug command

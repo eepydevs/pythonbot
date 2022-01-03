@@ -20,7 +20,7 @@ class Fun(commands.Cog):
     await ctx.send(f"{text}")
 
   #choose command
-  @commands.command(help = "Let the bot to choose something", description = "Usage: pb!choose (*options)\bExample: pb!choose 'thing 1' 'thing 2' 'thing 3'")
+  @commands.command(aliases = ["choice", "choices"], help = "Let the bot to choose something", description = "Usage: pb!choose (*options)\nExample: pb!choose 'thing 1' 'thing 2' 'thing 3'")
   async def choose(self, ctx, *options):
     e = discord.Embed(title = "Choice:", description = f"I choose.. {random.choice(options)}", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
