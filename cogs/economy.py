@@ -132,7 +132,7 @@ class Economy(commands.Cog):
       if random.randint(0, 100) < 35:
         e = discord.Embed(title = "Fail", description = "You failed!", color = random.randint(0, 16777215))
         if str(ctx.author.id) in db["debug"]:
-          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
+          e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}")
         await ctx.send(embed = e)
       else:
         rng = random.randint(50, 150)
@@ -463,7 +463,7 @@ class Economy(commands.Cog):
             else:
               e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
               if str(ctx.author.id) in db["debug"]:
-                e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}")
+                e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}")
               await message.edit(embed = e, view = None)
               view.stop()
               break
