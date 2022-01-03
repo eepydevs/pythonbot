@@ -19,11 +19,18 @@ class Fun(commands.Cog):
   async def say(self, ctx, *, text):
     await ctx.send(f"{text}")
 
+  #choose command
+  @commands.command(help = "Let the bot to choose something", description = "Usage: pb!choose (*options)\bExample: pb!choose 'thing 1' 'thing 2' 'thing 3'")
+  async def choose(self, ctx, *options):
+    e = discord.Embed(title = "Choice:", description = f"I choose.. {random.choice(options)}", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
+    
+
   #8ball command
   @commands.command(aliases = ["8ball"], help = "Say any Y/N question and 8ball will answer!", description = "Usage: pb!eightball (text)")
   async def eightball(self, ctx, *, text = ""):
     if text != "":
-      e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {responselist[random.randint(0, int(len(responselist) - 1))]}", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
       if str(ctx.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")
       await ctx.send(embed = e)
