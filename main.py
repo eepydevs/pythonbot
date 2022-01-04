@@ -57,7 +57,11 @@ async def on_ready():
   await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python Bot help | Made on Python 3.8.2!"))
   while True:
     print(f"{int(time.time())}")
-    for i in range(len(db["reminders"])):
+    if len(db["reminders"]) == 1:
+      check = 1
+    else:
+      check = 0
+    for i in range(len(db["reminders"]) - check):
       if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[i]]["time"]:
         ruser = db["reminders"][list(db["reminders"].keys())[i]]["rid"]
         rtext = db["reminders"][list(db["reminders"].keys())[i]]["rtext"]
