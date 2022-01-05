@@ -11,6 +11,7 @@ pyver = "3.8.2"
 dnver = "2.3.0"
 
 waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro", "You are the best!"]
+reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
 if "afk" not in db:
@@ -21,11 +22,30 @@ if "notes" not in db:
 
 if "reminders" not in db:
   db["reminders"] = {}
-  
+
+if "bugcounter" not in db:
+  db["bugcounter"] = 0
+
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
     bot.help_command.cog = self
+
+  #report bug command
+  @commands.command(help = "Report any of the bugs to owner!", description = "Usage: pb!report (text)\nExample: pb!report economy.py broken lmao\nNote: Don't spam report or else you will get blacklisted")
+  async def report(self, ctx, *, text):
+    if str(ctx.author.id) not in reportblacklist:
+      with open("buglist.txt", "a") as report:
+        db['bugcounter'] += 1
+        report.write("\n")
+        report.write(f"Bug #{db['bugcounter']}: {text} from {ctx.author}")
+        report.close()
+      e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bugcounter']}: {text} from {ctx.author}`", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
+      await ctx.send(embed = e)
+
 
   #remind command
   @commands.command(help = "Make a reminder for yourself", description = "Usage: pb!remind (time) (text)\nExample: pb!remind 1d do homework\nNote: `(time)` argument accepts those: N`d`, N`m`, N`s`, N`h`\n`d` = Day, `m` = Minutes, `s` = Seconds, `h` = Hours\nNote 2: `(time)` argument doesn't accept multiple of variations of time: example: pb!remind 1d 3h 43m 32s do homework\nNote 3: You can make only 1 reminder at the time")
