@@ -1,0 +1,2 @@
+Bug #1: remove get_command from eval,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, from icemay#6281: fixed
+Bug #2: if you send a ping message and edit it so it have no pings, and then delete it, pb wont notice. FIX!!!!!!!!!!!! OR I EAT LEG!!!!!!!!!!! from icemay#6281: can't be fixed i think

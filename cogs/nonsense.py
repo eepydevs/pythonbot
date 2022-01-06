@@ -17,10 +17,10 @@ def calc(text):
   check = text.split(" ")
   whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "(", ")", " "]
   for i in range(len(check)):
-    if len(check[i]) < 10:
+    if len(check[i]) < 15:
       continue
     else:
-      raise Exception("Maximum amount of characters per spaced string is 10!")
+      raise Exception("Maximum amount of characters per spaced string is 15!")
   if all(i in whitelist for i in text):
     return eval(text)
   else:
@@ -41,7 +41,7 @@ class Nonsense(commands.Cog):
   @commands.command(aliases = ["e"], help = "Execute python code (limited)", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST\nExecute python code and see results\nexample: pb!eval random.randint(0, 10)", hidden = True)
   @commands.check(lambda ctx: ctx.author.id in whitelist_id)
   async def eval(self, ctx, *, code):
-    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
+    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown"]
     try:
       if ctx.author.id == ctx.bot.owner.id:
         e = discord.Embed(title = "Eval:", description = f"{eval(code)}", color = random.randint(0, 16777215)) 
@@ -53,7 +53,7 @@ class Nonsense(commands.Cog):
           await ctx.send(embed = e)
           await ctx.message.add_reaction("❌")
         else:
-          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x))})}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None})}", color = random.randint(0, 16777215))
           await ctx.send(embed = e)
           await ctx.message.add_reaction("✅")
     except Exception as error:
@@ -64,12 +64,8 @@ class Nonsense(commands.Cog):
   #calculator command
   @commands.command(aliases = ["calc"], help = "Calculate anything you need! (basic math)", description = "Usage: pb!calculator (equation)\nExample: pb!calculator 1 + 2\nOutput: 3")
   async def calculator(self, ctx, *, equation):
-    try:
-      e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
-    except ValueError:
-      e = discord.Embed(title = "Calculator", description = "Something went wrong... (You may have used non-int)", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+    e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
   
   #embed command
   @commands.command(aliases = ["emb"], help = "Makes embed with title, description and footer", description = "You can make embeds with this command\nUsage: `pb!embed (title) (description) (footer)`\nExample: `pb!embed \"Hello title!\" \"Hello description!\" \"Hello footer!\"`")
