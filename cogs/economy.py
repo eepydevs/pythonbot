@@ -348,8 +348,8 @@ class Economy(commands.Cog):
   @commands.command(help = "Rob people and get money", description = "Get jailed\nHas cooldown of 30 seconds\nUsage: pb!rob (@mention)")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
   async def rob(self, ctx, member: discord.Member = None):
-    if member.id != ctx.author.id:
-      if member != None:
+    if member != None:
+      if member.id != ctx.author.id:
         if str(member.id) in db["balance"]:
           if db["balance"][str(member.id)] != 0 and db["balance"][str(member.id)] > 150:
             if str(ctx.author.id) not in db["passive"]:
@@ -412,11 +412,11 @@ class Economy(commands.Cog):
           await ctx.send(embed = e)
           ctx.command.reset_cooldown(ctx)
       else:
-        e = discord.Embed(title = "Error", description = "Choose someone to rob!", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = "You can't rob yourself!", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
         ctx.command.reset_cooldown(ctx)
     else:
-      e = discord.Embed(title = "Error", description = "You can't rob yourself!", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Error", description = "Choose someone to rob!", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
       ctx.command.reset_cooldown(ctx)
 
