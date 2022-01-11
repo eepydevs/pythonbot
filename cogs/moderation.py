@@ -243,9 +243,5 @@ class Moderation(commands.Cog):
         e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
         await ctx.send(embed = e)
 
-    
-    
-    
-
 def setup(bot):
   bot.add_cog(Moderation(bot))
