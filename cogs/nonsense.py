@@ -204,13 +204,16 @@ class Nonsense(commands.Cog):
     view.add_item(item = item3)
     view.add_item(item = item4)
     #view.add_item(item = item5)
-    await ctx.send("button test lmao", view = view)
+    message = await ctx.send("button test lmao", view = view)
     while True:
-        interaction = await self.bot.wait_for("interaction")
+      try:
+        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
         if interaction.user.id == ctx.author.id:
-          await interaction.send(content = f"You clicked a button!", ephemeral = True)
+          await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id}!", ephemeral = True)
         else:
-          await interaction.send(content = "You can't click this button, Sorry!", ephemeral = True)
+          await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
+      except:
+        pass
   
   #test 3 (select command) command
   @commands.command(aliases = ["menu"], help = "test command 3", hidden = True)

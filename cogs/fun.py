@@ -12,6 +12,33 @@ class Fun(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
+  #clicker experiment command idk
+  @commands.command(aliases = ["click"], help = "(BETA)", description = "Play clicker in discord in a bot ultra hd 8k 144fps (BETA)")
+  async def clicker(self, ctx):
+    coins = 0
+    color = random.randint(0, 16777215)
+    e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = random.randint(0, 16777215))
+    view = discord.ui.View(timeout = 60)
+    style = discord.ButtonStyle.blurple
+    item = discord.ui.Button(style = style, label = "Click here", custom_id = "click", emoji = "🖱️")
+    view.add_item(item = item)
+    message = await ctx.send(embed = e, view = view)
+    while True:
+      try:
+        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
+        if interaction.user.id == ctx.author.id:
+          if interaction.data.custom_id == "click":
+            #await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id} {coins}!", ephemeral = True)
+            coins += 1
+            e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = color)
+            await interaction.response.edit_message(embed = e)
+        else:
+          await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
+      except:
+        message.edit(view = None)
+        view.stop
+        break
+
   #say command
   @commands.command(help = "Repeats the thing you said", description = "Usage: pb!say (text)")
   async def say(self, ctx, *, text):

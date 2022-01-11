@@ -331,18 +331,9 @@ class Economy(commands.Cog):
   @commands.command(aliases = ["lb"], help = "Richest people here", description = "See other rich people in leaderboard")
   @commands.guild_only()
   async def leaderboard(self, ctx):
-    await ctx.trigger_typing()
-    leaderboard = "\n".join(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-    e = discord.Embed(title = "Leaderboard", description = leaderboard, color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
-
-
-  #leaderboard2 command
-  '''@commands.command(aliases = ["lb2"], help = "Richest people here", description = "See other rich people in leaderboard")
-  @commands.guild_only()
-  async def leaderboard2(self, ctx):
         await ctx.trigger_typing()
         leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+        color = random.randint(0, 16777215)
         page = 0
         view = discord.ui.View(timeout = 60)
         view.add_item(discord.ui.Button(
@@ -358,34 +349,67 @@ class Economy(commands.Cog):
         message = await ctx.send(embed = discord.Embed(
             title = "Leaderboard",
             description = "\n".join(leaderboard[page:page + 10]),
-            color = 0xffe5ce
+            color = color
         ), view = view)
         while True:
             try:
                 interaction = await ctx.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
                 if interaction.user == ctx.author:
-                    page += int(interaction.data["custom_id"])
+                    page += int(interaction.data.custom_id)
                     page = min(max(page, 0), len(leaderboard) // 10 * 10)
-                    await message.edit(embed = discord.Embed(
+                    await interaction.response.edit_message(embed = discord.Embed(
                         title = "Leaderboard",
                         description = "\n".join(leaderboard[page:page + 10]),
-                        color = 0xffe5ce
+                        color = color
                     ))
                 else:
-                    await interaction.followup.send("This button is not for you.", ephemeral = True)
+                    await interaction.response.send_message("This button is not for you.", ephemeral = True)
             except discord.utils.asyncio.TimeoutError:
                 await message.edit(view = None)
                 view.stop()
-                break'''
-  
+                break
   
   #global leaderboard command
-  @commands.command(aliases = ["glb", "globallb"], help = "Richest people globally", description = "See other rich people in global leaderboard")
+  @commands.command(aliases = ["glb", "globallb"], help = "Richest people here", description = "See other rich people in leaderboard")
+  @commands.guild_only()
   async def globalleaderboard(self, ctx):
-    await ctx.trigger_typing()
-    leaderboard = "\n".join(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-    e = discord.Embed(title = "Global leaderboard", description = leaderboard, color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+        await ctx.trigger_typing()
+        leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+        color = random.randint(0, 16777215)
+        page = 0
+        view = discord.ui.View(timeout = 60)
+        view.add_item(discord.ui.Button(
+            label = "",
+            emoji = "⬅️",
+            custom_id = "-10"
+        ))
+        view.add_item(discord.ui.Button(
+            label = "",
+            emoji = "➡️",
+            custom_id = "10"
+        ))
+        message = await ctx.send(embed = discord.Embed(
+            title = "Leaderboard",
+            description = "\n".join(leaderboard[page:page + 10]),
+            color = color
+        ), view = view)
+        while True:
+            try:
+                interaction = await ctx.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
+                if interaction.user == ctx.author:
+                    page += int(interaction.data.custom_id)
+                    page = min(max(page, 0), len(leaderboard) // 10 * 10)
+                    await interaction.response.edit_message(embed = discord.Embed(
+                        title = "Leaderboard",
+                        description = "\n".join(leaderboard[page:page + 10]),
+                        color = color
+                    ))
+                else:
+                    await interaction.send("This button is not for you.", ephemeral = True)
+            except discord.utils.asyncio.TimeoutError:
+                await message.edit(view = None)
+                view.stop()
+                break
 
   #rob command
   @commands.command(help = "Rob people and get money", description = "Get jailed\nHas cooldown of 30 seconds\nUsage: pb!rob (@mention)")
