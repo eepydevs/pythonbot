@@ -6,7 +6,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "4.92.30" # major.sub.fix
+botbuild = "4.95.32" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
@@ -46,7 +46,6 @@ class Utility(commands.Cog):
       e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
       await ctx.send(embed = e)
 
-
   #remind command
   @commands.command(help = "Make a reminder for yourself", description = "Usage: pb!remind (time) (text)\nExample: pb!remind 1d do homework\nNote: `(time)` argument accepts those: N`d`, N`m`, N`s`, N`h`\n`d` = Day, `m` = Minutes, `s` = Seconds, `h` = Hours\nNote 2: `(time)` argument doesn't accept multiple of variations of time: example: pb!remind 1d 3h 43m 32s do homework\nNote 3: You can make only 1 reminder at the time")
   async def remind(self, ctx, ctime = "1h", *, text):
@@ -75,9 +74,14 @@ class Utility(commands.Cog):
     before = time.time()
     message = await ctx.send("Pinging...")
     after = time.time()
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms\nUp since: <t:{int(self.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    if str(ctx.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{before}, {after}")
+    try:
+      e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms\nUp since: <t:{int(ctx.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{ctx.bot.latency * 1000}, {before}, {after}")
+    except:
+      e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms", color = random.randint(0, 16777215))
+      if str(ctx.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{ctx.bot.latency * 1000}")
     await message.edit(content = None, embed = e)
     
   #bot info command
@@ -86,10 +90,10 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by [Number1#4325](https://github.com/1randomguyspecial).\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(self.bot.guilds)} servers",  color = random.randint(0, 16777215))
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
-    e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
+    #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
     await ctx.send(embed = e)
   
-  @commands.command(help = "Shows contributor list", description = "Usage: pb!credits")
+  @commands.command(aliases = ["contributors",], help = "Shows contributor list", description = "Usage: pb!credits")
   async def credits(self, ctx):
     e = discord.Embed(title = "Contributors list", description = "[AnotherAccount123#0476](https://replit.com/@EthanSmurf) - Scripter, dscommands cog owner\n[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
