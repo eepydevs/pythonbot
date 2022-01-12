@@ -357,11 +357,14 @@ class Economy(commands.Cog):
                 if interaction.user == ctx.author:
                     page += int(interaction.data.custom_id)
                     page = min(max(page, 0), len(leaderboard) // 10 * 10)
-                    await interaction.response.edit_message(embed = discord.Embed(
+                    e = discord.Embed(
                         title = "Leaderboard",
                         description = "\n".join(leaderboard[page:page + 10]),
                         color = color
-                    ))
+                    )
+                    if str(ctx.author.id) in db["debug"]:
+                      e.add_field(name = "Debug", value = f"Variables value:\n{page}")
+                    await interaction.response.edit_message(embed = e)
                 else:
                     await interaction.response.send_message("This button is not for you.", ephemeral = True)
             except discord.utils.asyncio.TimeoutError:
@@ -399,11 +402,14 @@ class Economy(commands.Cog):
                 if interaction.user == ctx.author:
                     page += int(interaction.data.custom_id)
                     page = min(max(page, 0), len(leaderboard) // 10 * 10)
-                    await interaction.response.edit_message(embed = discord.Embed(
+                    e = discord.Embed(
                         title = "Leaderboard",
                         description = "\n".join(leaderboard[page:page + 10]),
                         color = color
-                    ))
+                    )
+                    if str(ctx.author.id) in db["debug"]:
+                      e.add_field(name = "Debug", value = f"Variables value:\n{page}")
+                    await interaction.response.edit_message(embed = e)
                 else:
                     await interaction.send("This button is not for you.", ephemeral = True)
             except discord.utils.asyncio.TimeoutError:

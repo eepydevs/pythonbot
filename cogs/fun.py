@@ -17,7 +17,8 @@ class Fun(commands.Cog):
   async def clicker(self, ctx):
     coins = 0
     color = random.randint(0, 16777215)
-    e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = color)
+    e.set_author(name = ctx.author.name, icon_url = ctx.author.avatar)
     view = discord.ui.View(timeout = 60)
     style = discord.ButtonStyle.blurple
     item = discord.ui.Button(style = style, label = "Click here", custom_id = "click", emoji = "🖱️")
@@ -31,11 +32,12 @@ class Fun(commands.Cog):
             #await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id} {coins}!", ephemeral = True)
             coins += 1
             e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = color)
+            e.set_author(name = ctx.author.name, icon_url = ctx.author.avatar)
             await interaction.response.edit_message(embed = e)
         else:
           await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
       except:
-        message.edit(view = None)
+        await message.edit(view = None)
         view.stop
         break
 

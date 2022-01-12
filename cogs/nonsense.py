@@ -168,20 +168,6 @@ class Nonsense(commands.Cog):
       e.set_footer(text = footer)
       await ctx.send(embed = e)
 
-  #contains command
-  @commands.command(aliases = ["includes"], help = "See if any word contains selected letter/word", description = "Example: pb!contains b abc\nexample 2: ?contains hello \"hello world\"")
-  async def contains(self, ctx, letter_or_word, word):
-    result = str(letter_or_word in word)
-    e = discord.Embed(title = "Results of ?contains:", description = f"Does {word} contain {letter_or_word}?: {result}", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
-
-  #test (edit message) command
-  @commands.command(help = "test command", description = "example: pb!edit \"hello\" 10 \"hello world\"\nnum = seconds")
-  async def edit(self, ctx, text, num: int, editedtext):
-    msg = await ctx.send(text)
-    await asyncio.sleep(num)
-    await msg.edit(content = editedtext)
-
   #test 2 (buttons message) command
   @commands.command(help = "test command 2", description = "idk lol", hidden = True)
   async def button(self, ctx):
@@ -247,13 +233,6 @@ class Nonsense(commands.Cog):
     except ValueError:
       await ctx.send("Error: Alls the arguments must be ints!")
       ctx.command.reset_cooldown(ctx)
-
-  #youare command
-  @commands.command(aliases = ["imare"], help = "See how you are `N% _____` (nice, cool for example)", description = "Usage: pb!youare (text)\nExample: `pb!youare Nice`\nOutput: You are 65% Nice")
-  async def youare(self, ctx, *, text = ""):
-    percentage = random.randint(0, 100)
-    e = discord.Embed(title = f"{ctx.author.name},", description = f"You are {percentage}% {text}", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
       
 def setup(bot):
   bot.add_cog(Nonsense(bot))

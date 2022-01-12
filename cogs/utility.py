@@ -6,7 +6,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "4.96.33" # major.sub.fix
+botbuild = "4.93.34" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
@@ -74,20 +74,15 @@ class Utility(commands.Cog):
     before = time.time()
     message = await ctx.send("Pinging...")
     after = time.time()
-    try:
-      e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms\nUp since: <t:{int(ctx.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-      if str(ctx.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{ctx.bot.latency * 1000}, {before}, {after}")
-    except:
-      e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms", color = random.randint(0, 16777215))
-      if str(ctx.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{ctx.bot.latency * 1000}")
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms\nUp since: <t:{int(ctx.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    if str(ctx.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{ctx.bot.latency * 1000}, {before}, {after}")
     await message.edit(content = None, embed = e)
     
   #bot info command
   @commands.command(help = "Shows bot's info", description = "Usage: pb!botinfo")
   async def botinfo(self, ctx):
-    e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by [Number1#4325](https://github.com/1randomguyspecial).\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(self.bot.guilds)} servers",  color = random.randint(0, 16777215))
+    e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by [Number1#4325](https://github.com/1randomguyspecial).\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(ctx.bot.guilds)} servers",  color = random.randint(0, 16777215))
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
