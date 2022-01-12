@@ -38,46 +38,42 @@ class Nonsense(commands.Cog):
     
 
   #eval command
-  @commands.command(aliases = ["e"], help = "Execute python code (limited)", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST\nExecute python code and see results\nexample: pb!eval random.randint(0, 10)", hidden = True)
-  @commands.check(lambda ctx: ctx.author.id in whitelist_id)
-  async def eval(self, ctx, *, code):
+  @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results", hidden = True)
+  @commands.check(lambda inter: inter.author.id in whitelist_id)
+  async def eval(inter, *, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension"]
     try:
-      if ctx.author.id == ctx.bot.owner.id:
+      if inter.author.id == inter.bot.owner.id:
         e = discord.Embed(title = "Eval:", description = f"{eval(code)}", color = random.randint(0, 16777215)) 
-        await ctx.send(embed = e)
-        await ctx.message.add_reaction("✅")
+        await inter.send(embed = e)
       else:
         if any(i in code for i in blacklist):
           e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
-          await ctx.message.add_reaction("❌")
+          await inter.send(embed = e)
         else:
-          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
-          await ctx.message.add_reaction("✅")
+          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}", color = random.randint(0, 16777215))
+          await inter.send(embed = e)
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
-      await ctx.message.add_reaction("❌")
+      await inter.send(embed = e)
   
   #calculator command
-  @commands.command(aliases = ["calc"], help = "Calculate anything you need! (basic math)", description = "Usage: pb!calculator (equation)\nExample: pb!calculator 1 + 2\nOutput: 3")
-  async def calculator(self, ctx, *, equation):
+  @commands.slash_command(name = "calc", description = "Calculate anything you need! (basic math)")
+  async def slashcalculator(inter, *, equation):
     e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+    await inter.send(embed = e)
   
   #embed command
-  @commands.command(aliases = ["emb"], help = "Makes embed with title, description and footer", description = "You can make embeds with this command\nUsage: `pb!embed (title) (description) (footer)`\nExample: `pb!embed \"Hello title!\" \"Hello description!\" \"Hello footer!\"`")
-  async def embed(self, ctx, title = "", desc = "", footer = ""):
+  @commands.slash_command(name = "embed", description = "Makes embed with title, description and footer")
+  async def slashembed(inter, title = "", desc = "", footer = ""):
     e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
-    e.set_author(name =  ctx.author.name, icon_url = str(ctx.author.avatar)[:-10])
+    e.set_author(name =  inter.author.name, icon_url = str(inter.author.avatar)[:-10])
     e.set_footer(text = footer)
-    await ctx.send(embed = e)
+    await inter.send(embed = e)
   
   #embed 2.0 command
-  @commands.command(aliases = ["emb2"], help = "Makes more advanced embed with title, description, footer and image", description = "You can make embeds with this command\nUsage: `pb!embed2 (title:text)/ (desc:text)/ (footer:text)/ (imagelink:link)/ (thumblink:link)`\nExample: `pb!embed2 title:Hello title!/ desc:Hello description!/ footer:Hello footer!/ imagelink:*link here*/ thumblink:*link here*`\nYou can execute python code (limited) with |*code*|\nEXECUTING CODE WORKS ONLY FOR WHITELISTED PEOPLE!")
-  async def embed2(self, ctx, *, options = ""):
+  @commands.slash_command(aliases = ["emb2"], description = "Makes more advanced embed with title, description, footer and image")
+  async def embed2(inter, *, options = ""):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
     list = options.split("/ ")
     errornum = 0
@@ -91,17 +87,17 @@ class Nonsense(commands.Cog):
     while num <= int(len(list) - 1):
       if "title:" in list[num]:
         if "|" in str(list[num])[6:]:
-          if int(ctx.author.id) in whitelist_id:
+          if int(inter.author.id) in whitelist_id:
             codelist = str(list[num])[6:].split("|")
             num2 = 1
             while num2 < int(len(codelist) - 1):
               if any(i in codelist[num2] for i in blacklist):
                 errornum = 1
                 e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-                await ctx.send(embed = e)
+                await inter.send(embed = e)
                 break
               else:
-                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
+                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
                 num2 += 2
             text = ""
             for x in codelist:
@@ -113,17 +109,17 @@ class Nonsense(commands.Cog):
           title = str(list[num])[6:]
       elif "desc:" in list[num]:
         if "|" in str(list[num])[5:]:
-          if int(ctx.author.id) in whitelist_id:
+          if int(inter.author.id) in whitelist_id:
             codelist = str(list[num])[5:].split("|")
             num2 = 1
             while num2 < int(len(codelist) - 1):
               if any(i in codelist[num2] for i in blacklist):
                 errornum = 1
                 e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-                await ctx.send(embed = e)
+                await inter.send(embed = e)
                 break
               else:
-                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
+                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
                 num2 += 2
             text = ""
             for x in codelist:
@@ -135,17 +131,17 @@ class Nonsense(commands.Cog):
           desc = str(list[num])[5:]
       elif "footer:" in list[num]:
         if "|" in str(list[num])[7:]:
-          if int(ctx.author.id) in whitelist_id:
+          if int(inter.author.id) in whitelist_id:
             codelist = str(list[num])[7:].split("|")
             num2 = 1
             while num2 < int(len(codelist) - 1):
               if any(i in codelist[num2] for i in blacklist):
                 errornum = 1
                 e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-                await ctx.send(embed = e)
+                await inter.send(embed = e)
                 break
               else:
-                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': ctx, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
+                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
                 num2 += 2
             text = ""
             for x in codelist:
@@ -162,15 +158,15 @@ class Nonsense(commands.Cog):
       num += 1
     if not errornum == 1:
       e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
-      e.set_author(name = ctx.author.name, icon_url = ctx.author.avatar)
+      e.set_author(name = inter.author.name, icon_url = inter.author.avatar)
       e.set_image(url = imagelink)
       e.set_thumbnail(url = thumblink)
       e.set_footer(text = footer)
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
   #test 2 (buttons message) command
-  @commands.command(help = "test command 2", description = "idk lol", hidden = True)
-  async def button(self, ctx):
+  @commands.slash_command(name = "button", description = "test command 2", hidden = True)
+  async def slashbutton(inter):
     view = discord.ui.View(timeout = 60)
     style = discord.ButtonStyle.blurple
     item = discord.ui.Button(style = style, label = "Primary", custom_id = "Primary", emoji = "1️⃣")
@@ -190,11 +186,11 @@ class Nonsense(commands.Cog):
     view.add_item(item = item3)
     view.add_item(item = item4)
     #view.add_item(item = item5)
-    message = await ctx.send("button test lmao", view = view)
+    message = await inter.send("button test lmao", view = view)
     while True:
       try:
-        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-        if interaction.user.id == ctx.author.id:
+        interaction = await inter.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
+        if interaction.user.id == inter.author.id:
           await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id}!", ephemeral = True)
         else:
           await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
@@ -202,37 +198,37 @@ class Nonsense(commands.Cog):
         pass
   
   #test 3 (select command) command
-  @commands.command(aliases = ["menu"], help = "test command 3", hidden = True)
-  async def select(self, ctx):
+  @commands.slash_command(name = "menu", description = "test command 3", hidden = True)
+  async def select(inter):
     view = discord.ui.View(timeout = 60)
     view.add_item(discord.ui.Select(placeholder = "Select an option", options = [discord.SelectOption(label = "Option 1", emoji = "1️⃣", value = "1"), discord.SelectOption(label = "Option 2", emoji = "2️⃣", value = "2"), discord.SelectOption(label = "Option 3", emoji = "3️⃣", value = "3")]))
-    message = await ctx.send("Select Menu", view = view)
+    message = await inter.send("Select Menu", view = view)
     while True:
       try:
-        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
+        interaction = await inter.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
         await interaction.send(content = f"You selected Option {view.children[0].values[0]}!", ephemeral = True)
       except asyncio.TimeoutError:
         view.stop()
         break
 
   #send emoji command
-  @commands.command(aliases = ["sendemo", "semo"], help = "Send emoji as bot", description = "Send selected emoji")
-  async def sendemoji(self, ctx, emoji: discord.Emoji):
-    await ctx.trigger_typing()
-    await ctx.send(emoji.url)
+  @commands.slash_command(name = "sendemoji", description = "Send emoji as bot")
+  async def slashsendemoji(inter, emoji: discord.Emoji):
+    await inter.trigger_typing()
+    await inter.send(emoji.url)
 
   #create invite command
   #fixed annoying spelling mistake
-  @commands.command(aliases = ["cinvite"], help = "Create an invite for server you're currently in", description = "Send help\nExample: pb!createinvite 1 (after 1 days invite expires) 0 (0 = infinity uses)\nNote: Max days: 7, max uses: 100\nHas cooldown of 1 minute")
+  @commands.slash_command(name = "createinvite", description = "Create an invite for server you're currently in")
   @commands.cooldown(rate = 1, per = 60, type = commands.BucketType.user)
-  async def createinvite(self, ctx, days: int = 7, uses: int = 0):
+  async def slashcreateinvite(inter, days: int = 7, uses: int = 0):
     try:
       maxage = 86400 * days
-      invite = await ctx.channel.create_invite(max_age = maxage, max_uses = uses, unique = False)
-      await ctx.send(f"Link: {invite.url}")
+      invite = await inter.channel.create_invite(max_age = maxage, max_uses = uses, unique = False)
+      await inter.send(f"Link: {invite.url}")
     except ValueError:
-      await ctx.send("Error: Alls the arguments must be ints!")
-      ctx.command.reset_cooldown(ctx)
+      await inter.send("Error: Alls the arguments must be ints!")
+      inter.command.reset_cooldown(inter)
       
 def setup(bot):
   bot.add_cog(Nonsense(bot))

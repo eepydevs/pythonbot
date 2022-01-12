@@ -40,79 +40,60 @@ class Fun(commands.Cog):
         await message.edit(view = None)
         view.stop
         break
-
-  #say command
-  @commands.command(help = "Repeats the thing you said", description = "Usage: pb!say (text)")
-  async def say(self, ctx, *, text):
-    await ctx.send(f"{text}")
-
-  #choose command
-  @commands.command(aliases = ["choice", "choices"], help = "Let the bot to choose something", description = "Usage: pb!choose (*options)\nExample: pb!choose 'thing 1' 'thing 2' 'thing 3'")
-  async def choose(self, ctx, *options):
-    e = discord.Embed(title = "Choice:", description = f"I choose.. {random.choice(options)}", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
-    
-
-  #8ball command
-  @commands.command(aliases = ["8ball"], help = "Say any Y/N question and 8ball will answer!", description = "Usage: pb!eightball (text)")
-  async def eightball(self, ctx, *, text = ""):
-    if text != "":
-      e = discord.Embed(title = f"{ctx.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
-      if str(ctx.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")
-      await ctx.send(embed = e)
-    else:
-      e = discord.Embed(title = "Error", description = "Type a Y/N question!", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
   
-  #coinflip command
-  @commands.command(aliases = ["coin"], help = "Flip a coin and get `Heads` or `Tails`", description = "Usage: pb!coinflip")
-  async def coinflip(self, ctx):
-    e = discord.Embed(title = "The coin flips...", description = "Wait for result", color = random.randint(0, 16777215))
-    msg = await ctx.send(embed = e)
-    await asyncio.sleep(1)
-    e = discord.Embed(title = "Coin landed", description = f"Results: {random.choice(('Tails', 'Heads'))}", color = random.randint(0, 16777215))
-    await  msg.edit(embed = e)
+  #say command slash
+  @commands.slash_command(name = "say",description = "Repeats the thing you said")
+  async def slashsay(inter, *, text):
+    await inter.response.send_message(f"{text}")
+  
+  #choose command slash
+  @commands.slash_command(name = "choice", description = "Usage: /choice thing 1, thing2, 3 thing")
+  async def slashchoice(inter, options):
+    e = discord.Embed(title = "Choice:", description = f"I choose.. {random.choice(options.split(', '))}", color = random.randint(0, 16777215))
+    await inter.response.send_message(embed = e)    
 
-  #random command
-  @commands.command(aliases = ["rd", "rng"], help = "RNG", description = "You can randomize numbers with this command\nUsage: pb!random (N1) (N2)\nUsage 2: pb!random (N1)")
-  async def random(self, ctx, num1: int = None, num2: int = None):
-    if num1 != None and num2 != None:
-      if num1 < num2:
-        randomized = random.randint(num1, num2)
-        e = discord.Embed(title = f"Randomized Number: {str(randomized)}", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
-      elif num1 == num2:
-        await ctx.send("Error: N1 is equal to N2!")
-      else:
-        randomized = random.randint(num2, num1)
-        e = discord.Embed(title = f"Randomized Number: {str(randomized)}", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
-    else:
-      randomized = random.randrange(num1)
+  #8ball command slash
+  @commands.slash_command(name = "8ball",description = "Usage: pb!eightball (text)")
+  async def slasheightball(inter, *, text):
+    e = discord.Embed(title = f"{inter.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
+    if str(inter.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")
+    await inter.response.send_message(embed = e)
+  
+  #coinflip command slash
+  @commands.slash_command(name = "coinflip", description = "Flip a coin and get `Heads` or `Tails`")
+  async def slashcoinflip(inter):
+    e = discord.Embed(title = "Coin flipped", description = f"Results: {random.choice(('Tails', 'Heads'))}", color = random.randint(0, 16777215))
+    await inter.response.send_message(embed = e)
+
+  #random command slash
+  @commands.slash_command(name = "random", description = "You can randomize numbers with this command\nUsage: pb!random (N1) (N2)\nUsage 2: pb!random (N1)")
+  async def slashrandom(inter, num1: int, num2: int):
+    if num1 < num2:
+      randomized = random.randint(num1, num2)
       e = discord.Embed(title = f"Randomized Number: {str(randomized)}", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
-
-  #dice command
-  @commands.command(help = "RNG 2", description = "Throw dices")
-  async def dice(self, ctx, dices: int = None, faces: int = None):
-    if dices != None and faces != None:
-      if dices >= 1 and faces >= 1:
-        dice = random.randint(1, int(faces * dices))
-        e = discord.Embed(title = "Dice", description = f"Number: {dice}", color = random.randint(0, 16777215))
-        e.set_thumbnail(url = "https://cdn.discordapp.com/attachments/843562496543817781/905114307556163614/dice.png")
-        await ctx.send(embed = e)
-      else: 
-        await ctx.send("Error: Invalid input")
+      await inter.response.send_message(embed = e)
+    elif num1 == num2:
+      await inter.response.send_message("Error: N1 is equal to N2!")
     else:
-      dice = random.randint(1, 6)
+      randomized = random.randint(num2, num1)
+      e = discord.Embed(title = f"Randomized Number: {str(randomized)}", color = random.randint(0, 16777215))
+      await inter.response.send_message(embed = e)
+
+  #dice command slash
+  @commands.slash_command(name = "dice", description = "Throw dices")
+  async def slashdice(inter, dices: int, faces: int):
+    if dices >= 1 and faces >= 1:
+      dice = random.randint(1, int(faces * dices))
       e = discord.Embed(title = "Dice", description = f"Number: {dice}", color = random.randint(0, 16777215))
       e.set_thumbnail(url = "https://cdn.discordapp.com/attachments/843562496543817781/905114307556163614/dice.png")
-      await ctx.send(embed = e)
+      await inter.response.send_message(embed = e)
+    else: 
+      await inter.response.send_message("Error: Invalid input")
 
   #math command
-  @commands.command(help = "Math questions, wohooo very fun..")
-  async def math(self, ctx):
+  @commands.slash_command(name = "math", description = "Math questions, wohooo very fun..")
+  async def slashmath(inter):
       firstNum = random.randint(0, 1000)
       secondNum = random.randint(0, 1000)
       chance = random.randint(0, 100)
@@ -134,92 +115,86 @@ class Fun(commands.Cog):
         answer = round(firstNum / secondNum)
       
       e = discord.Embed(title = "Math question", description = f"{question} = ?", color = random.randint(0, 16777215))
-      if str(ctx.author.id) in db["debug"]:
+      if str(inter.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{answer}")
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
       try:
-        message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 60)
+        message = await inter.bot.wait_for("message", check = lambda message: message.author == inter.author and message.channel == inter.channel, timeout = 60)
         if int(message.content) == answer:
-          rng = random.randint(250, 1000)
           e = discord.Embed(title = "Correct!", description = f"It was {answer}", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
         else:
-          rng = random.randint(50, 250)
-          db["balance"][str(ctx.author.id)] += rng
           e = discord.Embed(title = "Incorrect", description = f"The right answer was {answer}", color = random.randint(0, 1677215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
       except asyncio.TimeoutError:
-        rng = random.randint(50, 250)
-        db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Incorrect", description = f"The right answer was {answer}", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
       except ValueError:
-        rng = random.randint(50, 250)
-        db["balance"][str(ctx.author.id)] += rng
         e = discord.Embed(title = "Incorrect", description = f"The right answer was {answer}", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
 
-  #guess the number command
-  @commands.command(aliases = ["gtn"], help = "Guess the number minigame!", description = "Type `stop`/`close`/`leave`/`quit`/`exit` to stop playing\nThe `max` argument is used for maximum amount of count\nThe `tries_amt` argument is used for maximum amount of tries\nNote: 0 in `tries_amt` means infinity tries")
-  async def guessthenumber(self, ctx, max: int = 100, tries_amt: int = 0):
+  #guess the number command slash
+  @commands.slash_command(name = "guessthenumber", description = "The `max` arg is max count. The `tries_amt` arg is max tries. Note: 0 in `tries_amt` = inf tries")
+  async def slashguessthenumber(inter, max: int = 100, tries_amt: int = 0):
     botnum = random.randint(0, max)
     tries = 1
     infinity = False
     if tries_amt == 0:
       infinity = True
     e = discord.Embed(title = "Guess the number!", color = random.randint(0, 16777215))
-    e.add_field(name = "Settings", value = f"Infinity tries: {infinity}\nMax tries: {tries_amt}")
-    if str(ctx.author.id) in db["debug"]:
+    e.add_field(name = "Settings", value = f"Infinity tries: {infinity}\nMax tries: {tries_amt}", inline = False)
+    e.add_field(name = "Info", value = "Type `stop`/`close`/`leave`/`quit`/`exit` to stop playing", inline = False)
+    if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
-    await ctx.send(embed = e)
+    await inter.send(embed = e)
     while True:
       if infinity == False and tries > tries_amt:
         e = discord.Embed(title = "You lost", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
         break
-      message = await self.bot.wait_for("message", check = lambda message: message.author == ctx.author and message.channel == ctx.channel, timeout = 30)
+      message = await inter.bot.wait_for("message", check = lambda message: message.author == inter.author and message.channel == inter.channel, timeout = 30)
       if message.content.lower() != "stop" and message.content.lower() != "close" and message.content.lower() != "leave" and message.content.lower() != "quit" and message.content.lower() != "exit":
         try:
           if int(message.content) == botnum:
             rng = random.randint(250, 1000)
             e = discord.Embed(title = "Correct!", description = f"Congrats you won\nIt was {botnum}", color = random.randint(0, 16777215))
             e.set_footer(text = f"Took you: {tries} tries")
-            await ctx.send(embed = e)
+            await inter.send(embed = e)
             break
           elif int(message.content) < botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try higher", color = random.randint(0, 1677215))
-            if str(ctx.author.id) in db["debug"]:
+            if str(inter.author.id) in db["debug"]:
               e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
             e.set_footer(text = f"{tries} Tries")
-            await ctx.send(embed = e)
+            await inter.send(embed = e)
             tries += 1
           elif int(message.content) > botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try lower", color = random.randint(0, 1677215))
-            if str(ctx.author.id) in db["debug"]:
+            if str(inter.author.id) in db["debug"]:
               e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
             e.set_footer(text = f"{tries} Tries")
-            await ctx.send(embed = e)
+            await inter.send(embed = e)
             tries += 1
         except asyncio.TimeoutError:
           rng = random.randint(50, 250)
-          db["balance"][str(ctx.author.id)] += rng
+          db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
         except TimeoutError:
           rng = random.randint(50, 250)
-          db["balance"][str(ctx.author.id)] += rng
+          db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
         except ValueError:
           rng = random.randint(50, 250)
-          db["balance"][str(ctx.author.id)] += rng
+          db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = "Input error: Try again", color = random.randint(0, 16777215))
-          if str(ctx.author.id) in db["debug"]:
+          if str(inter.author.id) in db["debug"]:
             e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
       else:
         e = discord.Embed(title = "You left", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
         break
 
   #rps command

@@ -6,7 +6,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "4.93.35" # major.sub.fix
+botbuild = "5b.98.37" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
@@ -31,24 +31,32 @@ class Utility(commands.Cog):
     self.bot = bot
     bot.help_command.cog = self
 
+  #ping command
+  @commands.slash_command(name = "ping", description = "Shows bot's ping")
+  async def slashping(inter):
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms", color = random.randint(0, 16777215))
+    if str(inter.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}")
+    await inter.response.send_message(embed = e)
+
   #report bug command
-  @commands.command(help = "Report any of the bugs to owner!", description = "Usage: pb!report (text)\nExample: pb!report economy.py broken lmao\nNote: Don't spam report or else you will get blacklisted")
-  async def report(self, ctx, *, text):
-    if str(ctx.author.id) not in reportblacklist:
+  @commands.slash_command(name = "bugreport", description = "Report any of the bugs to owner!")
+  async def slashreport(inter, *, text):
+    if str(inter.author.id) not in reportblacklist:
       with open("buglist.txt", "a") as report:
         db['bugcounter'] += 1
         report.write("\n")
-        report.write(f"Bug #{db['bugcounter']}: {text} from {ctx.author}")
+        report.write(f"Bug #{db['bugcounter']}: {text} from {inter.author}")
         report.close()
-      e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bugcounter']}: {text} from {ctx.author}`", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
   #remind command
-  @commands.command(help = "Make a reminder for yourself", description = "Usage: pb!remind (time) (text)\nExample: pb!remind 1d do homework\nNote: `(time)` argument accepts those: N`d`, N`m`, N`s`, N`h`\n`d` = Day, `m` = Minutes, `s` = Seconds, `h` = Hours\nNote 2: `(time)` argument doesn't accept multiple of variations of time: example: pb!remind 1d 3h 43m 32s do homework\nNote 3: You can make only 1 reminder at the time")
-  async def remind(self, ctx, ctime = "1h", *, text):
+  @commands.slash_command(name = "remind", description = "Make a reminder for yourself")
+  async def slashremind(inter, ctime = "1h", *, text):
     if ctime[:-1].isnumeric():
       if ctime[len(ctime) - 1] == "m":
         rtime = int(time.time()) + 60 * int(ctime[:-1])
@@ -60,13 +68,13 @@ class Utility(commands.Cog):
         rtime = int(time.time()) + 3600 * int(ctime[:-1])
     else:
       raise ValueError("Invalid argument: time")
-    ruser = ctx.author.id
+    ruser = inter.author.id
     rtext = text
-    db["reminders"][str(ctx.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
+    db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
     e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
-    if str(ctx.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(ctx.author.id)])}")
-    await ctx.send(embed = e)
+    if str(inter.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
+    await inter.send(embed = e)
 
   #ping command
   @commands.command(help = "Shows bot's ping", description = "Usage: pb!ping") 
@@ -80,63 +88,58 @@ class Utility(commands.Cog):
     await message.edit(content = None, embed = e)
     
   #bot info command
-  @commands.command(help = "Shows bot's info", description = "Usage: pb!botinfo")
-  async def botinfo(self, ctx):
-    e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by [Number1#4325](https://github.com/1randomguyspecial).\nTotal amount of commands: {len(tuple(command for command in ctx.bot.commands if not command.hidden))}/{len(ctx.bot.commands)} ({len(ctx.bot.commands) - len(tuple(command for command in ctx.bot.commands if not command.hidden))} hidden)\nIn: {len(ctx.bot.guilds)} servers",  color = random.randint(0, 16777215))
+  @commands.slash_command(name = "botinfo", description = "Shows bot's info")
+  async def slashbotinfo(inter):
+    e = discord.Embed(title = "About PythonBot", description = f"PythonBot is bot. Bot. Discord bot.\nBot made by [Number1#4325](https://github.com/1randomguyspecial).\nTotal amount of commands: {len(tuple(command for command in inter.bot.commands if not command.hidden)) + len(inter.bot.slash_commands)}/{len(inter.bot.commands) + len(inter.bot.slash_commands)} ({len(inter.bot.commands) - len(tuple(command for command in inter.bot.commands if not command.hidden))} hidden) ({len(inter.bot.slash_commands)} slash)\nIn: {len(inter.bot.guilds)} servers",  color = random.randint(0, 16777215))
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: {botbuild}\nPython: {pyver}\nDisnake: {dnver}", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
-    await ctx.send(embed = e)
+    await inter.send(embed = e)
   
-  @commands.command(aliases = ["contributors",], help = "Shows contributor list", description = "Usage: pb!credits")
-  async def credits(self, ctx):
+  @commands.slash_command(name = "contributors", description = "Shows contributor list")
+  async def credits(inter):
     e = discord.Embed(title = "Contributors list", description = "[AnotherAccount123#0476](https://replit.com/@EthanSmurf) - Scripter, dscommands cog owner\n[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+    await inter.send(embed = e)
 
   #server info command
-  @commands.command(aliases = ["si", "server"], help = "Shows server's info", description = "Usage: pb!serverinfo")
-  async def serverinfo(self, ctx):
-    role_count = len(ctx.guild.roles)
-    list_of_bots = [self.bot.mention for self.bot in ctx.guild.members if self.bot.bot]
-    e = discord.Embed(title = f"Server info: {ctx.guild.name}", description = f"Icon url: {str(ctx.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(ctx.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-    e.add_field(name = "Members", value = f"Total: {ctx.guild.member_count}\nHumans: {ctx.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}", inline = False)
-    e.add_field(name = "Moderation", value = f"Server owner: {ctx.guild.owner.name}\nVerification level: {str(ctx.guild.verification_level)}\nNumber of roles: {role_count}\nNumber of channels: {len(ctx.guild.channels)}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots), inline = False)
-    if ctx.guild.icon != None:
-      e.set_thumbnail(url = str(ctx.guild.icon))
-    e.set_footer(text = f"ID: {ctx.guild.id}")
-    await ctx.send(embed = e)
+  @commands.slash_command(name = "serverinfo", description = "Shows server's info")
+  async def serverinfo(inter):
+    role_count = len(inter.guild.roles)
+    list_of_bots = [inter.bot.mention for inter.bot in inter.guild.members if inter.bot.bot]
+    e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
+    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}", inline = False)
+    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {role_count}\nNumber of channels: {len(inter.guild.channels)}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots), inline = False)
+    if inter.guild.icon != None:
+      e.set_thumbnail(url = str(inter.guild.icon))
+    e.set_footer(text = f"ID: {inter.guild.id}")
+    await inter.send(embed = e)
 
   #suggest command
-  @commands.command(help = "Suggest an idea", description = "Suggest an idea for server improvement or a bot maker!\nexample: pb!suggest \"hello world\" @Number1#4325\nexample 2: pb!suggest \"hello world\"")
-  async def suggest(self, ctx, text, member: discord.Member = None):
-    e = discord.Embed(title = f"Suggestion from: {ctx.author}", description = f"{text}", color = random.randint(0, 16777215))
-    e.set_thumbnail(url = str(ctx.author.avatar))
-    msg = await ctx.send(embed = e)
+  @commands.slash_command(name = "suggest", description = "Suggest an idea")
+  async def slashsuggest(inter, *, text):
+    e = discord.Embed(title = f"Suggestion from: {inter.author}", description = f"{text}", color = random.randint(0, 16777215))
+    e.set_thumbnail(url = str(inter.author.avatar))
+    msg = await inter.send(embed = e)
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
-    if member != None:
-      e = discord.Embed(title = f"Suggestion from: {ctx.author}", description = f"Idea: {text}", color = random.randint(0, 16777215))
-      e.set_thumbnail(url = str(ctx.author.avatar))
-      await member.send(embed = e)
-    await ctx.message.add_reaction("✅")
   
   #invite command
-  @commands.command(help = "See invites", description = "See invites  to bot support server and invite bot to your server")
-  async def invite(self, ctx):
+  @commands.slash_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
+  async def slashinvite(inter):
     e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
     view = discord.ui.View()
     style = discord.ButtonStyle.gray
-    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=8&scope=bot")
+    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239165561863&scope=bot%20applications.commands")
     style1 = discord.ButtonStyle.gray
     item1 = discord.ui.Button(style = style1, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
     view.add_item(item = item)
     view.add_item(item = item1)
-    await ctx.send(embed = e, view = view)
+    await inter.send(embed = e, view = view)
     
 
   #member info command
-  @commands.command(aliases = ["mi", "whois"], help = "Shows mentioned member's info", description = "Usage: pb!memberinfo (@mention)")
-  async def memberinfo(self, ctx, member: discord.Member = None):
+  @commands.slash_command(aname = "whois", description = "Shows mentioned member's info")
+  async def slashmemberinfo(inter, member: discord.Member = None):
     if member != None:
       role_list = []
 
@@ -144,7 +147,7 @@ class Utility(commands.Cog):
         if role.name != "@everyone":
           role_list.append(role.mention)
 
-      b = ",".join(role_list)
+      b = ", ".join(role_list)
       e = discord.Embed(title = f"Member info: {member}", description = f"Joined server date: <t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
       if member.avatar != None:
         e.set_thumbnail(url = str(member.avatar))
@@ -160,63 +163,63 @@ class Utility(commands.Cog):
         e.add_field(name = "Administrator?", value = "False", inline = False)
       e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
       e.set_footer(text = f"ID: {member.id}")
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
     else:
       rgwai = waiquotes[random.randint(0, len(waiquotes) - 1)]
       role_list = []
 
-      for role in ctx.author.roles:
+      for role in inter.author.roles:
         if role.name != "@everyone":
           role_list.append(role.mention)
 
-      b = ",".join(role_list)
-      e = discord.Embed(title = f"Member info: {ctx.author}", description = f"Joined server date: <t:{str(time.mktime(ctx.author.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(ctx.author.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-      if ctx.author.avatar != None:
-        e.set_thumbnail(url = str(ctx.author.avatar))
+      b = ", ".join(role_list)
+      e = discord.Embed(title = f"Member info: {inter.author}", description = f"Joined server date: <t:{str(time.mktime(inter.author.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(inter.author.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
+      if inter.author.avatar != None:
+        e.set_thumbnail(url = str(inter.author.avatar))
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
         e.add_field(name = "Roles (0):", value = "None")
-      if ctx.author.top_role != None:
-        e.add_field(name = "Top role:", value = ctx.author.top_role.mention, inline = False)
-      if ctx.author.guild_permissions.administrator:
+      if inter.author.top_role != None:
+        e.add_field(name = "Top role:", value = inter.author.top_role.mention, inline = False)
+      if inter.author.guild_permissions.administrator:
         e.add_field(name = "Administrator?", value = "True" , inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Icon url:", value = f"[Link here]({str(ctx.author.avatar)[:-10]})", inline = False)
+      e.add_field(name = "Icon url:", value = f"[Link here]({str(inter.author.avatar)[:-10]})", inline = False)
       e.add_field(name = "Quote:", value = f"{rgwai}")
-      e.set_footer(text = f"ID: {ctx.author.id}")
-      await ctx.send(embed = e)
+      e.set_footer(text = f"ID: {inter.author.id}")
+      await inter.send(embed = e)
        
   #emoji command
-  @commands.command(aliases = ["emo"], help = "See emoji info", description = "See selected emoji info")
-  async def emoji(self, ctx, emoji: discord.Emoji):
+  @commands.slash_command(name = "emoji", description = "See emoji info")
+  async def emoji(inter, emoji: discord.Emoji):
     e = discord.Embed(title = f"Emoji info: {emoji.name}", description = f"Animated?: {'True' if emoji.animated else 'False'}\nCreated at: <t:{int(emoji.created_at.timestamp())}:F>\nLink: [Link here]({emoji.url})", color = random.randint(0, 16777215))
     e.set_image(url = emoji.url)
     e.set_footer(text = f"ID: {emoji.id}")
-    await ctx.send(embed = e)
+    await inter.send(embed = e)
 
   #servers command
-  @commands.command(help = "See other servers' member counter", description = "This command is useless don't use it")
-  async def servers(self, ctx):
-    await ctx.trigger_typing()
-    counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(ctx.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
-    e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(ctx.bot.users)}\n{counter}", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+  @commands.slash_command(description = "See other servers' member counter")
+  async def servers(inter):
+    await inter.trigger_typing()
+    counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
+    e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
+    await inter.send(embed = e)
 
   #afk command
-  @commands.command(help = "Set your afk and reason for it")
-  async def afk(self, ctx, *, reason = "None"):
-      db["afk"][str(ctx.author.id)] = reason
+  @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
+  async def slashafk(inter, *, reason = "None"):
+      db["afk"][str(inter.author.id)] = reason
       e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
   #poll command
-  @commands.command(help = "Make polls", description = "Example: pb!poll 'Hello name!' 'Hello option 1!' 'Hello option 2!' 'Hello option 3!'")
-  async def poll(self, ctx, name = None, *options):
+  @commands.slash_command(name = "poll", description = "Example: pb!poll 'Hello name!' 'Hello option 1!' 'Hello option 2!' 'Hello option 3!'")
+  async def slashpoll(inter, name = None, *options):
     optionstuple = options[:10]
-    e = discord.Embed(title = f"Poll from {ctx.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i]}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
-    msg = await ctx.send(embed = e)
+    e = discord.Embed(title = f"Poll from {inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i]}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
+    msg = await inter.send(embed = e)
     for i in range(len(optionstuple)):
       await msg.add_reaction(pollemojis[i])
 
