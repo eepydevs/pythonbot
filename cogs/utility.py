@@ -138,7 +138,7 @@ class Utility(commands.Cog):
     
 
   #member info command
-  @commands.slash_command(aname = "whois", description = "Shows mentioned member's info")
+  @commands.slash_command(name = "whois", description = "Shows mentioned member's info")
   async def slashmemberinfo(inter, member: discord.Member = None):
     if member != None:
       role_list = []
