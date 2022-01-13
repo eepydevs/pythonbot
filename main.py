@@ -7,7 +7,7 @@ from replit import db
 from disnake.ext import commands
 from server import keep_alive
 
-bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all(), test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193])
+bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all(), test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193]) #, test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193]
 
 class EmbedMinimalHelp(commands.MinimalHelpCommand):
   async def send_pages(self):

@@ -52,10 +52,17 @@ class Moderation(commands.Cog):
     await inter.send(embed = e)
 
   #timeout command
-  @commands.slash_command(name = "timeout", description = "Mute/Timeout mentioned member")
+  @commands.slash_command(name = "timeout")
   @commands.has_permissions(moderate_members = True)
   @commands.bot_has_permissions(moderate_members = True)
   async def slashtimeout(inter, member: discord.Member, duration = "1d"):
+    '''
+    Timeout (mute) mentioned member
+
+    Parameters
+    ----------
+    duration: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1d
+    '''    
     if duration.endswith("d"):
       timeoutduration = 86400 * int(duration[:-1])
       await member.timeout(duration = timeoutduration)

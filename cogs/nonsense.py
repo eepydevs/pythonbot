@@ -1,6 +1,7 @@
 #cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
+from enum import Enum
 import random
 import asyncio
 import math
@@ -9,6 +10,10 @@ from replit import db
 
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092]
+
+class Required1(str, Enum):
+  You = "True"
+  Everyone = ""
 
 def shuffle(x):
   return random.sample(x, len(x))
@@ -25,6 +30,8 @@ def calc(text):
     return eval(text)
   else:
     raise ValueError("Something went wrong... (You may have used non-int)")
+
+
 
 class Nonsense(commands.Cog):
   def __init__(self, bot):
@@ -64,12 +71,33 @@ class Nonsense(commands.Cog):
     await inter.send(embed = e)
   
   #embed command
-  @commands.slash_command(name = "embed", description = "Makes embed with title, description and footer")
-  async def slashembed(inter, title = "", desc = "", footer = ""):
+  @commands.slash_command(name = "embed")
+  async def slashembed(inter, ephemeral: Required1, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", thumbnail = "", image = ""):
+    '''
+    Makes an embed for you
+    Parameters
+    ----------
+    ephemeral: Visibility of the embed, required
+    content: Text outside embed, default is none
+    author_name: Author name, default is your name
+    author_icon: Author icon, default is your pfp
+    title: Embed title, default is none
+    desc: Embed Description, default is none
+    footer: Embed footer, default is none
+    footer_icon: Footer icon, default is none
+    thumbnail: Embed thumbnail, default is none
+    image: Embed image, default is none
+    '''
+    if author_icon == "":
+      author_icon = str(inter.author.avatar)[:-10]
+    if author_name == "":
+      author_name = inter.author.name
     e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
-    e.set_author(name =  inter.author.name, icon_url = str(inter.author.avatar)[:-10])
-    e.set_footer(text = footer)
-    await inter.send(embed = e)
+    e.set_author(name = author_name, icon_url = author_icon)
+    e.set_footer(text = footer, icon_url = footer_icon)
+    e.set_thumbnail(url = thumbnail)
+    e.set_image(url = image)
+    await inter.send(content = content, embed = e, ephemeral = ephemeral)
   
   #embed 2.0 command
   @commands.slash_command(aliases = ["emb2"], description = "Makes more advanced embed with title, description, footer and image")
@@ -215,18 +243,6 @@ class Nonsense(commands.Cog):
   @commands.slash_command(name = "sendemoji", description = "Send emoji as bot")
   async def slashsendemoji(inter, emoji: discord.Emoji):
     await inter.response.send_message(emoji.url)
-
-  #create invite command
-  #fixed annoying spelling mistake
-  @commands.slash_command(name = "createinvite", description = "Create an invite for server you're currently in")
-  @commands.cooldown(rate = 1, per = 60, type = commands.BucketType.user)
-  async def slashcreateinvite(inter, days: int = 7, uses: int = 0):
-    try:
-      maxage = 86400 * days
-      invite = await inter.channel.create_invite(max_age = maxage, max_uses = uses, unique = False)
-      await inter.send(f"Link: {invite.url}")
-    except ValueError:
-      await inter.send("Error: Alls the arguments must be ints!")
-      
+    
 def setup(bot):
   bot.add_cog(Nonsense(bot))

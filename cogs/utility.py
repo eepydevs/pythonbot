@@ -6,7 +6,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.0.0" # major.sub.fix
+botbuild = "5.1.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
@@ -40,8 +40,15 @@ class Utility(commands.Cog):
     await inter.response.send_message(embed = e)
 
   #report bug command
-  @commands.slash_command(name = "bugreport", description = "Report any of the bugs to owner!")
-  async def slashreport(inter, *, text):
+  @commands.slash_command(name = "bugreport")
+  async def slashreport(inter, text):
+    '''
+    Report a bug to bot owner
+
+    Parameters
+    ----------
+    text: Tell your bug here
+    '''
     if str(inter.author.id) not in reportblacklist:
       with open("buglist.txt", "a") as report:
         db['bugcounter'] += 1
@@ -55,8 +62,16 @@ class Utility(commands.Cog):
       await inter.send(embed = e)
 
   #remind command
-  @commands.slash_command(name = "remind", description = "Make a reminder for yourself")
+  @commands.slash_command(name = "remind")
   async def slashremind(inter, ctime = "1h", *, text):
+    '''
+    Make a reminder for yourself
+
+    Parameters
+    ----------
+    ctime: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1h
+    text: Your reminder here
+    '''
     if ctime[:-1].isnumeric():
       if ctime[len(ctime) - 1] == "m":
         rtime = int(time.time()) + 60 * int(ctime[:-1])
@@ -115,8 +130,15 @@ class Utility(commands.Cog):
     await inter.send(embed = e)
 
   #suggest command
-  @commands.slash_command(name = "suggest", description = "Suggest an idea")
-  async def slashsuggest(inter, *, text):
+  @commands.slash_command(name = "suggest")
+  async def slashsuggest(inter, text):
+    '''
+    Suggest an improvement for server
+
+    Parameters
+    ----------
+    text: Tell your suggestion here
+    '''
     e = discord.Embed(title = f"Suggestion from: {inter.author}", description = f"{text}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.author.avatar))
     msg = await inter.send(embed = e)
@@ -209,19 +231,19 @@ class Utility(commands.Cog):
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
-  async def slashafk(inter, *, reason = "None"):
+  async def slashafk(inter, reason = "None"):
       db["afk"][str(inter.author.id)] = reason
       e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
   #poll command
-  @commands.slash_command(name = "poll", description = "Example: pb!poll 'Hello name!' 'Hello option 1!' 'Hello option 2!' 'Hello option 3!'")
+  '''@commands.slash_command(name = "poll", description = "Example: pb!poll 'Hello name!' 'Hello option 1!' 'Hello option 2!' 'Hello option 3!'")
   async def slashpoll(inter, name = None, *options):
     optionstuple = options[:10]
     e = discord.Embed(title = f"Poll from {inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i]}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
     msg = await inter.send(embed = e)
     for i in range(len(optionstuple)):
-      await msg.add_reaction(pollemojis[i])
+      await msg.add_reaction(pollemojis[i])'''
 
   #group smh
   @commands.group(aliases = ["n"], help = "Make notes with the bot (BETA)")
@@ -357,13 +379,13 @@ class Utility(commands.Cog):
       await ctx.send(embed = e)
 
   #exec command
-  @commands.command(help = "Execute python code", description = "bot owner only", hidden = True)
+  @commands.slash_command(name = "exec", description = "bot owner only")
   @commands.is_owner()
-  async def exec(self, ctx, *, code):
+  async def slashexec(inter, code):
     exec(code)
     print(f"{code} is executed")
     e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+    await inter.send(embed = e, ephemeral = True)
 
 def setup(bot):
   bot.add_cog(Utility(bot))
