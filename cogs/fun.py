@@ -43,7 +43,7 @@ class Fun(commands.Cog):
   
   #say command slash
   @commands.slash_command(name = "say",description = "Repeats the thing you said")
-  async def slashsay(inter, *, text):
+  async def slashsay(inter, text):
     await inter.response.send_message(f"{text}")
   
   #choose command slash
@@ -54,7 +54,7 @@ class Fun(commands.Cog):
 
   #8ball command slash
   @commands.slash_command(name = "8ball",description = "Usage: pb!eightball (text)")
-  async def slasheightball(inter, *, text):
+  async def slasheightball(inter, text):
     e = discord.Embed(title = f"{inter.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")

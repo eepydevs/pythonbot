@@ -16,38 +16,38 @@ class Debug(commands.Cog):
 
   #when error event
   @commands.Cog.listener()
-  async def on_command_error(self, ctx, error):
+  async def on_slash_command_error(self, inter, error):
     if isinstance(error, commands.CommandNotFound):
       return
     if not isinstance(error, commands.CommandOnCooldown):
       if not "Command raised an exception:" in str(error):
-        e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)}```", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = f"```{str(error)}```", color = random.randint(0, 16777215))
       else:
-        e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)[29:]}```", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = f"```{str(error)[29:]}```", color = random.randint(0, 16777215))
     else:
-      e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
-    await ctx.send(embed = e)
+      e = discord.Embed(title = "Error", description = f"{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
   #debug command
-  @commands.command(help = "Shows debug info", description = "bot owner only", hidden = True)
+  @commands.slash_command(name = "debug", description = "bot owner only")
   @commands.is_owner()
-  async def debug(self, ctx, text = None):
+  async def slashdebug(inter, text = None):
     if text != None:
-      if str(ctx.author.id) not in db["debug"]:
-        db["debug"][str(ctx.author.id)] = "True"
+      if str(inter.author.id) not in db["debug"]:
+        db["debug"][str(inter.author.id)] = "True"
         e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
       else:
-        del db["debug"][str(ctx.author.id)]
+        del db["debug"][str(inter.author.id)]
         e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
     else:
-      if str(ctx.author.id) in db["debug"]:
+      if str(inter.author.id) in db["debug"]:
         e = discord.Embed(title = "Debug info", description = "Debug mode is enabled", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
       else:
         e = discord.Embed(title = "Debug info", description = "Debug mode is disabled", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
 
 def setup(bot):
   bot.add_cog(Debug(bot))

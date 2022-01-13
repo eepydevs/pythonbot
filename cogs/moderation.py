@@ -41,7 +41,7 @@ class Moderation(commands.Cog):
   @commands.slash_command(name = "ban", description = "Ban mentioned people")
   @commands.has_permissions(ban_members = True)
   @commands.bot_has_permissions(ban_members = True)
-  async def ban(inter, member: discord.Member, *, reason = None):
+  async def ban(inter, member: discord.Member, reason = None):
     e = discord.Embed(title = "Banned!", description = f"You were banned from server {inter.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.guild.icon))
     await member.send(embed = e)
@@ -81,7 +81,7 @@ class Moderation(commands.Cog):
   @commands.slash_command(name = "unban", description = "Unban peole")
   @commands.has_permissions(ban_members = True)
   @commands.bot_has_permissions(ban_members = True)
-  async def unban(inter, member: discord.Member, *, reason = None):
+  async def unban(inter, member: discord.Member, reason = "None"):
     e = discord.Embed(title = "Unbanned!", description = f"You were unbanned from server {inter.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.guild.icon))
     await member.send(embed = e)
@@ -94,12 +94,10 @@ class Moderation(commands.Cog):
   @commands.slash_command(name = "purge", description = "Purge messages")
   @commands.has_permissions(manage_channels = True)
   @commands.bot_has_permissions(manage_channels = True)
-  async def slashpurge(inter, num1: int):
-    if num1 > 0:
-      if num1 <= 100:
-        await inter.message.delete()
-        await asyncio.sleep(1)
-        await inter.channel.purge(limit = num1)
+  async def slashpurge(inter, number: int):
+    if number > 0:
+      if number <= 100:
+        await inter.channel.purge(limit = number)
         pquote = purgequotes[random.randint(0, len(purgequotes) - 1)]
         e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))
         await inter.send(embed = e, delete_after = 5)
@@ -147,7 +145,7 @@ class Moderation(commands.Cog):
   @commands.slash_command(name = "warn", description = "Warn people (BETA)")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
-  async def slashwarn(inter, member: discord.Member, *, reason = "None"):
+  async def slashwarn(inter, member: discord.Member, reason = "None"):
     if str(member.id) not in db["warns"]:
       db["warns"][str(member.id)] = []
       updatelist = db["warns"][str(member.id)]

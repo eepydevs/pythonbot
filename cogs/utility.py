@@ -6,7 +6,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5b.98.37" # major.sub.fix
+botbuild = "5.0.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.0"
 
@@ -31,12 +31,12 @@ class Utility(commands.Cog):
     self.bot = bot
     bot.help_command.cog = self
 
-  #ping command
+  #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}")
+      e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.response.send_message(embed = e)
 
   #report bug command

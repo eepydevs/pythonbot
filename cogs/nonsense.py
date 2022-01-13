@@ -38,9 +38,9 @@ class Nonsense(commands.Cog):
     
 
   #eval command
-  @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results", hidden = True)
+  @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
-  async def eval(inter, *, code):
+  async def eval(inter, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension"]
     try:
       if inter.author.id == inter.bot.owner.id:
@@ -51,7 +51,7 @@ class Nonsense(commands.Cog):
           e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
           await inter.send(embed = e)
         else:
-          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}", color = random.randint(0, 16777215))
           await inter.send(embed = e)
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
@@ -59,7 +59,7 @@ class Nonsense(commands.Cog):
   
   #calculator command
   @commands.slash_command(name = "calc", description = "Calculate anything you need! (basic math)")
-  async def slashcalculator(inter, *, equation):
+  async def slashcalculator(inter, equation):
     e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
     await inter.send(embed = e)
   
@@ -73,7 +73,7 @@ class Nonsense(commands.Cog):
   
   #embed 2.0 command
   @commands.slash_command(aliases = ["emb2"], description = "Makes more advanced embed with title, description, footer and image")
-  async def embed2(inter, *, options = ""):
+  async def embed2(inter, options = ""):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
     list = options.split("/ ")
     errornum = 0
@@ -214,8 +214,7 @@ class Nonsense(commands.Cog):
   #send emoji command
   @commands.slash_command(name = "sendemoji", description = "Send emoji as bot")
   async def slashsendemoji(inter, emoji: discord.Emoji):
-    await inter.trigger_typing()
-    await inter.send(emoji.url)
+    await inter.response.send_message(emoji.url)
 
   #create invite command
   #fixed annoying spelling mistake
@@ -228,7 +227,6 @@ class Nonsense(commands.Cog):
       await inter.send(f"Link: {invite.url}")
     except ValueError:
       await inter.send("Error: Alls the arguments must be ints!")
-      inter.command.reset_cooldown(inter)
       
 def setup(bot):
   bot.add_cog(Nonsense(bot))
