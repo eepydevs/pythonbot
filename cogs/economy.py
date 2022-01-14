@@ -1,6 +1,7 @@
 #cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
+from enum import Enum
 import random
 import asyncio
 from replit import db
@@ -34,14 +35,25 @@ def iteminfo(name):
   if name == "Discount card":
     return "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!"
 
+class Required2(str, Enum):
+  info = "info"
+  use = "use"
 
 class Economy(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
   #item group
-  @commands.slash_command(name = "item", description = "Available actions: info, use")
-  async def slashitem(inter, action, itemname):
+  @commands.slash_command(name = "item")
+  async def slashitem(inter, action: Required2, itemname):
+    '''
+    See what you can do with your item
+
+    Parameters
+    ----------
+    action: Info - Shows selected item info, Use - Uses selected item
+    itemname: Select an item you have
+    '''
     if action == "info":
       if str(inter.author.id) in db["inventory"]:
         item = itemname.lower().capitalize()
