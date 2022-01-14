@@ -1,2 +1,10 @@
-Bug #1: remove get_command from eval,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, from icemay#6281: fixed
-Bug #2: if you send a ping message and edit it so it have no pings, and then delete it, pb wont notice. FIX!!!!!!!!!!!! OR I EAT LEG!!!!!!!!!!! from icemay#6281: can't be fixed i think
+Bug #1: remove get_command from eval,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,, from icemay#6281
+comment: fixed
+Bug #2: if you send a ping message and edit it so it have no pings, and then delete it, pb wont notice. FIX!!!!!!!!!!!! OR I EAT LEG!!!!!!!!!!! from icemay#6281
+comment: can't be fixed i think
+Bug #4: how this works from Dark_dot.html#5012
+comment: false
+Bug #5: 9+10=21 from Marble178 New Ac#4883
+comment: false
+Bug #6: 1. You need to multiplied 3 to 5, because 18 < 20 from Marble178 New Ac#4883
+comment: false
