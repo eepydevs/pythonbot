@@ -7,21 +7,45 @@ import math
 
 
 def uwuize(text):
+	extra = 1
+	emoticons = ["owo", "OwO", "uwu", "UwU", ">w<", "-w-", ":3", "^w^", ":>", ":<"]
 	translation = ""
-	for letter in text:
-		if letter.lower() in "r":
-			if letter.isupper():
-				translation += "W"
-			else:
-				translation += "w"
-		if letter.lower() in "l":
-			if letter.isupper():
-				translation += "W"
-			else:
-				translation += "w"
-		else: 
+	chance = random.randint(0, 100)
+	if chance >= 25:
+		for letter in text:
+			if letter.lower() in "r":
+				if letter.isupper():
+					translation += "W"
+				else:
+					translation += "w"
+			if letter.lower() in "l":
+				if letter.isupper():
+					translation += "W"
+				else:
+					translation += "w"
+			else: 
+				translation += letter
+			chance = random.randint(0, 100)
+			if chance <= 30:
+				translation += "~"
+				extra += 1
+			if len(translation) == len(text) + extra:
+				chance = random.randint(0, 100)
+				if chance >= 25:
+					translation += f" {random.choice(emoticons)}"
+		return translation
+	else:
+		for letter in text:
 			translation += letter
-	return translation
+			chance = random.randint(0, 100)
+			if chance <= 30:
+				translation += "~"
+				extra += 1
+			if len(translation) == len(text) + extra:
+				chance = random.randint(0, 100)
+				if chance <= 50:
+					translation += f" {random.choice(emoticons)}"
+		return translation
 
 class Text(commands.Cog):
   def __init__(self, bot):

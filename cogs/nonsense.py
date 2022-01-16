@@ -47,22 +47,22 @@ class Nonsense(commands.Cog):
   #eval command
   @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
-  async def eval(inter, code):
+  async def eval(inter, *, ephemeral: Required1 = Required1.You, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension"]
     try:
       if inter.author.id == inter.bot.owner.id:
-        e = discord.Embed(title = "Eval:", description = f"{eval(code)}", color = random.randint(0, 16777215)) 
-        await inter.send(embed = e)
+        e = discord.Embed(title = "Eval:", description = f"```py\n{code}\n```\nResult: ```\n{eval(code)}\n```", color = random.randint(0, 16777215)) 
+        await inter.send(embed = e, ephemeral = ephemeral)
       else:
         if any(i in code for i in blacklist):
           e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+          await inter.send(embed = e, ephemeral = True)
         else:
-          e = discord.Embed(title = "Eval:", description = f"{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+          e = discord.Embed(title = "Eval:", description = f"```py\n{code}\n```\nResult:\n```\n{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}\n```", color = random.randint(0, 16777215))
+          await inter.send(embed = e, ephemeral = ephemeral)
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
   
   #calculator command
   @commands.slash_command(name = "calc", description = "Calculate anything you need! (basic math)")
@@ -222,9 +222,10 @@ class Nonsense(commands.Cog):
           await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id}!", ephemeral = True)
         else:
           await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
-      except:
-        pass
-  
+      except asyncio.TimeoutError:
+        view.stop()
+        break
+        
   #test 3 (select command) command
   @commands.slash_command(name = "menu", description = "test command 3", hidden = True)
   async def select(inter):
