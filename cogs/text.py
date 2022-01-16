@@ -8,7 +8,7 @@ import math
 
 def uwuize(text):
 	import random
-	emoticons = ("owo", "OwO", "uwu", "UwU", ">w<", "<w<", "^w^", ">w>", "@w@", "-w-", ":3", "3:", ":>", ":<")
+	emoticons = ("owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "-w-", ":3", "3:", ":>", ":<")
 	vowels = ("a", "e", "i", "u", "o")
 	translation = ""
 	chance = random.randint(0, 100)
