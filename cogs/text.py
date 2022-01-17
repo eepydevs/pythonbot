@@ -7,7 +7,7 @@ import math
 
 
 def uwuize(text):
-  emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ":3", "3:", ":>", ":<"]
+  emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ":3", "3:", ":>", ":<", "'w'", "'~'"]
   random.shuffle(emoticons)
   vowels = ("a", "e", "i", "u", "o")
   translation = ""
