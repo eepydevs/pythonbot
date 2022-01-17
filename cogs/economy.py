@@ -769,7 +769,7 @@ class Economy(commands.Cog):
               await inter.send(embed = e)
             except asyncio.TimeoutError:
               e = discord.Embed(title = f"No response from mailed user ({member})", color = random.randint(0, 16777215))
-              await inter.send(embed = e, mention_author = False)
+              await inter.send(embed = e, ephemeral = True)
           else:
             e = discord.Embed(title = "Error", description = f"Sorry you can't message {member}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
             await inter.send(embed = e, ephemeral = True)
