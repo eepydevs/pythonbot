@@ -224,7 +224,7 @@ class Utility(commands.Cog):
   #servers command
   @commands.slash_command(description = "See other servers' member counter")
   async def servers(inter):
-    await inter.trigger_typing()
+    await inter.defer(ephemeral = True)
     counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
     e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
     await inter.send(embed = e)
