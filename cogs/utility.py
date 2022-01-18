@@ -31,6 +31,39 @@ class Utility(commands.Cog):
     self.bot = bot
     bot.help_command.cog = self
 
+  #context menu user info command
+  @commands.user_command(name="User Info")  
+  async def userinfo(self, inter, member: discord.Member):
+      role_list = []
+
+      for role in member.roles:
+        if role.name != "@everyone":
+          role_list.append(role.mention)
+
+      b = ", ".join(role_list)
+      e = discord.Embed(title = f"Member info: {member}", description = f"Joined server date: <t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
+      if member.avatar != None:
+        e.set_thumbnail(url = str(member.avatar))
+      if len(role_list) != 0:
+        e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
+      else:
+        e.add_field(name = "Roles (0)", value = "None")
+      if member.top_role != None:
+        e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
+      if member.guild_permissions.administrator:
+        e.add_field(name = "Administrator?", value = "True" , inline = False)
+      else:
+        e.add_field(name = "Administrator?", value = "False", inline = False)
+      e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
+      e.set_footer(text = f"ID: {member.id}")
+      await inter.send(embed = e, ephemeral = True)
+
+  #context menu message info command
+  @commands.message_command(name="Message Info") 
+  async def msginfo(self, inter, message: discord.Message):
+    e = discord.Embed(title = "Message info", description = f"Message ID: {message.id}\nChannel ID: {message.channel.id}\nServer ID: {message.guild.id}\n\nCreated at: <t:{str(time.mktime(message.created_at.timetuple()))[:-2]}:R>\nMessage content: {message.content}\nLink: [Jump url]({message.jump_url})", color = random.randint(0, 16777215))
+    await inter.response.send_message(embed = e, ephemeral = True)
+
   #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):

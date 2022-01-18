@@ -14,7 +14,7 @@ class Debug(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
-  #when error event
+  #when slash error
   @commands.Cog.listener()
   async def on_slash_command_error(self, inter, error):
     if isinstance(error, commands.CommandNotFound):
@@ -27,6 +27,19 @@ class Debug(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = f"{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
     await inter.send(embed = e, ephemeral = True)
+  #when normal error 
+  @commands.Cog.listener()
+  async def on_command_error(self, ctx, error):
+    if isinstance(error, commands.CommandNotFound):
+      return
+    if not isinstance(error, commands.CommandOnCooldown):
+      if not "Command raised an exception:" in str(error):
+        e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)}```", color = random.randint(0, 16777215))
+      else:
+        e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n```{str(error)[29:]}```", color = random.randint(0, 16777215))
+    else:
+      e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
+    await ctx.send(embed = e)
 
   #debug command
   @commands.slash_command(name = "debug", description = "bot owner only")
