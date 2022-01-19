@@ -42,7 +42,31 @@ class Nonsense(commands.Cog):
   #async def on_message_edit(self, ctx):
   #  if ctx.command.name == "eval":
   #    await self.eval(self, ctx, ctx.args[0])
-    
+
+  @commands.slash_command(name = "copyperson")
+  @commands.bot_has_permissions(manage_webhooks = True)
+  async def userecho(inter, member: discord.Member, *, content):
+    '''
+    Copy someone!
+    Parameters
+    ----------
+    member: Mention a person to copy
+    content: Input text here
+    '''
+    await inter.send(f"Successfully sent `{content}` as `{member}`", ephemeral = True) 
+    channel_webhooks = await inter.channel.webhooks()
+    webhook_count = 0
+
+    for webhook in channel_webhooks:
+        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Copy":
+            await webhook.send(
+                content=content, username=member.display_name, avatar_url=member.avatar
+            )
+            return
+
+    new_webhook = await inter.channel.create_webhook(name="PythonBot Copy", reason="PythonBot Copy command")
+    await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar)
+
 
   #eval command
   @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
