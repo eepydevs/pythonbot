@@ -184,7 +184,7 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
     view = discord.ui.View()
     style = discord.ButtonStyle.gray
-    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239165561863&scope=bot%20applications.commands")
+    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239702424647&scope=bot%20applications.commands")
     style1 = discord.ButtonStyle.gray
     item1 = discord.ui.Button(style = style1, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
     view.add_item(item = item)
