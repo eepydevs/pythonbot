@@ -101,13 +101,13 @@ class Nonsense(commands.Cog):
   
   #embed command
   @commands.slash_command(name = "embed")
-  async def slashembed(inter, ephemeral: Required1, _send: sendopt, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", color = random.randint(0, 16777215), thumbnail = "", image = ""):
+  async def slashembed(inter, ephemeral: Required1, *, _send: sendopt = sendopt.Slash, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", color = random.randint(0, 16777215), thumbnail = "", image = ""):
     '''
     Makes an embed for you
     Parameters
     ----------
     ephemeral: Visibility of the embed, required
-    _send: How to send embed, required
+    _send: How to send embed, default is slash
     content: Text outside embed, default is none
     author_name: Author name, default is your name
     author_icon: Author icon, default is your pfp
@@ -132,7 +132,7 @@ class Nonsense(commands.Cog):
       await inter.send("Successfully sent seperated embed", ephemeral = True)
       await inter.send(content = content, embed = e, ephemeral = ephemeral)
     elif _send == "Webhook":
-      inter.send("Successfully sent embed as webhook", ephemeral = True)
+      await inter.send("Successfully sent embed as webhook", ephemeral = True)
       channel_webhooks = await inter.channel.webhooks()
       webhook_count = 0
 
