@@ -9,7 +9,7 @@ import math
 def uwuize(text):
   emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ".w.", ".~.", "'w'", "'~'" ">:3",":3", "3:", "3:<", ">:>", ":>", ">:<", ":<"]
   random.shuffle(emoticons)
-  vowels = ("a", "e", "i", "u", "o")
+  vowels = ("a", "A", "e", "E", "i", "I", "u", "U", "o", "O")
   translation = ""
   chance = random.randint(0, 100)
   if chance >= 25:

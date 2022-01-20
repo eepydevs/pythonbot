@@ -15,6 +15,11 @@ class Required1(str, Enum):
   You = "True"
   Everyone = ""
 
+class sendopt(str, Enum):
+  Slash = "Slash"
+  Seperate = "Seperate"
+  Webhook = "Webhook"
+
 def shuffle(x):
   return random.sample(x, len(x))
 
@@ -58,13 +63,13 @@ class Nonsense(commands.Cog):
     webhook_count = 0
 
     for webhook in channel_webhooks:
-        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Copy":
+        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
             await webhook.send(
                 content=content, username=member.display_name, avatar_url=member.avatar
             )
             return
 
-    new_webhook = await inter.channel.create_webhook(name="PythonBot Copy", reason="PythonBot Copy command")
+    new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
     await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar)
 
 
@@ -96,12 +101,13 @@ class Nonsense(commands.Cog):
   
   #embed command
   @commands.slash_command(name = "embed")
-  async def slashembed(inter, ephemeral: Required1, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", thumbnail = "", image = ""):
+  async def slashembed(inter, ephemeral: Required1, _send: sendopt, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", color = random.randint(0, 16777215), thumbnail = "", image = ""):
     '''
     Makes an embed for you
     Parameters
     ----------
     ephemeral: Visibility of the embed, required
+    _send: How to send embed, required
     content: Text outside embed, default is none
     author_name: Author name, default is your name
     author_icon: Author icon, default is your pfp
@@ -109,6 +115,7 @@ class Nonsense(commands.Cog):
     desc: Embed Description, default is none
     footer: Embed footer, default is none
     footer_icon: Footer icon, default is none
+    color: Embed color, default is random
     thumbnail: Embed thumbnail, default is none
     image: Embed image, default is none
     '''
@@ -116,15 +123,33 @@ class Nonsense(commands.Cog):
       author_icon = str(inter.author.avatar)[:-10]
     if author_name == "":
       author_name = inter.author.name
-    e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
+    e = discord.Embed(title = title, description = desc, color = color)
     e.set_author(name = author_name, icon_url = author_icon)
     e.set_footer(text = footer, icon_url = footer_icon)
     e.set_thumbnail(url = thumbnail)
     e.set_image(url = image)
-    await inter.send(content = content, embed = e, ephemeral = ephemeral)
+    if _send == "Seperate":
+      await inter.send("Successfully sent seperated embed", ephemeral = True)
+      await inter.send(content = content, embed = e, ephemeral = ephemeral)
+    elif _send == "Webhook":
+      inter.send("Successfully sent embed as webhook", ephemeral = True)
+      channel_webhooks = await inter.channel.webhooks()
+      webhook_count = 0
+
+      for webhook in channel_webhooks:
+        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
+            await webhook.send(
+                content = content, embed = e, username = inter.bot.user.display_name, avatar_url = inter.bot.user.avatar
+            )
+            return
+
+      new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
+      await new_webhook.send(content = content, embed = e, username = inter.bot.user.display_name, avatar_url = inter.bot.user.avatar)
+    else:
+      await inter.send(content = content, embed = e, ephemeral = ephemeral)
   
   #embed 2.0 command
-  @commands.slash_command(aliases = ["emb2"], description = "Makes more advanced embed with title, description, footer and image")
+  '''@commands.slash_command(aliases = ["emb2"], description = "Makes more advanced embed with title, description, footer and image")
   async def embed2(inter, options = ""):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
     list = options.split("/ ")
@@ -214,7 +239,7 @@ class Nonsense(commands.Cog):
       e.set_image(url = imagelink)
       e.set_thumbnail(url = thumblink)
       e.set_footer(text = footer)
-      await inter.send(embed = e)
+      await inter.send(embed = e)'''
 
   #test 2 (buttons message) command
   @commands.slash_command(name = "button", description = "test command 2", hidden = True)
