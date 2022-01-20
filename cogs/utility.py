@@ -279,137 +279,134 @@ class Utility(commands.Cog):
       await msg.add_reaction(pollemojis[i])'''
 
   #group smh
-  @commands.group(aliases = ["n"], help = "Make notes with the bot (BETA)")
-  async def note(self, ctx):
-    if str(ctx.author.id) not in db["notes"]:
-        db["notes"][str(ctx.author.id)] = {}
-    if ctx.invoked_subcommand == None:
-      e = discord.Embed(title = "Error", description = "Type a subcommand!\nAvaliable subcommands: add, read, list, replace, create, newline, readraw and delete", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+  @commands.slash_command(description = "Make notes with the bot (BETA)")
+  async def note(self, inter):
+    if str(inter.author.id) not in db["notes"]:
+      db["notes"][str(inter.author.id)] = {}
   
-  @note.command(aliases = ["l"], help = "Shows list of notes you have")
-  async def list(self, ctx):
-    if str(ctx.author.id) in db["notes"] and db["notes"][str(ctx.author.id)] != {}:
-      notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(ctx.author.id)].keys(), start = 1))
-      e = discord.Embed(title = f"{ctx.author}'s notes:", description = notes, color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+  @note.sub_command(description =  "Shows list of notes you have")
+  async def list(self, inter):
+    if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
+      notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
+      e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
+      await inter.send(embed = e)
     else:
-      e = discord.Embed(title = f"Notes: {ctx.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
   
-  @note.command(aliases = ["make"], help = "Creates note")
-  async def create(self, ctx, name = None, *, text = None):
-    if str(ctx.author.id) in db["notes"]:
-      if name not in db["notes"][str(ctx.author.id)]:
+  @note.sub_command(description = "Creates note")
+  async def create(self, inter, name = None, text = None):
+    if str(inter.author.id) in db["notes"]:
+      if name not in db["notes"][str(inter.author.id)]:
         if text != None:
-          updatenotes = db["notes"][str(ctx.author.id)]
+          updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = text
-          db["notes"][str(ctx.author.id)] = updatenotes
+          db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
         else:
-          updatenotes = db["notes"][str(ctx.author.id)]
+          updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = "New note"
-          db["notes"][str(ctx.author.id)] = updatenotes
+          db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
       else:
         e = discord.Embed(title = "Error", description = "This name is used!", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
     else:
       if text != None:
-        db["notes"][str(ctx.author.id)] = {}
-        updatenotes = db["notes"][str(ctx.author.id)]
+        db["notes"][str(inter.author.id)] = {}
+        updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] = text
-        db["notes"][str(ctx.author.id)] = updatenotes
+        db["notes"][str(inter.author.id)] = updatenotes
         e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
       else:
-        db["notes"][str(ctx.author.id)] = {}
-        updatenotes = db["notes"][str(ctx.author.id)]
+        db["notes"][str(inter.author.id)] = {}
+        updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] = "New note"
-        db["notes"][str(ctx.author.id)] = updatenotes
+        db["notes"][str(inter.author.id)] = updatenotes
         e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
   
-  @note.command(aliases = ["overwrite", "ow", "rewrite", "rw"], help = "Replaces whole note text")
-  async def replace(self, ctx, name = None, *, text = None):
+  @note.sub_command(description =  "Replaces whole note text")
+  async def overwrite(inter, name, text):
     try:
-      updatenotes = db["notes"][str(ctx.author.id)]
+      updatenotes = db["notes"][str(inter.author.id)]
       updatenotes[name] = text
-      db["notes"][str(ctx.author.id)] = updatenotes
+      db["notes"][str(inter.author.id)] = updatenotes
       e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
     except KeyError:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
-  @note.command(aliases = ["insert"], help = "Inserts text at the end\nread - reads selected note")
-  async def add(self, ctx, name = None, *, text = None):
+  @note.sub_command(description = "Inserts text at the end\nread - reads selected note")
+  async def add(self, inter, name = None, text = None):
     try:
-      updatenotes = db["notes"][str(ctx.author.id)]
+      updatenotes = db["notes"][str(inter.author.id)]
       updatenotes[name] += f" {text}"
-      db["notes"][str(ctx.author.id)] = updatenotes
+      db["notes"][str(inter.author.id)] = updatenotes
       e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
     except KeyError:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
-  @note.command(aliases = ["ninsert"], help = "Inserts text at the end on new line")
-  async def newline(self, ctx, name = None, *, text = None):
+  @note.sub_command(description = "Inserts text at the end on new line")
+  async def newline(self, inter, name = None, text = None):
     try:
-      updatenotes = db["notes"][str(ctx.author.id)]
+      updatenotes = db["notes"][str(inter.author.id)]
       updatenotes[name] += f"\n{text}"
-      db["notes"][str(ctx.author.id)] = updatenotes
+      db["notes"][str(inter.author.id)] = updatenotes
       e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
     except KeyError:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
   
-  @note.command(aliases = ["r"], help = "Reads selected note")
-  async def read(self, ctx, *, name = None):
-    if name in db["notes"][str(ctx.author.id)]:
-      e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(ctx.author.id)].get(name)}", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+  @note.sub_command(description = "Reads selected note")
+  async def read(self, inter, name):
+    if name in db["notes"][str(inter.author.id)]:
+      e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
     else:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
-  @note.command(aliases = ["del"], help = "Deletes selected note")
-  async def delete(self, ctx, *, name = None):
-    if str(ctx.author.id) in db["notes"]:
+  @note.sub_command(description = "Deletes selected note")
+  async def delete(self, inter, name):
+    if str(inter.author.id) in db["notes"]:
       if name != None:
-        if name in db["notes"][str(ctx.author.id)]:
-          updatenotes = db["notes"][str(ctx.author.id)]
+        if name in db["notes"][str(inter.author.id)]:
+          updatenotes = db["notes"][str(inter.author.id)]
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is deleted!", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
           updatenotes.pop(name)
-          db["notes"][str(ctx.author.id)] = updatenotes
+          db["notes"][str(inter.author.id)] = updatenotes
         else:
           e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
+          await inter.send(embed = e)
       else:
         e = discord.Embed(title = f"Error", description = "You can't delete nothing!", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
     else:
       e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
-  @note.command(aliases = ["rr"], help = "Reads selected note but **text** is \*\*text\*\*")
-  async def readraw(self, ctx, name = None):
-    if str(ctx.author.id) in db["notes"]:
-      if name in db["notes"][str(ctx.author.id)]:
-        text = db['notes'][str(ctx.author.id)].get(name).replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
+  @note.sub_command(description = "Reads selected note but escapes markdown")
+  async def read_raw(self, inter, name):
+    if str(inter.author.id) in db["notes"]:
+      if name in db["notes"][str(inter.author.id)]:
+        text = db['notes'][str(inter.author.id)].get(name).replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
         e = discord.Embed(title = f"Notes: {name}", description = text, color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
       else:
         e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
+        await inter.send(embed = e)
     else:
       e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
+      await inter.send(embed = e)
 
   #exec command
   @commands.slash_command(name = "exec", description = "bot owner only")
