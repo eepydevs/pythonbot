@@ -1,6 +1,7 @@
 #cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
+import requests
 import random
 import asyncio
 from replit import db
@@ -41,8 +42,24 @@ class Fun(commands.Cog):
         view.stop
         break
   
+  @commands.slash_command(name = "getmeme", description = "Get a meme lol")
+  async def slashmeme(inter):
+    r = requests.get("https://meme-api.herokuapp.com/gimme")
+    rjson = r.json()
+    while True:
+      if str(rjson['nsfw']).title() == "True":
+        r = requests.get("https://meme-api.herokuapp.com/gimme")
+        rjson = r.json()
+      else:
+        break
+    e = discord.Embed(title = f"{rjson['title']}", description = f"Link: {rjson['postLink']}\nMeme by: {rjson['author']}", color = random.randint(0, 16777215))
+    e.set_image(url = f"{rjson['url']}")
+    e.set_footer(text = f"👍: {rjson['ups']}")
+    await inter.send(embed = e)
+
+
   #say command slash
-  @commands.slash_command(name = "say",description = "Repeats the thing you said")
+  @commands.slash_command(name = "say", description = "Repeats the thing you said")
   async def slashsay(inter, text):
     await inter.response.send_message(f"{text}")
   
