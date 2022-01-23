@@ -35,12 +35,15 @@ async def on_message(message):
 
 @bot.event
 async def on_message_delete(message):
-  if str(message.guild.id) in db["serversetting"]["gpd"]:
-    if message.mentions:
-      if message.author.bot != True:
-        e = discord.Embed(title = "Ghost ping detected!", description = f"{message.content}", color = random.randint(0, 16777215))
-        e.set_footer(text = f"Message from: {message.author}")
-        await message.channel.send(embed = e)
+  try:
+    if str(message.guild.id) in db["serversetting"]["gpd"]:
+      if message.mentions:
+        if message.author.bot != True:
+          e = discord.Embed(title = "Ghost ping detected!", description = f"{message.content}", color = random.randint(0, 16777215))
+          e.set_footer(text = f"Message from: {message.author}")
+          await message.channel.send(embed = e)
+  except:
+    pass
 
 #when connected event lol
 @bot.event

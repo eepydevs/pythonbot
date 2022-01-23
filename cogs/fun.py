@@ -6,7 +6,8 @@ import random
 import asyncio
 from replit import db
 
-responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly.."]
+responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly..", "Concentrate and ask again.", "Cannot predict now.", "Ask again later."]
+random.shuffle(responselist)
 
 
 class Fun(commands.Cog):
@@ -72,6 +73,7 @@ class Fun(commands.Cog):
   #8ball command slash
   @commands.slash_command(name = "8ball",description = "Usage: pb!eightball (text)")
   async def slasheightball(inter, text):
+    random.shuffle(responselist)
     e = discord.Embed(title = f"{inter.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")

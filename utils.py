@@ -41,6 +41,6 @@ def Embed(
 
 async def Webhook(ctx):
   for webhook in (await ctx.channel.webhooks()):
-    if webhook.user.id == ctx.bot.user.id and webhook.name == "Car Tupper":
+    if webhook.user.id == ctx.bot.user.id and webhook.name == "PythonBot Webhook":
       return webhook
-  return (await ctx.channel.create_webhook(name="Car Tupper"))
+  return (await ctx.channel.create_webhook(name="PythonBot Webhook"))
