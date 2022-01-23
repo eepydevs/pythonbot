@@ -2,6 +2,8 @@
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
+import re
+import utils
 import random
 import asyncio
 import math
@@ -48,6 +50,28 @@ class Nonsense(commands.Cog):
   #  if ctx.command.name == "eval":
   #    await self.eval(self, ctx, ctx.args[0])
 
+  @commands.Cog.listener()
+  async def on_message(self, msg):
+    if msg.author.bot:
+      return
+    reg = ':[a-zA-Z]+:'
+    other = re.split(reg, msg.content)
+    emjs = re.findall(reg, msg.content)
+    content=other[0]
+    for i in range(len(emjs)):
+      myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
+      emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
+      content+=emj+other[i+1]
+      
+    if content==msg.content: return
+    if msg.reference and len(msg.content.split())==1:
+      await msg.delete()
+      await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
+    else:
+      webhook = (await utils.Webhook((await self.bot.get_context(msg))))
+      await msg.delete()
+      await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar)
+
   @commands.slash_command(name = "copyperson")
   @commands.bot_has_permissions(manage_webhooks = True)
   async def userecho(inter, member: discord.Member, *, content):
@@ -72,6 +96,30 @@ class Nonsense(commands.Cog):
     new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
     await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar)
 
+  @commands.slash_command()
+  async def react(self, inter, emoji:discord.Emoji, message:discord.Message):
+    '''
+    Let a Tupper add a Reaction
+
+    Parameters
+    ----------
+    emoji: The Emoji to react with
+    message:  The Message Url you want to react to
+    '''
+    await message.add_reaction(emoji)
+    if isinstance(inter, discord.Message):
+      sent = await inter.author.send('Reaction added!\nMake sure to add your own Reaction for it to stay')
+    else:
+      await inter.send('Reaction added!\nMake sure to add your own Reaction for it to stay', ephemeral=True)
+      sent = inter.response
+    try:
+      await self.bot.wait_for('reaction_add', check=lambda react, user: react.message==message and user==inter.author, timeout=10)
+      await message.remove_reaction(emoji, self.bot.user)
+      await sent.delete()
+      return
+    except:
+      await message.remove_reaction(emoji, self.bot.user)
+      await sent.delete()
 
   #eval command
   @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
