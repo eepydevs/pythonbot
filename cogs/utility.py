@@ -69,16 +69,20 @@ class Utility(commands.Cog):
   #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):
-    url = "https://api.uptimerobot.com/v2/getMonitors"
-    payload = "api_key=ur1498720-9af5fdfa5379789418825cfc&format=json&all_time_uptime_ratio=1"
-    headers = {
-    'content-type': "application/x-www-form-urlencoded",
-    'cache-control': "no-cache"
-    }
-    response = requests.request("POST", url, data=payload, headers=headers)          
-    resjson = response.json()
+    try:
+      url = "https://api.uptimerobot.com/v2/getMonitors"
+      payload = "api_key=ur1498720-9af5fdfa5379789418825cfc&format=json&all_time_uptime_ratio=1"
+      headers = {
+      'content-type': "application/x-www-form-urlencoded",
+      'cache-control': "no-cache"
+      }
+      response = requests.request("POST", url, data=payload, headers=headers)          
+      resjson = response.json()
+      alltimeratio = f"{resjson['monitors'][1]['all_time_uptime_ratio']}%"
+    except:
+      alltimeratio = "Unavailable"
 
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nAll time uptime ratio: {resjson['monitors'][1]['all_time_uptime_ratio']}%", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nAll time uptime ratio: `{alltimeratio}`", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.response.send_message(embed = e)
@@ -284,7 +288,7 @@ class Utility(commands.Cog):
   @commands.slash_command(name = "poll", description = "Example: /poll Hello name! Hello option 1!, Hello option 2!, Hello option 3!")
   async def slashpoll(inter, name, options):
     '''
-    Suggest an improvement for server
+    Make a poll
 
     Parameters
     ----------
