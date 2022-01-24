@@ -25,8 +25,14 @@ if "notes" not in db:
 if "reminders" not in db:
   db["reminders"] = {}
 
-if "bugcounter" not in db:
-  db["bugcounter"] = 0
+if "bot" not in db:
+  db["bot"] = {}
+
+if "bugcounter" not in db["bot"]:
+  db["bot"]["bugcounter"] = 0
+
+if "atr_log" not in db["bot"]:
+  db["bot"]["atr_log"] = 0
 
 class Utility(commands.Cog):
   def __init__(self, bot):
@@ -79,8 +85,9 @@ class Utility(commands.Cog):
       response = requests.request("POST", url, data=payload, headers=headers)          
       resjson = response.json()
       alltimeratio = f"{resjson['monitors'][1]['all_time_uptime_ratio']}%"
+      db["bot"]["atr_log"] = alltimeratio
     except:
-      alltimeratio = "Unavailable"
+      alltimeratio = db["bot"]["atr_log"]
 
     e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nAll time uptime ratio: `{alltimeratio}`", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
