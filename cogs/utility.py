@@ -106,9 +106,9 @@ class Utility(commands.Cog):
     '''
     if str(inter.author.id) not in reportblacklist:
       with open("buglist.txt", "a") as report:
-        db['bugcounter'] += 1
+        db['bot']['bugcounter'] += 1
         report.write("\n")
-        report.write(f"Bug #{db['bugcounter']}: {text} from {inter.author}")
+        report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
         report.close()
       e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
