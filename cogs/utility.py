@@ -2,6 +2,8 @@
 import disnake as discord
 from disnake.ext import commands
 import random
+import os
+import requests
 import asyncio
 import datetime, time
 from replit import db
@@ -67,7 +69,16 @@ class Utility(commands.Cog):
   #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    url = "https://api.uptimerobot.com/v2/getMonitors"
+    payload = "api_key=ur1498720-9af5fdfa5379789418825cfc&format=json&all_time_uptime_ratio=1"
+    headers = {
+    'content-type': "application/x-www-form-urlencoded",
+    'cache-control': "no-cache"
+    }
+    response = requests.request("POST", url, data=payload, headers=headers)          
+    resjson = response.json()
+
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nAll time uptime ratio: {resjson['monitors'][1]['all_time_uptime_ratio']}%", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.response.send_message(embed = e)
@@ -270,13 +281,23 @@ class Utility(commands.Cog):
       await inter.send(embed = e)
 
   #poll command
-  '''@commands.slash_command(name = "poll", description = "Example: pb!poll 'Hello name!' 'Hello option 1!' 'Hello option 2!' 'Hello option 3!'")
-  async def slashpoll(inter, name = None, *options):
-    optionstuple = options[:10]
+  @commands.slash_command(name = "poll", description = "Example: /poll Hello name! Hello option 1!, Hello option 2!, Hello option 3!")
+  async def slashpoll(inter, name, options):
+    '''
+    Suggest an improvement for server
+
+    Parameters
+    ----------
+    name: Name of your poll
+    options: Example: Hello option 1!, Hello option 2!, Hello option 3!
+    '''  
+    optionstuple = options.split(', ')[:10]
     e = discord.Embed(title = f"Poll from {inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i]}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
-    msg = await inter.send(embed = e)
+    #await inter.send("Successfully sent poll", ephemeral = True)
+    await inter.send(embed = e)
+    msg = await inter.original_message()
     for i in range(len(optionstuple)):
-      await msg.add_reaction(pollemojis[i])'''
+      await msg.add_reaction(pollemojis[i])
 
   #group smh
   @commands.slash_command(description = "Make notes with the bot (BETA)")
