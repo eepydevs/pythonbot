@@ -316,7 +316,7 @@ class Utility(commands.Cog):
     if str(inter.author.id) not in db["notes"]:
       db["notes"][str(inter.author.id)] = {}
   
-  @note.sub_command(description =  "Shows list of notes you have")
+  @note.sub_command(description = "Shows list of notes you have")
   async def list(self, inter):
     if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
       notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
