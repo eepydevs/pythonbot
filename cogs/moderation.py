@@ -17,7 +17,7 @@ if "warns" not in db:
 if "serversetting" not in db:
   db["serversetting"] = {}
   db["serversetting"]["gpd"] = {}
-  db["serversetting"]["antiscam"] = {}
+  db["serversetting"]["nqn"] = {}
 
 class Moderation(commands.Cog):
   def __init__(self, bot):
@@ -219,13 +219,30 @@ class Moderation(commands.Cog):
             db["serversetting"]["gpd"][str(inter.guild.id)] = "True"
             e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
             await inter.send(embed = e)
+        if setting == "nqn":
+          if str(inter.guild.id) in db["serversetting"]["nqn"]:
+            del db["serversetting"]["nqn"][str(inter.guild.id)]
+            e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            db["serversetting"]["nqn"][str(inter.guild.id)] = "True"
+            e = discord.Embed(title = "Success", description = "You enabled NQN feature for this server", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
       else:
-        if str(inter.guild.id) in db["serversetting"]["gpd"]:
-          e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-        else:
-          e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+        if setting == "gpd":
+          if str(inter.guild.id) in db["serversetting"]["gpd"]:
+            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+        if setting == "nqn":
+          if str(inter.guild.id) in db["serversetting"]["nqn"]:
+            e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature enabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
 
 def setup(bot):
   bot.add_cog(Moderation(bot))

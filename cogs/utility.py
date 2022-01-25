@@ -75,6 +75,7 @@ class Utility(commands.Cog):
   #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):
+    inter.response.defer()
     try:
       url = "https://api.uptimerobot.com/v2/getMonitors"
       payload = "api_key=ur1498720-9af5fdfa5379789418825cfc&format=json&all_time_uptime_ratio=1"
