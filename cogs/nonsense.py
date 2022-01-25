@@ -45,12 +45,6 @@ class Nonsense(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
 
-  #listener
-  #@commands.Cog.listener()
-  #async def on_message_edit(self, ctx):
-  #  if ctx.command.name == "eval":
-  #    await self.eval(self, ctx, ctx.args[0])
-
   @commands.Cog.listener()
   async def on_message(self, msg):
     if msg.author.bot:
@@ -73,7 +67,7 @@ class Nonsense(commands.Cog):
       await msg.delete()
       await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar)
 
-  @commands.slash_command(name = "copyperson")
+  @commands.slash_command(name = "copy-person")
   @commands.bot_has_permissions(manage_webhooks = True)
   async def userecho(inter, member: discord.Member, *, content):
     '''
@@ -196,99 +190,6 @@ class Nonsense(commands.Cog):
       await new_webhook.send(content = content, embed = e, username = inter.bot.user.display_name, avatar_url = inter.bot.user.avatar)
     else:
       await inter.send(content = content, embed = e, ephemeral = ephemeral)
-  
-  #embed 2.0 command
-  '''@commands.slash_command(aliases = ["emb2"], description = "Makes more advanced embed with title, description, footer and image")
-  async def embed2(inter, options = ""):
-    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval"]
-    list = options.split("/ ")
-    errornum = 0
-    num = 0
-    num2 = 1
-    title = ""
-    desc = ""
-    footer = ""
-    imagelink = ""
-    thumblink = ""
-    while num <= int(len(list) - 1):
-      if "title:" in list[num]:
-        if "|" in str(list[num])[6:]:
-          if int(inter.author.id) in whitelist_id:
-            codelist = str(list[num])[6:].split("|")
-            num2 = 1
-            while num2 < int(len(codelist) - 1):
-              if any(i in codelist[num2] for i in blacklist):
-                errornum = 1
-                e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-                await inter.send(embed = e)
-                break
-              else:
-                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
-                num2 += 2
-            text = ""
-            for x in codelist:
-              text += str(x)
-            title = text
-          else:
-            title = str(list[num])[6:]
-        else:
-          title = str(list[num])[6:]
-      elif "desc:" in list[num]:
-        if "|" in str(list[num])[5:]:
-          if int(inter.author.id) in whitelist_id:
-            codelist = str(list[num])[5:].split("|")
-            num2 = 1
-            while num2 < int(len(codelist) - 1):
-              if any(i in codelist[num2] for i in blacklist):
-                errornum = 1
-                e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-                await inter.send(embed = e)
-                break
-              else:
-                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
-                num2 += 2
-            text = ""
-            for x in codelist:
-              text += str(x)
-            desc = text
-          else:
-            desc = str(list[num])[5:]
-        else:
-          desc = str(list[num])[5:]
-      elif "footer:" in list[num]:
-        if "|" in str(list[num])[7:]:
-          if int(inter.author.id) in whitelist_id:
-            codelist = str(list[num])[7:].split("|")
-            num2 = 1
-            while num2 < int(len(codelist) - 1):
-              if any(i in codelist[num2] for i in blacklist):
-                errornum = 1
-                e = discord.Embed(title = "Error", description = "None", color = random.randint(0, 16777215))
-                await inter.send(embed = e)
-                break
-              else:
-                codelist[num2] = eval(codelist[num2], {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'ctx': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None})
-                num2 += 2
-            text = ""
-            for x in codelist:
-              text += str(x)
-            footer = text
-          else:
-            footer = str(list[num])[7:]
-        else:
-          footer = str(list[num])[7:]
-      elif "imagelink:" in list[num]:
-        imagelink = str(list[num])[10:]
-      elif "thumblink:" in list[num]:
-        thumblink = str(list[num])[10:]
-      num += 1
-    if not errornum == 1:
-      e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
-      e.set_author(name = inter.author.name, icon_url = inter.author.avatar)
-      e.set_image(url = imagelink)
-      e.set_thumbnail(url = thumblink)
-      e.set_footer(text = footer)
-      await inter.send(embed = e)'''
 
   #test 2 (buttons message) command
   @commands.slash_command(name = "button", description = "test command 2", hidden = True)
