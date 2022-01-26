@@ -12,6 +12,7 @@ import math
 import datetime, time
 from replit import db
 
+bad_words = os.getenv("badwords")
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
 
@@ -39,8 +40,6 @@ def calc(text):
     return eval(text)
   else:
     raise ValueError("Something went wrong... (You may have used non-int)")
-
-
 
 class Nonsense(commands.Cog):
   def __init__(self, bot):
@@ -88,8 +87,11 @@ class Nonsense(commands.Cog):
     e = discord.Embed(title = f"Urban Dictionary Meaning for: {query}", url = rjson['list'][0]['permalink'], color = random.randint(0, 16777215))
     e.add_field(name = "Definition:", value = rjson['list'][0]['definition'], inline = False)
     e.add_field(name = "Example:", value = rjson['list'][0]['example'], inline = False)
-    e.set_footer(text = f"👍: {rjson['list'][0]['thumbs_up']} | Author: {rjson['list'][0]['author']}")
+    e.set_footer(text = f"👍: {rjson['list'][0]['thumbs_up']} / 👎: {rjson['list'][0]['thumbs_down']} | Author: {rjson['list'][0]['author']}")
     await inter.send(embed = e)
+    #except:
+    #  e = discord.Embed(title = "Error", description = "Something went wrong...", color = random.randint(0, 16777215))
+    #  await inter.send(embed = e, ephemeral = True)
 
 
   @commands.slash_command(name = "copy-person")
