@@ -74,22 +74,23 @@ class Nonsense(commands.Cog):
     ----------
     query: Your term here!
     '''
-    url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
-    querystring = {"term": query}
-    headers = {
-        'x-rapidapi-key': os.getenv('urbanAPI'),
-        'x-rapidapi-host': "mashape-community-urban-dictionary.p.rapidapi.com"
-        }
-    response = requests.request("GET", url, headers=headers, params=querystring)
-    rjson = response.json()
-    e = discord.Embed(title = f"Urban Dictionary Meaning for: {query}", url = rjson['list'][0]['permalink'], color = random.randint(0, 16777215))
-    e.add_field(name = "Definition:", value = rjson['list'][0]['definition'], inline = False)
-    e.add_field(name = "Example:", value = rjson['list'][0]['example'], inline = False)
-    e.set_footer(text = f"👍: {rjson['list'][0]['thumbs_up']} / 👎: {rjson['list'][0]['thumbs_down']} | Author: {rjson['list'][0]['author']}")
-    await inter.send(embed = e)
-    #except:
-    #  e = discord.Embed(title = "Error", description = "Something went wrong...", color = random.randint(0, 16777215))
-    #  await inter.send(embed = e, ephemeral = True)
+    try:
+      url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
+      querystring = {"term": query}
+      headers = {
+          'x-rapidapi-key': os.getenv('urbanAPI'),
+          'x-rapidapi-host': "mashape-community-urban-dictionary.p.rapidapi.com"
+          }
+      response = requests.request("GET", url, headers=headers, params=querystring)
+      rjson = response.json()
+      e = discord.Embed(title = f"Urban Dictionary Meaning for: {query}", url = rjson['list'][0]['permalink'], color = random.randint(0, 16777215))
+      e.add_field(name = "Definition:", value = rjson['list'][0]['definition'], inline = False)
+      e.add_field(name = "Example:", value = rjson['list'][0]['example'], inline = False)
+      e.set_footer(text = f"👍: {rjson['list'][0]['thumbs_up']} / 👎: {rjson['list'][0]['thumbs_down']} | Author: {rjson['list'][0]['author']}")
+      await inter.send(embed = e)
+    except:
+      e = discord.Embed(title = "Error", description = "Something went wrong...", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
 
   @commands.slash_command(name = "copy-person")
