@@ -47,24 +47,27 @@ class Nonsense(commands.Cog):
   async def on_message(self, msg):
     if msg.author.bot:
       return
-    if str(msg.guild.id) in db["serversetting"]["nqn"]:
-      reg = ':[a-zA-Z]+:'
-      other = re.split(reg, msg.content)
-      emjs = re.findall(reg, msg.content)
-      content=other[0]
-      for i in range(len(emjs)):
-        myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
-        emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
-        content+=emj+other[i+1]
-        
-      if content==msg.content: return
-      if msg.reference and len(msg.content.split())==1:
-        await msg.delete()
-        await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
-      else:
-        webhook = (await utils.Webhook((await self.bot.get_context(msg))))
-        await msg.delete()
-        await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar)
+    try:
+      if str(msg.guild.id) in db["serversetting"]["nqn"]:
+        reg = ':[a-zA-Z]+:'
+        other = re.split(reg, msg.content)
+        emjs = re.findall(reg, msg.content)
+        content=other[0]
+        for i in range(len(emjs)):
+          myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
+          emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
+          content+=emj+other[i+1]
+          
+        if content==msg.content: return
+        if msg.reference and len(msg.content.split())==1:
+          await msg.delete()
+          await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
+        else:
+          webhook = (await utils.Webhook((await self.bot.get_context(msg))))
+          await msg.delete()
+          await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar)
+    except:
+      pass
 
   @commands.slash_command(name = "urban")
   async def slashurban(inter, query):
