@@ -34,6 +34,7 @@ if "bugcounter" not in db["bot"]:
 if "atr_log" not in db["bot"]:
   db["bot"]["atr_log"] = 0
 
+
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
@@ -77,19 +78,20 @@ class Utility(commands.Cog):
   async def slashping(inter):
     try:
       url = "https://api.uptimerobot.com/v2/getMonitors"
-      payload = "api_key=ur1498720-9af5fdfa5379789418825cfc&format=json&all_time_uptime_ratio=1"
+      payload = "api_key=m789844302-2c9467e07ebf524406068312&format=json&custom_uptime_ratios=1-30"
       headers = {
       'content-type': "application/x-www-form-urlencoded",
       'cache-control': "no-cache"
       }
       response = requests.request("POST", url, data=payload, headers=headers)          
       resjson = response.json()
-      alltimeratio = f"{resjson['monitors'][1]['all_time_uptime_ratio']}%"
-      db["bot"]["atr_log"] = alltimeratio
+      print(resjson)
+      customtimeratio = resjson['monitors'][0]['custom_uptime_ratio'].split('-')
+      db["bot"]["atr_log"] = customtimeratio
     except:
-      alltimeratio = db["bot"]["atr_log"]
+      customtimeratio = db["bot"]["atr_log"]
 
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nAll time uptime ratio: `{alltimeratio}`", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nToday's uptime ratio: `{customtimeratio[0]}%`\nThis month's uptime ratio: `{customtimeratio[1]}%`", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.response.send_message(embed = e)
