@@ -198,7 +198,8 @@ class Utility(commands.Cog):
     '''
     e = discord.Embed(title = f"Suggestion from: {inter.author}", description = f"{text}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.author.avatar))
-    msg = await inter.send(embed = e)
+    await inter.send(embed = e)
+    msg = await inter.original_message()
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
   
