@@ -34,7 +34,6 @@ if "bugcounter" not in db["bot"]:
 if "atr_log" not in db["bot"]:
   db["bot"]["atr_log"] = 0
 
-
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
@@ -202,6 +201,8 @@ class Utility(commands.Cog):
     msg = await inter.original_message()
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
+
+  
   
   #invite command
   @commands.slash_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
