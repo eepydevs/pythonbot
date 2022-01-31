@@ -10,6 +10,7 @@ replit = "^3.2.4"
 Flask = "^2.0.2"
 app = "^0.0.1"
 disnake = "^2.3.0"
+Js2Py = "^0.71"
 
 [tool.poetry.dev-dependencies]
 

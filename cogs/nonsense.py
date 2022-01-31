@@ -8,6 +8,7 @@ import utils
 import random
 import asyncio
 import requests
+import js2py
 import math
 import datetime, time
 from replit import db
@@ -17,6 +18,10 @@ whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 6915
 class Required1(str, Enum):
   You = "True"
   Everyone = ""
+
+class Required2(str, Enum):
+  Normal = "Normal"
+  Await = "Await"
 
 class sendopt(str, Enum):
   Slash = "Slash"
@@ -145,25 +150,52 @@ class Nonsense(commands.Cog):
       await message.remove_reaction(emoji, self.bot.user)
       await sent.delete()
 
-  #eval command
-  @commands.slash_command(name = "eval", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
+  #eval python command
+  @commands.slash_command(name = "evalpy", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
-  async def eval(inter, *, ephemeral: Required1 = Required1.You, code):
+  async def evalpy(inter, *, ephemeral: Required1 = Required1.You, send_way: Required2 = Required2.Normal, code):
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension"]
     try:
       if inter.author.id == inter.bot.owner.id:
-        e = discord.Embed(title = "Eval:", description = f"```py\n{code}\n```\nResult: ```\n{eval(code)}\n```", color = random.randint(0, 16777215)) 
-        await inter.send(embed = e, ephemeral = ephemeral)
-      else:
-        if any(i in code for i in blacklist):
-          e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
-          await inter.send(embed = e, ephemeral = True)
-        else:
-          e = discord.Embed(title = "Eval:", description = f"```py\n{code}\n```\nResult:\n```\n{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None})}\n```", color = random.randint(0, 16777215))
+        if send_way == "Normal":
+          e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{eval(code)}\n```", color = random.randint(0, 16777215)) 
           await inter.send(embed = e, ephemeral = ephemeral)
+        elif send_way == "Await":
+          e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
+          await inter.send(embed = e, ephemeral = ephemeral)
+          await eval(code)
+      else:
+        if send_way == "Normal":
+          if any(i in code for i in blacklist):
+            e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = True)
+          else:
+            e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult:\n```\n{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})}\n```", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = ephemeral)
+        else:
+          if any(i in code for i in blacklist):
+            e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = True)
+          else:
+            e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = ephemeral)
+            await eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
+
+  #eval javascript command
+  @commands.slash_command(name = "evaljs", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute javascript code and see results")
+  @commands.check(lambda inter: inter.author.id in whitelist_id)
+  async def evaljs(inter, *, ephemeral: Required1 = Required1.You, code):
+    try:
+      if inter.author.id == inter.bot.owner.id:
+        e = discord.Embed(title = "JSEval:", description = f"```js\n{code}\n```\nResult: ```\n{js2py.eval_js(code)}\n```", color = random.randint(0, 16777215)) 
+        await inter.send(embed = e, ephemeral = ephemeral)
+    except Exception as error:
+      e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    
   
   #calculator command
   @commands.slash_command(name = "calc", description = "Calculate anything you need! (basic math)")
