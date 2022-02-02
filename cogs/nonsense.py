@@ -154,7 +154,7 @@ class Nonsense(commands.Cog):
   @commands.slash_command(name = "evalpy", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
   async def evalpy(inter, *, ephemeral: Required1 = Required1.You, send_way: Required2 = Required2.Normal, code):
-    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension"]
+    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension", "leave"]
     try:
       if inter.author.id == inter.bot.owner.id:
         if send_way == "Normal":

@@ -117,5 +117,11 @@ class Text(commands.Cog):
     modtext = uwuize(text)
     await inter.send(modtext)
 
+  #domify command
+  @commands.slash_command(name = "domify", description = "Domify your inputted text!")
+  async def dot(inter, *, text):
+    modtext = text.lower() + "."
+    await inter.send(modtext)
+
 def setup(bot):
   bot.add_cog(Text(bot))
