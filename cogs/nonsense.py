@@ -31,6 +31,45 @@ class sendopt(str, Enum):
 def shuffle(x):
   return random.sample(x, len(x))
 
+def runbf(str):
+  array = [0] * 30000
+  i = 0
+  codei = 1
+  codeiStack = []
+  strp = []
+  while codei < len(str):
+    l = str[codei]
+    #increase
+    if l == '+':
+      array[i] = ((array[i] + 1) % 255)
+    #decrease
+    elif l == '-':
+      array[i] = ((array[i] - 1) % 255)
+    #go one cell right
+    elif l == ">":
+      i += 1
+    #go one cell left
+    elif l == "<":
+      i -= 1
+    #input ascii character in strp array
+    elif l == ".":
+      strp.append(chr(array[i]))
+    #join every letter in strp array and print
+    elif l == '[':
+      codeiStack.append(codei)
+    elif l == ']':
+      if array[i] != 0:
+        #restart the loop
+        codei = codeiStack[-1]
+      else:
+        #exit the loop
+        codeiStack.pop()
+    codei += 1
+  if len(strp) != 0:
+    return "".join(f"{ll}" for ll in strp)
+  else:
+    pass
+
 def calc(text):
   check = text.split(" ")
   whitelist = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "/", "%", "+", "-", "(", ")", " ", "."]
@@ -194,6 +233,16 @@ class Nonsense(commands.Cog):
         await inter.send(embed = e, ephemeral = ephemeral)
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    
+  #eval brainfudge command
+  @commands.slash_command(name = "evalbf", description = "Execute brainfudge code and see results")
+  async def evalbf(inter, *, ephemeral: Required1 = Required1.You, code):
+    try:
+      e = discord.Embed(title = "BFEval:", description = f"```bf\n{code}\n```\nResult: ```\n{runbf(code)}\n```", color = random.randint(0, 16777215)) 
+      await inter.send(embed = e, ephemeral = ephemeral)
+    except:
+      e = discord.Embed(title = "Error", description = f"Something went wrong. Try again...", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
     
   
