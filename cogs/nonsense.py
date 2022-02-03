@@ -34,7 +34,7 @@ def shuffle(x):
 def runbf(str):
   array = [0] * 30000
   i = 0
-  codei = 1
+  codei = 0
   codeiStack = []
   strp = []
   while codei < len(str):

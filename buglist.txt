@@ -8,3 +8,6 @@ Bug #5: 9+10=21 from Marble178 New Ac#4883
 comment: 9+10=19
 Bug #6: 1. You need to multiplied 3 to 5, because 18 < 20 from Marble178 New Ac#4883
 comment: multiple*
+--------------------
+Bug #1: ratio from MOHINEESH SAI  ?  /#0042
+comment: false
