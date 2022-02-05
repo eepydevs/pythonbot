@@ -2,6 +2,7 @@
 import disnake as discord
 from disnake.ext import commands
 import asyncio
+from enum import Enum
 import random
 from replit import db
 
@@ -18,6 +19,16 @@ if "serversetting" not in db:
   db["serversetting"] = {}
   db["serversetting"]["gpd"] = {}
   db["serversetting"]["nqn"] = {}
+
+class Requiredc(str, Enum):
+  Text_Channel = "text"
+  Voice_Channel = "voice"
+  Stage_Channel = "stage"
+
+class Requiredcnsfw(str, Enum):
+  true = "True"
+  false = ""
+  
 
 class Moderation(commands.Cog):
   def __init__(self, bot):
@@ -243,6 +254,41 @@ class Moderation(commands.Cog):
           else:
             e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
             await inter.send(embed = e)
+
+
+  @commands.slash_command(name = "createchannel", description = "Create a channel")
+  @commands.has_permissions(manage_channels = True)
+  @commands.bot_has_permissions(manage_channels = True)
+  async def createchannel(inter, *, name, channeltype: Requiredc = Requiredc.Text_Channel, topic = "", nsfw: Requiredcnsfw = Requiredcnsfw.false):
+    '''
+    Create a channel
+
+    Parameters
+    ----------
+    name: Name of new channel
+    channeltype: Existing types: text, voice, stage
+    topic: Description of new channel
+    nsfw: false or true
+    '''    
+    if nsfw:
+      nsfw = True
+    else:
+      nsfw = False
+    if channeltype == "text":
+      await inter.guild.create_text_channel(name = name.replace(" ", "-"), category = inter.channel.category, topic = topic, nsfw = nsfw)
+      e = discord.Embed(title = "Success", description = f"Text channel {name} is created!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    elif channeltype == "voice":
+      await inter.guild.create_voice_channel(name = name, category = inter.channel.category)
+      e = discord.Embed(title = "Success", description = f"Voice channel {name} is created!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    elif channeltype == "stage":
+      await inter.guild.create_stage_channel(name = name.replace(" ", "-"), category = inter.channel.category, topic = topic)
+      e = discord.Embed(title = "Success", description = f"Stage channel {name} is created!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "Unknown type!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
 def setup(bot):
   bot.add_cog(Moderation(bot))

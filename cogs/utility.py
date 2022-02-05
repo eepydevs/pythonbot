@@ -77,20 +77,19 @@ class Utility(commands.Cog):
   async def slashping(inter):
     try:
       url = "https://api.uptimerobot.com/v2/getMonitors"
-      payload = "api_key=m789844302-2c9467e07ebf524406068312&format=json&custom_uptime_ratios=1-30"
+      payload = "api_key=m789844302-2c9467e07ebf524406068312&format=json&custom_uptime_ratios=7-30"
       headers = {
       'content-type': "application/x-www-form-urlencoded",
       'cache-control': "no-cache"
       }
       response = requests.request("POST", url, data=payload, headers=headers)          
       resjson = response.json()
-      print(resjson)
       customtimeratio = resjson['monitors'][0]['custom_uptime_ratio'].split('-')
       db["bot"]["atr_log"] = customtimeratio
     except:
       customtimeratio = db["bot"]["atr_log"]
 
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nToday's uptime ratio: `{customtimeratio[0]}%`\nThis month's uptime ratio: `{customtimeratio[1]}%`", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nThis week's uptime ratio: `{customtimeratio[0]}%`\nThis month's uptime ratio: `{customtimeratio[1]}%`", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.response.send_message(embed = e)
@@ -178,8 +177,9 @@ class Utility(commands.Cog):
     role_count = len(inter.guild.roles)
     list_of_bots = [inter.bot.mention for inter.bot in inter.guild.members if inter.bot.bot]
     e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}", inline = False)
-    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {role_count}\nNumber of channels: {len(inter.guild.channels)}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots), inline = False)
+    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {role_count}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots))
+    e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
+    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
     if inter.guild.icon != None:
       e.set_thumbnail(url = str(inter.guild.icon))
     e.set_footer(text = f"ID: {inter.guild.id}")
