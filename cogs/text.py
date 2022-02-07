@@ -2,12 +2,9 @@
 import disnake as discord
 from disnake.ext import commands
 import random
-import asyncio
-import math
-
 
 def uwuize(text):
-  emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", "u<u", "u>u", "o<o", "o>o", "O<O", "O>O", "U>U", "U<U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ".w.", ".~.", "'w'", "'~'" ">:3",":3", "3:", "3:<", ">:>", ":>", ">:<", ":<"]
+  emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", "u<u", "u>u", "o<o", "o>o", "O<O", "O>O", "U>U", "U<U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ".w.", ".~.", "'w'", "'~'" ">:3",":3", "3:", "3:<", ">:>", ":>", ">:<", ":<" "*purr*", "meow!"]
   random.shuffle(emoticons)
   vowels = ("a", "A", "e", "E", "i", "I", "u", "U", "o", "O")
   translation = ""
@@ -34,7 +31,7 @@ def uwuize(text):
             else:
               translation += "w"
         chance = random.randint(0, 100)
-        if chance <= 30:
+        if chance <= 15:
           translation += "~"
     chance = random.randint(0, 100)
     if chance >= 25:
@@ -44,7 +41,7 @@ def uwuize(text):
     for letter in text:
       translation += letter
       chance = random.randint(0, 100)
-      if chance <= 30:
+      if chance <= 15:
         translation += "~"
     chance = random.randint(0, 100)
     if chance <= 50:
