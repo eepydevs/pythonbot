@@ -54,10 +54,10 @@ async def on_connection():
 @bot.event
 async def on_ready():
   print("bot connected")
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python Bot help | Restarted"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game("Restarted"))
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("pb!help/@Python Bot help | Made on Python 3.8.2!"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game("/commandname | Made on Python 3.8.2!"))
   while True:
     print(f"{int(time.time())}")
     if len(db["reminders"]) == 1:
