@@ -10,7 +10,7 @@ from replit import db
 
 botbuild = "5.7.6" # major.sub.fix
 pyver = "3.8.2"
-dnver = "2.3.0"
+dnver = "2.3.1"
 
 waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro", "You are the best!"]
 reportblacklist = []
@@ -110,7 +110,7 @@ class Utility(commands.Cog):
         report.write("\n")
         report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
         report.close()
-      e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bot']['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
