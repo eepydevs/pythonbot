@@ -38,8 +38,15 @@ class Moderation(commands.Cog):
   @commands.slash_command(name = "kick", description = "Kick mentioned member")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
-  async def slashkick(inter, member: discord.Member): 
-    e = discord.Embed(title = "Pwned!", description = f"You were kicked from server {inter.guild.name}", color = random.randint(0, 16777215))
+  async def slashkick(inter, member: discord.Member):
+    '''
+    Kick people
+
+    Parameters
+    ----------
+    member: Mention member
+    '''
+    e = discord.Embed(title = "Kicked!", description = f"You were kicked from server {inter.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.guild.icon))
     await member.send(embed = e)
     
@@ -53,6 +60,14 @@ class Moderation(commands.Cog):
   @commands.has_permissions(ban_members = True)
   @commands.bot_has_permissions(ban_members = True)
   async def ban(inter, member: discord.Member, reason = None):
+    '''
+    Ban people
+
+    Parameters
+    ----------
+    member: Mention member
+    reason: Reason for the ban, will show up in audit log
+    '''
     e = discord.Embed(title = "Banned!", description = f"You were banned from server {inter.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.guild.icon))
     await member.send(embed = e)
@@ -62,8 +77,8 @@ class Moderation(commands.Cog):
     e = discord.Embed(title = "Success", description = f"Successfully banned {member.mention}! {bquote}", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
-  #timeout command
-  @commands.slash_command(name = "timeout")
+  '''#timeout command
+  @commands.slash_command(name = "timeout", description = "timeout people")
   @commands.has_permissions(moderate_members = True)
   @commands.bot_has_permissions(moderate_members = True)
   async def slashtimeout(inter, member: discord.Member, duration = "1d"):
@@ -72,6 +87,7 @@ class Moderation(commands.Cog):
 
     Parameters
     ----------
+    member: Mention member
     duration: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1d
     '''    
     if duration.endswith("d"):
@@ -93,13 +109,21 @@ class Moderation(commands.Cog):
       timeoutduration = 60 * int(duration[:-1])
       await member.timeout(duration = timeoutduration)
       e = discord.Embed(title = f"{member.name} Got timeout", description = f"Duration: {int(duration[:-1])} minutes", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e)'''
 
   #unban command
-  @commands.slash_command(name = "unban", description = "Unban peole")
+  @commands.slash_command(name = "unban", description = "Unban people")
   @commands.has_permissions(ban_members = True)
   @commands.bot_has_permissions(ban_members = True)
   async def unban(inter, member: discord.Member, reason = "None"):
+    '''
+    Unban people
+
+    Parameters
+    ----------
+    member: Mention member
+    reason: Reason for the unban, will show up in audit log
+    '''
     e = discord.Embed(title = "Unbanned!", description = f"You were unbanned from server {inter.guild.name}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.guild.icon))
     await member.send(embed = e)
@@ -113,6 +137,13 @@ class Moderation(commands.Cog):
   @commands.has_permissions(manage_channels = True)
   @commands.bot_has_permissions(manage_channels = True)
   async def slashpurge(inter, number: int):
+    '''
+    Purge messages
+    
+    Parameters
+    ----------
+    number: Number used for purging, min=0, max=100
+    '''
     if number > 0:
       if number <= 100:
         await inter.channel.purge(limit = number)
@@ -139,6 +170,13 @@ class Moderation(commands.Cog):
   #prefix command
   @commands.slash_command(name = "prefix", description = "See current prefix or change it")
   async def slashprefix(inter, prefix = None):
+    '''
+    Set or see current prefix
+
+    Parameters
+    ----------
+    prefix: Prefix here
+    '''
     if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
       if not prefix:
         e = discord.Embed(title = "Prefix", description = f"Current prefix is: `{db['prefix'][str(inter.guild.id)]}`", color = random.randint(0, 16777215))
@@ -164,6 +202,14 @@ class Moderation(commands.Cog):
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
   async def slashwarn(inter, member: discord.Member, reason = "None"):
+    '''
+    Warn people
+
+    Parameters
+    ----------
+    member: Mention member
+    reason: Reason for the warn, will be shown in /warns member: @mention
+    '''
     if str(member.id) not in db["warns"]:
       db["warns"][str(member.id)] = []
       updatelist = db["warns"][str(member.id)]
@@ -182,6 +228,13 @@ class Moderation(commands.Cog):
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
   async def slashwarns(inter, member: discord.Member):
+    '''
+    See people's warns
+
+    Parameters
+    ----------
+    member: Mention member
+    '''
     if str(member.id) in db["warns"] and db["warns"][str(member.id)] != []:
       list = db["warns"][str(member.id)]
       text = ""
@@ -198,6 +251,14 @@ class Moderation(commands.Cog):
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
   async def removewarn(inter, member: discord.Member, index: int):
+    '''
+    Remove people's warns
+
+    Parameters
+    ----------
+    member: Mention member
+    index: index of the warn, shown in /warns member: @mention
+    '''
     if str(member.id) in db["warns"] and db["warns"][str(member.id)] != []:
       updatelist = db["warns"][str(member.id)]
       try:
@@ -218,7 +279,15 @@ class Moderation(commands.Cog):
 
   #setting group
   @commands.slash_command(name = "setting", description = "See current setting or change it. Available settings: gpd")
-  async def slashsetting(inter, setting, switch):
+  async def slashsetting(inter, setting, switch = "info"):
+    '''
+    Switch settings
+
+    Parameters
+    ----------
+    setting: Available settings: gpd, nqn
+    switch: basically anything
+    '''
     if switch != "info":
       if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
         if setting == "gpd":

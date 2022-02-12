@@ -193,6 +193,15 @@ class Nonsense(commands.Cog):
   @commands.slash_command(name = "evalpy", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
   async def evalpy(inter, *, ephemeral: Required1 = Required1.You, send_way: Required2 = Required2.Normal, code):
+    '''
+    Only for people that are in whitelist
+
+    Parameters
+    ----------
+    ephemeral: Visibility of eval
+    send_way: Available ways: Normal, Await
+    code: Code here
+    '''
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension", "leave"]
     try:
       if inter.author.id == inter.bot.owner.id:
@@ -227,6 +236,14 @@ class Nonsense(commands.Cog):
   @commands.slash_command(name = "evaljs", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute javascript code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
   async def evaljs(inter, *, ephemeral: Required1 = Required1.You, code):
+    '''
+    nobody can use this sadly
+
+    Parameters
+    ----------
+    ephemeral: Visibility of eval
+    code: Code here
+    '''
     try:
       if inter.author.id == inter.bot.owner.id:
         e = discord.Embed(title = "JSEval:", description = f"```js\n{code}\n```\nResult: ```\n{js2py.eval_js(code)}\n```", color = random.randint(0, 16777215)) 
@@ -238,6 +255,14 @@ class Nonsense(commands.Cog):
   #eval brainfudge command
   @commands.slash_command(name = "evalbf", description = "Execute brainfudge code and see results")
   async def evalbf(inter, *, ephemeral: Required1 = Required1.You, code):
+    '''
+    Execute brainfudge code and see the results
+
+    Parameters
+    ----------
+    ephemeral: Visibility of eval
+    code: Code here
+    '''
     try:
       e = discord.Embed(title = "BFEval:", description = f"```bf\n{code}\n```\nResult: ```\n{runbf(code)}\n```", color = random.randint(0, 16777215)) 
       await inter.send(embed = e, ephemeral = ephemeral)
@@ -249,6 +274,13 @@ class Nonsense(commands.Cog):
   #calculator command
   @commands.slash_command(name = "calc", description = "Calculate anything you need! (basic math)")
   async def slashcalculator(inter, equation):
+    '''
+    Calculate basic math
+
+    Parameters
+    ----------
+    equation: Example: 1 + 1
+    '''
     e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
     await inter.send(embed = e)
   
@@ -301,7 +333,7 @@ class Nonsense(commands.Cog):
     else:
       await inter.send(content = content, embed = e, ephemeral = ephemeral)
 
-  #test 2 (buttons message) command
+  '''#test 2 (buttons message) command
   @commands.slash_command(name = "button", description = "test command 2", hidden = True)
   async def slashbutton(inter):
     view = discord.ui.View(timeout = 60)
@@ -334,8 +366,8 @@ class Nonsense(commands.Cog):
       except asyncio.TimeoutError:
         view.stop()
         break
-        
-  #test 3 (select command) command
+        '''
+  '''#test 3 (select command) command
   @commands.slash_command(name = "menu", description = "test command 3", hidden = True)
   async def select(inter):
     view = discord.ui.View(timeout = 60)
@@ -347,11 +379,18 @@ class Nonsense(commands.Cog):
         await interaction.send(content = f"You selected Option {view.children[0].values[0]}!", ephemeral = True)
       except asyncio.TimeoutError:
         view.stop()
-        break
+        break'''
 
   #send emoji command
   @commands.slash_command(name = "sendemoji", description = "Send emoji as bot")
   async def slashsendemoji(inter, emoji: discord.Emoji):
+    '''
+    Send emoji as bot
+
+    Parameters
+    ----------
+    emoji: Emoji here
+    '''
     await inter.response.send_message(emoji.url)
     
 def setup(bot):

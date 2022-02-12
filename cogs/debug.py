@@ -45,6 +45,13 @@ class Debug(commands.Cog):
   @commands.slash_command(name = "debug", description = "bot owner only")
   @commands.is_owner()
   async def slashdebug(inter, text = None):
+    '''
+    debug,,
+
+    Parameters
+    ----------
+    text: None
+    '''
     if text != None:
       if str(inter.author.id) not in db["debug"]:
         db["debug"][str(inter.author.id)] = "True"

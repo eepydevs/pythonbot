@@ -62,17 +62,38 @@ class Fun(commands.Cog):
   #say command slash
   @commands.slash_command(name = "say", description = "Repeats the thing you said")
   async def slashsay(inter, text):
+    '''
+    Repeats the thing you said
+    
+    Parameters
+    ----------
+    text: Text here
+    '''
     await inter.response.send_message(f"{text}")
   
   #choose command slash
   @commands.slash_command(name = "choice", description = "Usage: /choice thing 1, thing2, 3 thing")
   async def slashchoice(inter, options):
+    '''
+    Let the bot to choose something for you
+
+    Parameters
+    ----------
+    options: Example: thing 1, thing2, 3thing
+    '''
     e = discord.Embed(title = "Choice:", description = f"I choose.. {random.choice(options.split(', '))}", color = random.randint(0, 16777215))
     await inter.response.send_message(embed = e)    
 
   #8ball command slash
   @commands.slash_command(name = "8ball",description = "Usage: pb!eightball (text)")
   async def slasheightball(inter, text):
+    '''
+    Ask 8ball a Y/N question
+
+    Parameters
+    ----------
+    text: Text here
+    '''
     random.shuffle(responselist)
     e = discord.Embed(title = f"{inter.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
@@ -88,6 +109,14 @@ class Fun(commands.Cog):
   #random command slash
   @commands.slash_command(name = "random", description = "You can randomize numbers with this command\nUsage: pb!random (N1) (N2)\nUsage 2: pb!random (N1)")
   async def slashrandom(inter, num1: int, num2: int):
+    '''
+    You can randomize numbers with this command
+
+    Parameters
+    ----------
+    num1: Number 1
+    num2: Number 2
+    '''
     if num1 < num2:
       randomized = random.randint(num1, num2)
       e = discord.Embed(title = f"Randomized Number: {str(randomized)}", color = random.randint(0, 16777215))
@@ -102,6 +131,14 @@ class Fun(commands.Cog):
   #dice command slash
   @commands.slash_command(name = "dice", description = "Throw dices")
   async def slashdice(inter, dices: int, faces: int):
+    '''
+    Throw dices
+
+    Parameters
+    ----------
+    dices: Amount of dices
+    faces: Amount of faces on each dice
+    '''
     if dices >= 1 and faces >= 1:
       dice = random.randint(1, int(faces * dices))
       e = discord.Embed(title = "Dice", description = f"Number: {dice}", color = random.randint(0, 16777215))
@@ -155,6 +192,14 @@ class Fun(commands.Cog):
   #guess the number command slash
   @commands.slash_command(name = "guessthenumber", description = "The `max` arg is max count. The `tries_amt` arg is max tries. Note: 0 in `tries_amt` = inf tries")
   async def slashguessthenumber(inter, max: int = 100, tries_amt: int = 0):
+    '''
+    Guess the number minigame
+
+    Parameters
+    ----------
+    max: Maximum count
+    tries_amt: Amount of tries you have, 0 = inf
+    '''
     botnum = random.randint(0, max)
     tries = 1
     infinity = False
@@ -195,18 +240,12 @@ class Fun(commands.Cog):
             await inter.send(embed = e)
             tries += 1
         except asyncio.TimeoutError:
-          rng = random.randint(50, 250)
-          db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
           await inter.send(embed = e)
         except TimeoutError:
-          rng = random.randint(50, 250)
-          db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = "Timeout", description = f"The right answer was {botnum}", color = random.randint(0, 16777215))
           await inter.send(embed = e)
         except ValueError:
-          rng = random.randint(50, 250)
-          db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = "Input error: Try again", color = random.randint(0, 16777215))
           if str(inter.author.id) in db["debug"]:
             e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")

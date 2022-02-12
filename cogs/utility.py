@@ -8,7 +8,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.7.6" # major.sub.fix
+botbuild = "5.8.7" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.1"
 
@@ -95,7 +95,7 @@ class Utility(commands.Cog):
     await inter.response.send_message(embed = e)
 
   #report bug command
-  @commands.slash_command(name = "bugreport")
+  @commands.slash_command(name = "bugreport", description = "report bug")
   async def slashreport(inter, text):
     '''
     Report a bug to bot owner
@@ -117,7 +117,7 @@ class Utility(commands.Cog):
       await inter.send(embed = e)
 
   #remind command
-  @commands.slash_command(name = "remind")
+  @commands.slash_command(name = "remind", description = "reminder")
   async def slashremind(inter, ctime = "1h", *, text):
     '''
     Make a reminder for yourself
@@ -186,7 +186,7 @@ class Utility(commands.Cog):
     await inter.send(embed = e)
 
   #suggest command
-  @commands.slash_command(name = "suggest")
+  @commands.slash_command(name = "suggest", description = "suggest")
   async def slashsuggest(inter, text):
     '''
     Suggest an improvement for server
@@ -221,6 +221,13 @@ class Utility(commands.Cog):
   #member info command
   @commands.slash_command(name = "whois", description = "Shows mentioned member's info")
   async def slashmemberinfo(inter, member: discord.Member = None):
+    '''
+    Shows mentioned member's info
+
+    Parameters
+    ----------
+    member: Mention member
+    '''
     if member != None:
       role_list = []
 
@@ -275,22 +282,36 @@ class Utility(commands.Cog):
   #emoji command
   @commands.slash_command(name = "emoji", description = "See emoji info")
   async def emoji(inter, emoji: discord.Emoji):
+    '''
+    See emoji info
+
+    Parameters
+    ----------
+    emoji: Emoji here
+    '''
     e = discord.Embed(title = f"Emoji info: {emoji.name}", description = f"Animated?: {'True' if emoji.animated else 'False'}\nCreated at: <t:{int(emoji.created_at.timestamp())}:F>\nLink: [Link here]({emoji.url})", color = random.randint(0, 16777215))
     e.set_image(url = emoji.url)
     e.set_footer(text = f"ID: {emoji.id}")
     await inter.send(embed = e)
 
-  #servers command
+  '''#servers command
   @commands.slash_command(description = "See other servers' member counter")
   async def servers(inter):
     await inter.response.defer()
     counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
     e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    await inter.send(embed = e)'''
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
   async def slashafk(inter, reason = "None"):
+      '''
+      Set your afk and reason for it
+  
+      Parameters
+      ----------
+      reason: Reason for afk
+      '''
       db["afk"][str(inter.author.id)] = reason
       e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
@@ -331,7 +352,15 @@ class Utility(commands.Cog):
       await inter.send(embed = e)
   
   @note.sub_command(description = "Creates note")
-  async def create(self, inter, name = None, text = None):
+  async def create(self, inter, name, text):
+    '''
+    Creates note
+
+    Parameters
+    ----------
+    name: Note's name here
+    text: Note's text here
+    '''
     if str(inter.author.id) in db["notes"]:
       if name not in db["notes"][str(inter.author.id)]:
         if text != None:
@@ -367,6 +396,14 @@ class Utility(commands.Cog):
   
   @note.sub_command(description =  "Replaces whole note text")
   async def overwrite(inter, name, text):
+    '''
+    Replaces whole note text
+
+    Parameters
+    ----------
+    name: Note's name here
+    text: Note's text here
+    '''
     try:
       updatenotes = db["notes"][str(inter.author.id)]
       updatenotes[name] = text
@@ -377,8 +414,16 @@ class Utility(commands.Cog):
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
-  @note.sub_command(description = "Inserts text at the end\nread - reads selected note")
-  async def add(self, inter, name = None, text = None):
+  @note.sub_command(description = "Inserts text at the end")
+  async def add(self, inter, name, text):
+    '''
+    Inserts text at the end
+
+    Parameters
+    ----------
+    name: Note's name here
+    text: Note's text here
+    '''
     try:
       updatenotes = db["notes"][str(inter.author.id)]
       updatenotes[name] += f" {text}"
@@ -390,7 +435,15 @@ class Utility(commands.Cog):
       await inter.send(embed = e)
 
   @note.sub_command(description = "Inserts text at the end on new line")
-  async def newline(self, inter, name = None, text = None):
+  async def newline(self, inter, name, text):
+    '''
+    Inserts text at the end on new line
+
+    Parameters
+    ----------
+    name: Note's name here
+    text: Note's text here
+    '''
     try:
       updatenotes = db["notes"][str(inter.author.id)]
       updatenotes[name] += f"\n{text}"
@@ -403,6 +456,13 @@ class Utility(commands.Cog):
   
   @note.sub_command(description = "Reads selected note")
   async def read(self, inter, name):
+    '''
+    Reads selected note
+
+    Parameters
+    ----------
+    name: Note's name here
+    '''
     if name in db["notes"][str(inter.author.id)]:
       e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
       await inter.send(embed = e)
@@ -412,6 +472,13 @@ class Utility(commands.Cog):
 
   @note.sub_command(description = "Deletes selected note")
   async def delete(self, inter, name):
+    '''
+    Deletes selected note
+
+    Parameters
+    ----------
+    name: Note's name here
+    '''
     if str(inter.author.id) in db["notes"]:
       if name != None:
         if name in db["notes"][str(inter.author.id)]:
@@ -432,6 +499,13 @@ class Utility(commands.Cog):
 
   @note.sub_command(description = "Reads selected note but escapes markdown")
   async def read_raw(self, inter, name):
+    '''
+    Reads selected note but escapes markdown
+
+    Parameters
+    ----------
+    name: Note's name here
+    '''
     if str(inter.author.id) in db["notes"]:
       if name in db["notes"][str(inter.author.id)]:
         text = db['notes'][str(inter.author.id)].get(name).replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
@@ -448,6 +522,13 @@ class Utility(commands.Cog):
   @commands.slash_command(name = "exec", description = "bot owner only")
   @commands.is_owner()
   async def slashexec(inter, code):
+    '''
+    bot owner only
+
+    Parameters
+    ----------
+    code: Code here
+    '''
     exec(code)
     print(f"{code} is executed")
     e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))

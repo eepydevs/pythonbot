@@ -96,6 +96,13 @@ class Economy(commands.Cog):
   #balance command
   @commands.slash_command(name = "balance", description = "Look how much cash you have")
   async def slashbalance(inter, member: discord.Member = None):
+    '''
+    Look how much cash you have
+
+    Parameters
+    ----------
+    member: Mention member
+    '''
     if member is None:
       if str(inter.author.id) not in db["balance"]:
         db["balance"][str(inter.author.id)] = 0
@@ -150,7 +157,7 @@ class Economy(commands.Cog):
       
 
   #work command
-  @commands.slash_command(name = "work", description = "Work to get some cash\nHas cooldown of 30 minutes")
+  @commands.slash_command(name = "work", description = "Work to get some cash. Has cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 60 * 30, type = commands.BucketType.user)
   async def slashwork(inter):
     if str(inter.author.id) in db["balance"]:
@@ -224,6 +231,14 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "give", description = "Share some money with mentioned member")
   @commands.guild_only()
   async def slashgive(inter, member: discord.Member, payment: int):
+    '''
+    Share some money with mentioned member
+
+    Parameters
+    ----------
+    member: Mention member
+    payment: Amount of cash
+    '''
     if str(inter.author.id) in db["balance"]:
       money = db["balance"][str(inter.author.id)]
       if member.id != inter.author.id:
@@ -269,6 +284,13 @@ class Economy(commands.Cog):
   #gamble command
   @commands.slash_command(name = "gamble", description = "Lose every dollar you have lol")
   async def gamble(inter, payment: int):
+    '''
+    Lose every dollar you have lol
+
+    Parameters
+    ----------
+    payment: Amount of cash
+    '''
     rng = random.randint(0, 12)
     dice = random.randint(0, 12)
     if str(inter.author.id) in db["balance"]:
@@ -407,6 +429,13 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "rob", description = "Get jailed, Has cooldown of 30 seconds")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
   async def slashrob(inter, member: discord.Member):
+      '''
+      Get jailed, Has cooldown of 30 seconds
+  
+      Parameters
+      ----------
+      member: Mention member
+      '''
       if member.id != inter.author.id:
         if str(member.id) in db["balance"]:
           if db["balance"][str(member.id)] != 0 and db["balance"][str(member.id)] > 150:
@@ -549,6 +578,13 @@ class Economy(commands.Cog):
   #buy command
   @commands.slash_command(name = "buy", description = "Buy a thing (that is useless)")
   async def slashbuy(inter, item_name):
+      '''
+      Buy a thing in shop
+  
+      Parameters
+      ----------
+      item_name: Item name here
+      '''
       modtext = item_name.lower()
       itemname = modtext.capitalize()
       if itemname in db["shop"]:
@@ -592,7 +628,14 @@ class Economy(commands.Cog):
 
   #sell command
   @commands.slash_command(name = "sell", description = "Sell any item you have")
-  async def slashsell(inter, itemname = None):
+  async def slashsell(inter, itemname):
+    '''
+    Sell any item you have
+  
+    Parameters
+    ----------
+    itemname: Item name here
+    '''
     if itemname != None:
       modtext = itemname.lower()
       itemname = modtext.capitalize()
@@ -634,6 +677,13 @@ class Economy(commands.Cog):
   #inventory command
   @commands.slash_command(name = "inventory", description = "See what do you have")
   async def slashinventory(inter, member: discord.Member = None):
+    '''
+    See what do you have
+
+    Parameters
+    ----------
+    member: Mentioned member
+    '''
     if member is None:
       if str(inter.author.id) in db["inventory"] and db["inventory"][str(inter.author.id)] != {}:
         inventory = "\n".join(f"{index}. `{name}`: {amount}" for index, (name, amount) in enumerate(db["inventory"][str(inter.author.id)].items(), start = 1))
@@ -748,7 +798,16 @@ class Economy(commands.Cog):
 
   #mail command
   @commands.slash_command(name = "mail", description = "Mail someone with the bot. Requirement: Both you and mentioned member must have atleast 1 smartphone")
-  async def slashmail(inter, member: discord.Member, text = "", imagelink = ""):
+  async def slashmail(inter, member: discord.Member, text, imagelink = ""):
+    '''
+    Mail someone with the bot. Requirement: Both You and Mentioned member must have atleast 1 smartphone
+  
+    Parameters
+    ----------
+    member: Mention member here
+    text: Text to send
+    imagelink: Image to send (link)
+    '''
     if str(inter.author.id) in db["inventory"]:
       if "Smartphone" in db["inventory"][str(inter.author.id)]:
         if str(member.id) in db["inventory"]:
@@ -786,6 +845,13 @@ class Economy(commands.Cog):
   #profile command
   @commands.slash_command(name = "profile", description = "See user's economical info!")
   async def slashprofile(inter, member: discord.Member = None):
+    '''
+    See member's economical info!
+  
+    Parameters
+    ----------
+    member: Mentioned member
+    '''
     money = 0
     inventory = "Nothing here"
     passive = "False"
