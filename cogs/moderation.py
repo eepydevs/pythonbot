@@ -82,14 +82,14 @@ class Moderation(commands.Cog):
   @commands.has_permissions(moderate_members = True)
   @commands.bot_has_permissions(moderate_members = True)
   async def slashtimeout(inter, member: discord.Member, duration = "1d"):
-    '''
+    
     Timeout (mute) mentioned member
 
     Parameters
     ----------
     member: Mention member
     duration: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1d
-    '''    
+        
     if duration.endswith("d"):
       timeoutduration = 86400 * int(duration[:-1])
       await member.timeout(duration = timeoutduration)
