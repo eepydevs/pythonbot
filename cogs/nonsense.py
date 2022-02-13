@@ -161,7 +161,7 @@ class Nonsense(commands.Cog):
             )
             return
 
-    new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
+    new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
     await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar)
 
   @commands.slash_command()
