@@ -8,7 +8,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.8.7" # major.sub.fix
+botbuild = "5.9.7" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.3.1"
 
@@ -47,11 +47,14 @@ class Utility(commands.Cog):
       for role in member.roles:
         if role.name != "@everyone":
           role_list.append(role.mention)
-
+          
+      role_list.reverse()
       b = ", ".join(role_list)
-      e = discord.Embed(title = f"Member info: {member}", description = f"Joined server date: <t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
       if member.avatar != None:
         e.set_thumbnail(url = str(member.avatar))
+      e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
+      e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
@@ -59,12 +62,12 @@ class Utility(commands.Cog):
       if member.top_role != None:
         e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
       if member.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True" , inline = False)
+        e.add_field(name = "Administrator?", value = "True", inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
       e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
       e.set_footer(text = f"ID: {member.id}")
-      await inter.send(embed = e, ephemeral = True)
+      await inter.send(embed = e)
 
   #context menu message info command
   @commands.message_command(name="Message Info") 
@@ -234,11 +237,14 @@ class Utility(commands.Cog):
       for role in member.roles:
         if role.name != "@everyone":
           role_list.append(role.mention)
-
+          
+      role_list.reverse()
       b = ", ".join(role_list)
-      e = discord.Embed(title = f"Member info: {member}", description = f"Joined server date: <t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
       if member.avatar != None:
         e.set_thumbnail(url = str(member.avatar))
+      e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
+      e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
@@ -246,7 +252,7 @@ class Utility(commands.Cog):
       if member.top_role != None:
         e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
       if member.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True" , inline = False)
+        e.add_field(name = "Administrator?", value = "True", inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
       e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
@@ -260,10 +266,13 @@ class Utility(commands.Cog):
         if role.name != "@everyone":
           role_list.append(role.mention)
 
+      role_list.reverse()
       b = ", ".join(role_list)
-      e = discord.Embed(title = f"Member info: {inter.author}", description = f"Joined server date: <t:{str(time.mktime(inter.author.joined_at.timetuple()))[:-2]}:R>\nCreated account date: <t:{str(time.mktime(inter.author.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"Member info: {inter.author}", description = f"{inter.author.mention}", color = random.randint(0, 16777215))
       if inter.author.avatar != None:
         e.set_thumbnail(url = str(inter.author.avatar))
+      e.add_field(name = "Joined", value = f"<t:{str(time.mktime(inter.author.joined_at.timetuple()))[:-2]}:R>", inline = True)
+      e.add_field(name = "Registered", value = f"<t:{str(time.mktime(inter.author.created_at.timetuple()))[:-2]}:R>", inline = True)
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
@@ -271,7 +280,7 @@ class Utility(commands.Cog):
       if inter.author.top_role != None:
         e.add_field(name = "Top role:", value = inter.author.top_role.mention, inline = False)
       if inter.author.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True" , inline = False)
+        e.add_field(name = "Administrator?", value = "True", inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
       e.add_field(name = "Icon url:", value = f"[Link here]({str(inter.author.avatar)[:-10]})", inline = False)
