@@ -139,7 +139,40 @@ class Nonsense(commands.Cog):
       e = discord.Embed(title = "Error", description = "Something went wrong...", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
-
+  @commands.slash_command(name = "md")
+  async def md(inter, *, ephemeral: Required1 = Required1.You, text):
+    '''
+    .md Format your message
+    Parameters
+    ----------
+    ephemeral: Visibilty of embed
+    text: Input text here, // for newline
+    '''
+    modtext = text.split("//")
+    if modtext[0].strip().startswith("# "):
+      title = modtext.pop(0)[2:]
+    else:
+      title = ".md format"
+    if "\n".join(modtext).replace("- ", "• ").find("## ") == -1:
+      desc = "\n".join(modtext).replace("- ", "• ")
+    else:
+      descindex = "\n".join(modtext).replace("- ", "• ").find("## ")
+      desc = "\n".join(modtext).replace("- ", "• ")[:descindex]
+    e = discord.Embed(title = title, description = desc, color = random.randint(0, 16777215))
+    subheaders = "//".join(modtext).split("## ")
+    indexsh = 1
+    for item in modtext:
+      if item.strip().startswith("## "):
+        if "\n".join(subheaders[indexsh].split("//")[1:]).replace("- ", "• "):
+          val = "\n".join(subheaders[indexsh].split("//")[1:]).replace("- ", "• ")
+        else:
+          val = "_ _"
+        e.add_field(name = item[3:], value = val, inline = False)
+        indexsh += 1
+    await inter.send(embed = e, ephemeral = ephemeral)
+    
+    
+  
   @commands.slash_command(name = "copy-person")
   @commands.bot_has_permissions(manage_webhooks = True)
   async def userecho(inter, member: discord.Member, *, content):
