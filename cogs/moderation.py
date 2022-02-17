@@ -158,14 +158,19 @@ class Moderation(commands.Cog):
       await inter.send("❌ Please insert a number above 0")
 
   #pin command
-  @commands.command(help = "Pin a message", description = "This is useless command don't use it\nUsage: Reply a message and type pb!pin\nUsage 2: pb!pin (message id)")
+  @commands.slash_command()
   @commands.has_permissions(manage_channels = True)
   @commands.bot_has_permissions(manage_channels = True)
-  async def pin(self, ctx, message: discord.Message = None):
-    if message == None and ctx.message.reference.resolved != None:
-      await ctx.message.reference.resolved.pin()
-    else:
-      await message.pin()
+  async def pin(inter, message: discord.Message):
+    '''
+    Pin a message, This is useless command don't use it
+    
+    Parameters
+    ----------
+    message: Message id
+    '''
+    await message.pin()
+    await inter.send(f"[Message]({message.jump_url}) pinned successfully")
 
   #prefix command
   @commands.slash_command(name = "prefix", description = "See current prefix or change it")

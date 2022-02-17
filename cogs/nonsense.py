@@ -28,6 +28,67 @@ class sendopt(str, Enum):
   Seperate = "Seperate"
   Webhook = "Webhook"
 
+class menuthing(discord.ui.Select):
+  def __init__(self, inter: discord.Interaction):
+    self.inter = inter
+    options = [
+      discord.SelectOption(label = "Option 1", emoji = "1️⃣", value = "1"),
+      discord.SelectOption(label = "Option 2", emoji = "2️⃣", value = "2"),
+      discord.SelectOption(label = "Option 3", emoji = "3️⃣", value = "3")
+    ]
+
+    super().__init__(
+      placeholder="Select option",
+      min_values=1,
+      max_values=1,
+      options=options,
+    )
+  async def interaction_check(self, inter: discord.MessageInteraction):
+        if inter.author != self.inter.author:
+            await inter.response.send_message(...)
+            return False
+        return True
+    
+  async def callback(self, interaction: discord.MessageInteraction):
+    await interaction.send(f"You selected Option {self.values[0]}!", ephemeral = True)
+
+class menuView(discord.ui.View):
+  def __init__(self, inter: discord.Interaction):
+      super().__init__()
+      self.add_item(menuthing(inter))
+
+class buttonthing(discord.ui.View):
+  def __init__(self, inter: discord.Interaction):
+    super().__init__(timeout = 60)
+    self.inter = inter
+    
+  async def interaction_check(self, inter: discord.MessageInteraction):
+    if inter.author != self.inter.author:
+      await inter.response.send_message(...)
+      return False
+    return True
+    
+  @discord.ui.button(label = "Primary", custom_id = "Primary", emoji = "1️⃣", style = discord.ButtonStyle.blurple)
+  async def primary_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await interaction.send("You clicked Primary", ephemeral = True)
+
+  @discord.ui.button(label = "Secondary", custom_id = "Secondary", emoji = "2️⃣", style = discord.ButtonStyle.gray)
+  async def secondary_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await interaction.send("You clicked Secondary", ephemeral = True)
+
+  @discord.ui.button(label = "Success", custom_id = "Success", emoji = "✅", style = discord.ButtonStyle.green)
+  async def success_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await interaction.send("You clicked Success", ephemeral = True)
+
+  @discord.ui.button(label = "Danger", custom_id = "Danger", emoji = "⚠️", style = discord.ButtonStyle.red)
+  async def danger_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await interaction.send("You clicked Danger", ephemeral = True)
+
+  """@discord.ui.button(label = "Link", custom_id = "Link", emoji = "🔗", style = discord.ButtonStyle.gray)
+  async def link_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await interaction.send("You clicked Link", ephemeral = True)""" #this one i guess is useless lmao
+
+  
 def shuffle(x):
   return random.sample(x, len(x))
 
@@ -366,53 +427,17 @@ class Nonsense(commands.Cog):
     else:
       await inter.send(content = content, embed = e, ephemeral = ephemeral)
 
-  '''#test 2 (buttons message) command
-  @commands.slash_command(name = "button", description = "test command 2", hidden = True)
+  #test 2 (buttons message) command
+  @commands.slash_command(name = "button", description = "test command 2")
   async def slashbutton(inter):
-    view = discord.ui.View(timeout = 60)
-    style = discord.ButtonStyle.blurple
-    item = discord.ui.Button(style = style, label = "Primary", custom_id = "Primary", emoji = "1️⃣")
-    style1 = discord.ButtonStyle.gray
-    item1 = discord.ui.Button(style = style1, label = "Secondary", custom_id = "Secondary", emoji = "2️⃣")
-    style2 = discord.ButtonStyle.green
-    item2 = discord.ui.Button(style = style2, label = "Success", custom_id = "Success", emoji = "✅")
-    style3 = discord.ButtonStyle.red
-    item3 = discord.ui.Button(style = style3, label = "Danger", custom_id = "Danger", emoji = "⚠️")
-    style4 = discord.ButtonStyle.gray
-    item4 = discord.ui.Button(style = style4, label = "Link", url = "https://www.youtube.com/c/MrBeast6000", emoji = "🔗")
-    #style5 = discord.ButtonStyle.red
-    #item5 = discord.ui.Button(style = style5, label = "Disable", custom_id = "Disable", emoji = "⛔")
-    view.add_item(item = item)
-    view.add_item(item = item1)
-    view.add_item(item = item2)
-    view.add_item(item = item3)
-    view.add_item(item = item4)
-    #view.add_item(item = item5)
-    message = await inter.send("button test lmao", view = view)
-    while True:
-      try:
-        interaction = await inter.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-        if interaction.user.id == inter.author.id:
-          await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id}!", ephemeral = True)
-        else:
-          await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
-      except asyncio.TimeoutError:
-        view.stop()
-        break
-        '''
-  '''#test 3 (select command) command
-  @commands.slash_command(name = "menu", description = "test command 3", hidden = True)
+    await inter.send("button test lol", view = buttonthing(inter))
+        
+  #test 3 (select command) command
+  @commands.slash_command(name = "menu", description = "test command 3")
   async def select(inter):
-    view = discord.ui.View(timeout = 60)
-    view.add_item(discord.ui.Select(placeholder = "Select an option", options = [discord.SelectOption(label = "Option 1", emoji = "1️⃣", value = "1"), discord.SelectOption(label = "Option 2", emoji = "2️⃣", value = "2"), discord.SelectOption(label = "Option 3", emoji = "3️⃣", value = "3")]))
-    message = await inter.send("Select Menu", view = view)
-    while True:
-      try:
-        interaction = await inter.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-        await interaction.send(content = f"You selected Option {view.children[0].values[0]}!", ephemeral = True)
-      except asyncio.TimeoutError:
-        view.stop()
-        break'''
+    view = menuView(inter.author)
+
+    await inter.send("Select Menu", view = view)
 
   #send emoji command
   @commands.slash_command(name = "sendemoji", description = "Send emoji as bot")

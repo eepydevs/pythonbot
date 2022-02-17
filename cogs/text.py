@@ -36,6 +36,9 @@ def uwuize(text):
         if chance <= 15:
           translation += "~"
     chance = random.randint(0, 100)
+    if chance <= 20:
+      translation += f" {random.choice(endings)}"
+    chance = random.randint(0, 100)
     if chance >= 25:
       translation += f" {random.choice(emoticons)}"
     return translation
@@ -234,5 +237,39 @@ class Text(commands.Cog):
       result.append(item + "ize")
     await inter.send(" ".join(f"{item}" for item in result))
 
+  @commands.slash_command()
+  async def brickify(self, inter, text):
+    '''
+    Brickify your inputted text!
+
+    Parameters
+    ----------
+    text: Text here
+    '''
+    text = text.lower()
+    text.replace('yes', 'yee')
+    text.replace('no', 'nope')
+    text.replace('hello','hewwo').replace('hi', 'hii')
+    text.replace("'",'')
+    text = f"{random.choice(['hmm', 'heh', 'lol', 'uhm', 'yeah'])} {text} {random.choice([':V', 'u<u', 'o<o', ':)', '🍞', '~'])}"
+    await inter.send(text)
+
+  @commands.slash_command()
+  async def shoutify(self, inter, text):
+    '''
+    SHhOuttIfY yyOuR inPUtTedd TeXXt!!!
+
+    Parameters
+    ----------
+    text: TeXXt hEre?!
+    '''
+    text = ''.join(random.choice([c.upper(), c.lower()])*int(random.random()*1.3+1) for c in text)
+    text += random.choice(['!!!', '?!'])
+    await inter.send(text)
+
+  @commands.slash_command()
+  async def spoilerize(self, inter, text):
+    await inter.send(''.join(f'||{c}||' for c in text))
+  
 def setup(bot):
   bot.add_cog(Text(bot))

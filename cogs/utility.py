@@ -10,7 +10,7 @@ from replit import db
 
 botbuild = "5.9.7" # major.sub.fix
 pyver = "3.8.2"
-dnver = "2.3.1"
+dnver = "2.4.0"
 
 waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro", "You are the best!"]
 reportblacklist = []
@@ -178,7 +178,7 @@ class Utility(commands.Cog):
   @commands.slash_command(name = "serverinfo", description = "Shows server's info")
   async def serverinfo(inter):
     role_count = len(inter.guild.roles)
-    list_of_bots = [inter.bot.mention for inter.bot in inter.guild.members if inter.bot.bot]
+    list_of_bots = [inter.bot.mention for inter.bot in inter.guild.members if inter.author.bot]
     e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
     e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {role_count}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots))
     e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
