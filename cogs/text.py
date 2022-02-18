@@ -270,6 +270,18 @@ class Text(commands.Cog):
   @commands.slash_command()
   async def spoilerize(self, inter, text):
     await inter.send(''.join(f'||{c}||' for c in text))
-  
+
+
+  @commands.slash_command(name = "sortify", description = "Sort your inputted text!")
+  async def sort(inter, *, text):
+    '''
+    Sort your inputted text!
+
+    Parameters
+    ----------
+    text: Text here
+    '''
+    modtext = sorted(text.split(" "), )
+    await inter.send(" ".join(modtext))
 def setup(bot):
   bot.add_cog(Text(bot))
