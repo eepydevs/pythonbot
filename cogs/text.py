@@ -269,8 +269,14 @@ class Text(commands.Cog):
 
   @commands.slash_command()
   async def spoilerize(self, inter, text):
-    await inter.send(''.join(f'||{c}||' for c in text))
+    '''
+    Spoiler your inputted text
 
+    Parameters
+    ----------
+    text: Text here
+    '''
+    await inter.send(''.join(f'||{c}||' for c in text))
 
   @commands.slash_command(name = "sortify", description = "Sort your inputted text!")
   async def sort(inter, *, text):
@@ -283,5 +289,30 @@ class Text(commands.Cog):
     '''
     modtext = sorted(text.split(" "), )
     await inter.send(" ".join(modtext))
+
+  @commands.slash_command(name = "qmaify")
+  async def qma(inter, *, text):
+    '''
+    Qmaify your inputted text!
+
+    Parameters
+    ----------
+    text: Text here
+    '''
+    await inter.send(f"- {text}")
+
+  @commands.slash_command(name = "remixuerify")
+  async def remixuer(inter, *, text):
+    '''
+    Remixuerify your inputted text!
+
+    Parameters
+    ----------
+    text: Text here
+    '''
+    catemoji = ["😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"]
+    random.shuffle(catemoji)
+    await inter.send(f"{random.choice(catemoji)} {text}")
+    
 def setup(bot):
   bot.add_cog(Text(bot))
