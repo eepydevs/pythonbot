@@ -56,6 +56,25 @@ def uwuize(text):
       translation += f" {random.choice(emoticons)}"
     return translation
 
+def indicator(text):
+  emojis = {"0": "0️⃣", "1": "1️⃣", "2": "2️⃣", "3": "3️⃣", "4": "4️⃣",
+            "5": "5️⃣", "6": "6️⃣", "7": "7️⃣", "8": "8️⃣", "9": "9️⃣",
+            "a": "🇦", "b": "🇧", "c": "🇨", "d": "🇩", "e": "🇪", "f": "🇫",
+            "g": "🇬", "h": "🇭", "i": "🇮", "j": "🇯", "k": "🇰", "l": "🇱",
+            "m": "🇲", "n": "🇳", "o": "🇴", "p": "🇵", "q": "🇶", "r": "🇷",
+            "s": "🇸", "t": "🇹", "u": "🇺", "v": "🇻", "w": "🇼", "x": "🇽",
+            "y": "🇾", "z": "🇿", "!": "❗", "?": "❓", " ": "⬛", "*": "*️⃣",
+            "-": "➖", "+": "➕", "#": "#️⃣", "×": "✖️", "÷": "➗",
+            "€": "💶", "£": "💷", "¥": "💴", "$": "💵", "<": "◀️",
+            ">": "▶️"}
+  result = ""
+  for letter in text:
+    if letter.lower() in emojis:
+      result += f"{emojis[letter.lower()]} "
+    else:
+      result += f"{letter} "
+  return result
+
 class Text(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
@@ -313,6 +332,18 @@ class Text(commands.Cog):
     catemoji = ["😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"]
     random.shuffle(catemoji)
     await inter.send(f"{random.choice(catemoji)} {text}")
+
+  @commands.slash_command(name = "indicatorify")
+  async def indicatorify(inter, *, text):
+    '''
+    Indicatorify your inputted text!
+
+    Parameters
+    ----------
+    text: Text here
+    '''
+    modtext = indicator(text)
+    await inter.send(modtext)
     
 def setup(bot):
   bot.add_cog(Text(bot))

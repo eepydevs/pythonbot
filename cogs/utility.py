@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.11.8" # major.sub.fix
+botbuild = "5.12.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -120,7 +120,7 @@ class Utility(commands.Cog):
       e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
-  #remind command
+  """#remind command
   @commands.slash_command(name = "remind", description = "reminder")
   async def slashremind(inter, ctime = "1h", *, text):
     '''
@@ -148,18 +148,7 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
-    await inter.send(embed = e)
-
-  #ping command
-  @commands.command(help = "Shows bot's ping", description = "Usage: pb!ping") 
-  async def ping(self, ctx):
-    before = time.time()
-    message = await ctx.send("Pinging...")
-    after = time.time()
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(ctx.bot.latency * 1000)}ms\nReply ping: {int((time.time() - ctx.message.created_at.timestamp()) * 1000) - int((after - before) * 1000)}ms (original: {int((time.time() - ctx.message.created_at.timestamp()) * 1000)}ms)\nEdit ping: {int((after - before) * 1000)}ms\nUp since: <t:{int(ctx.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    if str(ctx.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{ctx.bot.latency * 1000}, {before}, {after}")
-    await message.edit(content = None, embed = e)
+    await inter.send(embed = e)"""
     
   #bot info command
   @commands.slash_command(name = "botinfo", description = "Shows bot's info")
@@ -209,9 +198,8 @@ class Utility(commands.Cog):
     msg = await inter.original_message()
     await msg.add_reaction("👍")
     await msg.add_reaction("👎")
+    await msg.add_reaction("❓")
 
-  
-  
   #invite command
   @commands.slash_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
   async def slashinvite(inter):
@@ -225,7 +213,6 @@ class Utility(commands.Cog):
     view.add_item(item = item1)
     await inter.send(embed = e, view = view)
     
-
   #member info command
   @commands.slash_command(name = "whois", description = "Shows mentioned member's info")
   async def slashmemberinfo(inter, member: discord.Member = None):

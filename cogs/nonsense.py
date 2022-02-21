@@ -45,7 +45,7 @@ class menuthing(discord.ui.Select):
     )
   async def interaction_check(self, inter: discord.MessageInteraction):
         if inter.author != self.inter.author:
-            await inter.response.send_message(...)
+            await inter.send("This selection menu is not for you", ephemeral = True)
             return False
         return True
     
@@ -64,7 +64,7 @@ class buttonthing(discord.ui.View):
     
   async def interaction_check(self, inter: discord.MessageInteraction):
     if inter.author != self.inter.author:
-      await inter.response.send_message(...)
+      await inter.send("Those buttons are not for you", ephemeral = True)
       return False
     return True
     
@@ -327,7 +327,7 @@ class Nonsense(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   #eval javascript command
-  @commands.slash_command(name = "evaljs", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute javascript code and see results")
+  @commands.slash_command(name = "evaljs", description = "bot owner only. Execute javascript code and see results")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
   async def evaljs(inter, *, ephemeral: Required1 = Required1.You, code):
     '''

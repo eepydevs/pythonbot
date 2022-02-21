@@ -7,7 +7,7 @@ from replit import db
 from disnake.ext import commands
 from server import keep_alive
 
-bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all()) #, test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 924730067437887488, 938379015524327444, 891653711095533578, 898289451661418527, 879677249459191829, 944167505625235467, 936314779524542544]
+bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all(), test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 924730067437887488, 938379015524327444, 891653711095533578, 898289451661418527, 879677249459191829, 944167505625235467, 936314779524542544, 921529784771706920]) #, test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 924730067437887488, 938379015524327444, 891653711095533578, 898289451661418527, 879677249459191829, 944167505625235467, 936314779524542544, 921529784771706920]
 
 class EmbedMinimalHelp(commands.MinimalHelpCommand):
   async def send_pages(self):
@@ -58,7 +58,7 @@ async def on_ready():
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
   await bot.change_presence(status = discord.Status.online, activity = discord.Game("/commandname | Made in Python 3.8.2!"))
-  while True:
+  """while True:
     print(f"{int(time.time())}")
     if len(db["reminders"]) == 1:
       check = 1
@@ -71,7 +71,7 @@ async def on_ready():
         e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
         await bot.get_user(ruser).send(embed = e)
         del db["reminders"][list(db["reminders"].keys())[i]]
-    await asyncio.sleep(10)
+    await asyncio.sleep(10)"""
 
 #load extension command
 @bot.command(aliases = ["l"], help = "load extension", description = "bot owner only\nusage: ?load (extension)", hidden = True)

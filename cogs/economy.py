@@ -6,8 +6,6 @@ import random
 import asyncio
 from replit import db
 
-whitelist = [439788095483936768, 826509766893371392]
-
 if "balance" not in db:
   db["balance"] = {}
 
