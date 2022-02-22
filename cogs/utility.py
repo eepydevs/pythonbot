@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.12.0" # major.sub.fix
+botbuild = "5.13.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -313,7 +313,7 @@ class Utility(commands.Cog):
       ----------
       reason: Reason for afk
       '''
-      db["afk"][str(inter.author.id)] = reason
+      db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
       e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 

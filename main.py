@@ -7,7 +7,7 @@ from replit import db
 from disnake.ext import commands
 from server import keep_alive
 
-bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all()) #, test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 924730067437887488, 938379015524327444, 891653711095533578, 898289451661418527, 879677249459191829, 944167505625235467, 936314779524542544, 921529784771706920, 945278050537472001]
+bot = commands.Bot(command_prefix = lambda bot, msg: (commands.when_mentioned_or(db['prefix'][str(msg.guild.id)]) if msg.guild != None else commands.when_mentioned_or('pb!'))(bot, msg), intents=discord.Intents.all(), test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 924730067437887488, 938379015524327444, 891653711095533578, 898289451661418527, 879677249459191829, 944167505625235467, 936314779524542544, 921529784771706920, 945278050537472001, 925014030677082122]) #, test_guilds = [908099219401883670, 929889688746086440, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 924730067437887488, 938379015524327444, 891653711095533578, 898289451661418527, 879677249459191829, 944167505625235467, 936314779524542544, 921529784771706920, 945278050537472001, 925014030677082122]
 
 class EmbedMinimalHelp(commands.MinimalHelpCommand):
   async def send_pages(self):
@@ -29,7 +29,7 @@ async def on_message(message):
     await message.channel.send(f"Welcome back, {message.author.mention}", delete_after = 5)
   for member in message.mentions:
     if str(member.id) in db["afk"]:
-      e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]}", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]['reason']}\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
       await message.channel.send(embed = e)
   await bot.process_commands(message)
 
