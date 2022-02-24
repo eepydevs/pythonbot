@@ -171,11 +171,11 @@ class Utility(commands.Cog):
   #server info command
   @commands.slash_command(name = "serverinfo", description = "Shows server's info")
   async def serverinfo(inter):
-    role_count = len(inter.guild.roles)
-    list_of_bots = [inter.bot.mention for inter.bot in inter.guild.members if inter.author.bot]
+    server_role_count = len(inter.guild.roles)
+    list_of_bots = [bot.mention for bot in inter.guild.members if bot.bot]
     e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {role_count}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots))
-    e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
+    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {server_role_count}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots))
+    e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels) - len(inter.guild.categories)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
     e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
     if inter.guild.icon != None:
       e.set_thumbnail(url = str(inter.guild.icon))
@@ -347,10 +347,10 @@ class Utility(commands.Cog):
     if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
       notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
       e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Creates note")
   async def create(self, inter, name, text):
@@ -369,16 +369,16 @@ class Utility(commands.Cog):
           updatenotes[name] = text
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+          await inter.send(embed = e, ephemeral = True)
         else:
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = "New note"
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+          await inter.send(embed = e, ephemeral = True)
       else:
         e = discord.Embed(title = "Error", description = "This name is used!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
     else:
       if text != None:
         db["notes"][str(inter.author.id)] = {}
@@ -386,14 +386,14 @@ class Utility(commands.Cog):
         updatenotes[name] = text
         db["notes"][str(inter.author.id)] = updatenotes
         e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
       else:
         db["notes"][str(inter.author.id)] = {}
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] = "New note"
         db["notes"][str(inter.author.id)] = updatenotes
         e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description =  "Replaces whole note text")
   async def overwrite(inter, name, text):
@@ -403,17 +403,17 @@ class Utility(commands.Cog):
     Parameters
     ----------
     name: Note's name here
-    text: Note's text here
+    text: Note's text here, // to newline
     '''
     try:
       updatenotes = db["notes"][str(inter.author.id)]
-      updatenotes[name] = text
+      updatenotes[name] = text.replace("//", "\n")
       db["notes"][str(inter.author.id)] = updatenotes
       e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
     except KeyError:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end")
   async def add(self, inter, name, text):
@@ -430,10 +430,10 @@ class Utility(commands.Cog):
       updatenotes[name] += f" {text}"
       db["notes"][str(inter.author.id)] = updatenotes
       e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
     except KeyError:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end on new line")
   async def newline(self, inter, name, text):
@@ -450,10 +450,10 @@ class Utility(commands.Cog):
       updatenotes[name] += f"\n{text}"
       db["notes"][str(inter.author.id)] = updatenotes
       e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
     except KeyError:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Reads selected note")
   async def read(self, inter, name):
@@ -466,10 +466,10 @@ class Utility(commands.Cog):
     '''
     if name in db["notes"][str(inter.author.id)]:
       e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Deletes selected note")
   async def delete(self, inter, name):
@@ -485,18 +485,18 @@ class Utility(commands.Cog):
         if name in db["notes"][str(inter.author.id)]:
           updatenotes = db["notes"][str(inter.author.id)]
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is deleted!", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+          await inter.send(embed = e, ephemeral = True)
           updatenotes.pop(name)
           db["notes"][str(inter.author.id)] = updatenotes
         else:
           e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
+          await inter.send(embed = e, ephemeral = True)
       else:
         e = discord.Embed(title = f"Error", description = "You can't delete nothing!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Reads selected note but escapes markdown")
   async def read_raw(self, inter, name):
@@ -511,13 +511,13 @@ class Utility(commands.Cog):
       if name in db["notes"][str(inter.author.id)]:
         text = db['notes'][str(inter.author.id)].get(name).replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
         e = discord.Embed(title = f"Notes: {name}", description = text, color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
       else:
         e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+        await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+      await inter.send(embed = e, ephemeral = True)
 
   #exec command
   @commands.slash_command(name = "exec", description = "bot owner only")

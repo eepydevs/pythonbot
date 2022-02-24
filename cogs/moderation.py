@@ -29,7 +29,6 @@ class Requiredcnsfw(str, Enum):
   true = "True"
   false = ""
   
-
 class Moderation(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
@@ -46,14 +45,18 @@ class Moderation(commands.Cog):
     ----------
     member: Mention member
     '''
-    e = discord.Embed(title = "Kicked!", description = f"You were kicked from server {inter.guild.name}", color = random.randint(0, 16777215))
-    e.set_thumbnail(url = str(inter.guild.icon))
-    await member.send(embed = e)
-    
-    await member.kick()
-    kquote = modquotes[random.randint(0, len(modquotes) - 1)]
-    e = discord.Embed(title = "Success", description = f"Successfully kicked {member.mention}! {kquote}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    if not inter.author.top_role < member.top_role:
+      e = discord.Embed(title = "Kicked!", description = f"You were kicked from server {inter.guild.name}", color = random.randint(0, 16777215))
+      e.set_thumbnail(url = str(inter.guild.icon))
+      await member.send(embed = e)
+      
+      await member.kick()
+      kquote = modquotes[random.randint(0, len(modquotes) - 1)]
+      e = discord.Embed(title = "Success", description = f"Successfully kicked {member.mention}! {kquote}", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You can't kick a person higher than you", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #ban command
   @commands.slash_command(name = "ban", description = "Ban mentioned people")
@@ -68,14 +71,19 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the ban, will show up in audit log
     '''
-    e = discord.Embed(title = "Banned!", description = f"You were banned from server {inter.guild.name}", color = random.randint(0, 16777215))
-    e.set_thumbnail(url = str(inter.guild.icon))
-    await member.send(embed = e)
-
-    await member.ban(reason = reason)
-    bquote = modquotes[random.randint(0, len(modquotes) - 1)]
-    e = discord.Embed(title = "Success", description = f"Successfully banned {member.mention}! {bquote}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    if not inter.author.top_role < member.top_role:
+        e = discord.Embed(title = "Banned!", description = f"You were banned from server {inter.guild.name}", color = random.randint(0, 16777215))
+        e.set_thumbnail(url = str(inter.guild.icon))
+        await member.send(embed = e)
+    
+        await member.ban(reason = reason)
+        bquote = modquotes[random.randint(0, len(modquotes) - 1)]
+        e = discord.Embed(title = "Success", description = f"Successfully banned {member.mention}! {bquote}", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You can't ban a person higher than you", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+  
 
   '''#timeout command
   @commands.slash_command(name = "timeout", description = "timeout people")
@@ -124,13 +132,19 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the unban, will show up in audit log
     '''
-    e = discord.Embed(title = "Unbanned!", description = f"You were unbanned from server {inter.guild.name}", color = random.randint(0, 16777215))
-    e.set_thumbnail(url = str(inter.guild.icon))
-    await member.send(embed = e)
-
-    await member.unban(reason = reason)
-    e = discord.Embed(title = "Success", description = f"Successfully unbanned {member.mention}!", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    if not inter.author.top_role < member.top_role:
+        e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+        e = discord.Embed(title = "Unbanned!", description = f"You were unbanned from server {inter.guild.name}", color = random.randint(0, 16777215))
+        e.set_thumbnail(url = str(inter.guild.icon))
+        await member.send(embed = e)
+    
+        await member.unban(reason = reason)
+        e = discord.Embed(title = "Success", description = f"Successfully unbanned {member.mention}!", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You can't nnban a person higher than you", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #purge command
   @commands.slash_command(name = "purge", description = "Purge messages")
@@ -215,18 +229,24 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the warn, will be shown in /warns member: @mention
     '''
-    if str(member.id) not in db["warns"]:
-      db["warns"][str(member.id)] = []
-      updatelist = db["warns"][str(member.id)]
-      updatelist.append(reason)
-      db["warns"][str(member.id)] = updatelist
-      e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+    if not inter.author.top_role < member.top_role:
+      if str(inter.guild.id) not in db["warns"]:
+        db["warns"][str(inter.guild.id)] = {}
+      if str(member.id) not in db["warns"][str(inter.guild.id)]:
+        db["warns"][str(inter.guild.id)][str(member.id)] = []
+        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+        updatelist.append(reason)
+        db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+        e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+      else:
+        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+        updatelist.append(reason)
+        db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+        e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
     else:
-      updatelist = db["warns"][str(member.id)]
-      updatelist.append(reason)
-      db["warns"][str(member.id)] = updatelist
-      e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
   @commands.slash_command(name = "warns", description =  "See people's warns (BETA)")
@@ -240,16 +260,22 @@ class Moderation(commands.Cog):
     ----------
     member: Mention member
     '''
-    if str(member.id) in db["warns"] and db["warns"][str(member.id)] != []:
-      list = db["warns"][str(member.id)]
-      text = ""
-      text += f"1. `{list[0]}`"
-      for i in range(len(list) - 1):
-        text += f"\n{i + 2}. `{list[i + 1]}`"
-      e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+    if not inter.author.top_role < member.top_role:
+      if str(inter.guild.id) not in db["warns"]:
+        db["warns"][str(inter.guild.id)] = {}
+      if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
+        list = db["warns"][str(inter.guild.id)][str(member.id)]
+        text = ""
+        text += f"1. `{list[0]}`"
+        for i in range(len(list) - 1):
+          text += f"\n{i + 2}. `{list[i + 1]}`"
+        e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+      else:
+        e = discord.Embed(title = f"{member.name}'s Warns:", description = "They have no warns", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
     else:
-      e = discord.Embed(title = f"{member.name}'s Warns:", description = "They have no warns", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
   @commands.slash_command(name = "removewarn", description = "Remove people's warns (BETA)")
@@ -264,23 +290,30 @@ class Moderation(commands.Cog):
     member: Mention member
     index: index of the warn, shown in /warns member: @mention
     '''
-    if str(member.id) in db["warns"] and db["warns"][str(member.id)] != []:
-      updatelist = db["warns"][str(member.id)]
-      try:
-        if not len(updatelist) < index or not 0 > index:
-          reason = updatelist.pop(int(index - 1))
-          db["warns"][str(member.id)] = updatelist
-          e = discord.Embed(title = "Success!", description = f"`{member.name}`'s warn: {index}: `{reason}` is deleted!", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-        else:
+    if not inter.author.top_role < member.top_role:
+      if str(inter.guild.id) not in db["warns"]:
+        db["warns"][str(inter.guild.id)] = {}
+      if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
+        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+        try:
+          if not len(updatelist) < index or not 0 > index:
+            reason = updatelist.pop(int(index - 1))
+            db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+            e = discord.Embed(title = "Success!", description = f"`{member.name}`'s warn: {index}: `{reason}` is deleted!", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+        except IndexError:
           e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
           await inter.send(embed = e)
-      except IndexError:
-        e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
+      else:
+        e = discord.Embed(title = "Error", description = "They have no warns", color = random.randint(0, 16777215))
         await inter.send(embed = e)
     else:
-      e = discord.Embed(title = "Error", description = "They have no warns", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Error", description = "You can't remove warns from a person higher than you", color = random.randint(0, 16777215))
       await inter.send(embed = e)
+    
 
   #setting group
   @commands.slash_command(name = "setting", description = "See current setting or change it. Available settings: gpd")
