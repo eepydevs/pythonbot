@@ -114,7 +114,7 @@ def runbf(str):
       i -= 1
     #input ascii character in strp array
     elif l == ".":
-      strp.append(chr(array[i]))
+      strp.append(ascii(array[i]))
     #join every letter in strp array and print
     elif l == '[':
       codeiStack.append(codei)
