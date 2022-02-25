@@ -87,6 +87,8 @@ class buttonthing(discord.ui.View):
   """@discord.ui.button(label = "Link", custom_id = "Link", emoji = "🔗", style = discord.ButtonStyle.gray)
   async def link_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
     await interaction.send("You clicked Link", ephemeral = True)""" #this one i guess is useless lmao
+  # who useless? - UNKNOWN
+  # guess who writed this!
 
   
 def shuffle(x):
@@ -114,7 +116,7 @@ def runbf(str):
       i -= 1
     #input ascii character in strp array
     elif l == ".":
-      strp.append(ascii(array[i]))
+      strp.append(chr(array[i]))
     #join every letter in strp array and print
     elif l == '[':
       codeiStack.append(codei)
@@ -450,6 +452,18 @@ class Nonsense(commands.Cog):
     emoji: Emoji here
     '''
     await inter.response.send_message(emoji.url)
+
+  #someone command
+  @commands.slash_command(name = "someone", description = "Ping random person (Just like @someone back in 2018)")
+  @commands.cooldown(rate = 1, per = 60, type = commands.BucketType.user)
+  async def someone(inter):
+    while True:
+      member = random.choice(inter.guild.members)
+      if member.bot:
+        continue
+      else:
+        break
+    await inter.send(member.mention)
     
 def setup(bot):
   bot.add_cog(Nonsense(bot))
