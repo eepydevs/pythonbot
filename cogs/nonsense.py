@@ -455,7 +455,7 @@ class Nonsense(commands.Cog):
 
   #someone command
   @commands.slash_command(name = "someone", description = "Ping random person (Just like @someone back in 2018)")
-  @commands.cooldown(rate = 1, per = 60, type = commands.BucketType.user)
+  @commands.has_permissions(administrator = True)
   async def someone(inter):
     while True:
       member = random.choice(inter.guild.members)
