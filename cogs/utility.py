@@ -9,19 +9,13 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.15.0" # major.sub.fix
+botbuild = "5.15.1" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
 waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro", "You are the best!"]
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
-
-def Count(arr):
-  result = 0
-  for item in arr:
-    result += len(item.members)
-  return result
 
 if "afk" not in db:
   db["afk"] = {}
@@ -163,7 +157,7 @@ class Utility(commands.Cog):
     int, os.popen('free -t -m').readlines()[-1].split()[1:])
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [Number1#4325](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
-    e.add_field(name = "Bot", value = f"Total amount of commands: {len(tuple(command for command in inter.bot.commands if not command.hidden)) + len(inter.bot.slash_commands)}/{len(inter.bot.commands) + len(inter.bot.slash_commands)} ({len(inter.bot.commands) - len(tuple(command for command in inter.bot.commands if not command.hidden))} hidden) ({len(inter.bot.slash_commands)} slash)\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{Count(inter.bot.guilds)}`")
+    e.add_field(name = "Bot", value = f"Total amount of commands: {len(tuple(command for command in inter.bot.commands if not command.hidden)) + len(inter.bot.slash_commands)}/{len(inter.bot.commands) + len(inter.bot.slash_commands)} ({len(inter.bot.commands) - len(tuple(command for command in inter.bot.commands if not command.hidden))} hidden) ({len(inter.bot.slash_commands)} slash)\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
     e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `1024MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
