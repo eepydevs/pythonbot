@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.15.1" # major.sub.fix
+botbuild = "5.16.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -535,6 +535,20 @@ class Utility(commands.Cog):
     print(f"{code} is executed")
     e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
     await inter.send(embed = e, ephemeral = True)
+
+  #quote command
+  @commands.slash_command(name = "quote")
+  async def quote(inter, text):
+    '''
+    Quote command or whatever idk
+
+    Parameters
+    ----------
+    text: Your text here
+    '''
+    e = discord.Embed(title = "Quote", description = f"{text}", color = random.randint(0, 16777215))
+    e.set_footer(text = f"{inter.author}", icon_url = str(inter.author.avatar))
+    await inter.send(embed = e)
 
 def setup(bot):
   bot.add_cog(Utility(bot))
