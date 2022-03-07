@@ -130,7 +130,7 @@ class Fun(commands.Cog):
 
   #dice command slash
   @commands.slash_command(name = "dice", description = "Throw dices")
-  async def slashdice(inter, dices: int, faces: int):
+  async def slashdice(inter, dices: int = 2, faces: int = 6):
     '''
     Throw dices
 
