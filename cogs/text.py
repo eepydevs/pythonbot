@@ -13,16 +13,17 @@ def uwuize(text):
   chance = random.randint(0, 100)
   if chance >= 25:
     for letter in text:
-      if letter.lower() in "r":
-        if letter.isupper():
-          translation += "W"
-        else:
-          translation += "w"
-      if letter.lower() in "l":
-        if letter.isupper():
-          translation += "W"
-        else:
-          translation += "w"
+      if letter in "rRwW":
+        if letter.lower() in "r":
+          if letter.isupper():
+            translation += "W"
+          else:
+            translation += "w"
+        if letter.lower() in "l":
+          if letter.isupper():
+            translation += "W"
+          else:
+            translation += "w"
       else: 
         translation += letter
         chance = random.randint(0, 100)
@@ -74,6 +75,20 @@ def indicator(text):
     else:
       result += f"{letter} "
   return result
+
+def ifyed(text):
+  endings = ["ing", "ly", "ed", "y", "ie", "ize", "ify"]
+  result = []
+  for word in text.split(" "):
+    saveword = word
+    randomrange = random.randint(3, 10)
+    for i in range(randomrange):
+      chance = random.randint(0, 100)
+      if chance <= 30:
+        random.shuffle(endings)
+        saveword += random.choice(endings)
+    result.append(saveword)
+  return " ".join(result)
 
 class Text(commands.Cog):
   def __init__(self, bot):
@@ -343,6 +358,18 @@ class Text(commands.Cog):
     text: Text here
     '''
     modtext = indicator(text)
+    await inter.send(modtext)
+
+  @commands.slash_command(name = "ifyinglyedy")
+  async def ifyending(inter, *, text):
+    '''
+    Ifyinglyedy your inputted text!
+
+    Parameters
+    ----------
+    text: Text here
+    '''
+    modtext = ifyed(text)
     await inter.send(modtext)
     
 def setup(bot):
