@@ -550,5 +550,37 @@ class Utility(commands.Cog):
     e.set_footer(text = f"{inter.author}", icon_url = str(inter.author.avatar))
     await inter.send(embed = e)
 
+  #finduser command
+  @commands.slash_command(name = "finduser")
+  async def finduser(inter, user):
+    '''
+    Find a user i guess
+    
+    Parameters
+    ----------
+    user: User here
+    '''
+    result = []
+    for member in inter.bot.users:
+      if user.lower() in member.name.lower() and not member.bot:
+        result.append(f"{member.name}\#{member.discriminator}")
+
+    fields, fi, mul = [[]], 0, 1
+    for i, m in enumerate(result):
+      if i == 20 * mul:
+        fields.append([])
+        fi += 1
+        mul += 1
+      else:
+        fields[fi].append(m)
+        
+    e = discord.Embed(title = f"Searching for \"{user}\"", description = "This may be inaccurate", color = random.randint(0, 16777215))
+    if result:
+      for i, field in enumerate(fields, start = 1):
+        e.add_field(name = f"Part {i}", value = "\n".join(field), inline = True)
+    else:
+      e.add_field(name = "No results found", value = "_ _")
+    await inter.send(embed = e, ephemeral = True)
+
 def setup(bot):
   bot.add_cog(Utility(bot))
