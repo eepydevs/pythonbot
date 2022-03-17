@@ -563,8 +563,11 @@ class Utility(commands.Cog):
     result = []
     for member in inter.bot.users:
       if user.lower() in member.name.lower() and not member.bot:
-        result.append(f"{member.name}\#{member.discriminator}")
-
+        name = member.name
+        i = name.lower().find(user.lower())
+        found = name.replace(name[i:len(user) + i], f"**__{name[i:len(user) + i]}__**")
+        result.append(f"{found}\#{member.discriminator}")
+  
     fields, fi, mul = [[]], 0, 1
     for i, m in enumerate(result):
       if i == 20 * mul:
