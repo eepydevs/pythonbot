@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.16.0" # major.sub.fix
+botbuild = "5.16.1" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -79,6 +79,7 @@ class Utility(commands.Cog):
   #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):
+    await inter.response.defer()
     try:
       url = "https://api.uptimerobot.com/v2/getMonitors"
       payload = "api_key=m789844302-2c9467e07ebf524406068312&format=json&custom_uptime_ratios=7-30"
@@ -96,7 +97,7 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nThis week's uptime ratio: `{customtimeratio[0]}%`\nThis month's uptime ratio: `{customtimeratio[1]}%`", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
-    await inter.response.send_message(embed = e)
+    await inter.edit_original_message(embed = e)
 
   #report bug command
   @commands.slash_command(name = "bugreport", description = "report bug")
@@ -153,6 +154,7 @@ class Utility(commands.Cog):
   #bot info command
   @commands.slash_command(name = "botinfo", description = "Shows bot's info")
   async def slashbotinfo(inter):
+    await inter.response.defer()
     total_memory, used_memory, free_memory = map(
     int, os.popen('free -t -m').readlines()[-1].split()[1:])
     
@@ -162,7 +164,7 @@ class Utility(commands.Cog):
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
-    await inter.send(embed = e)
+    await inter.edit_original_message(embed = e)
   
   @commands.slash_command(name = "contributors", description = "Shows contributor list")
   async def credits(inter):
