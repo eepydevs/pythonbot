@@ -177,7 +177,7 @@ class Utility(commands.Cog):
     server_role_count = len(inter.guild.roles)
     list_of_bots = [bot.mention for bot in inter.guild.members if bot.bot]
     e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {server_role_count}\nList of bots({len(list_of_bots)}): " + ", ".join(list_of_bots))
+    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {server_role_count}")
     e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels) - len(inter.guild.categories)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
     e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
     if inter.guild.icon != None:
@@ -564,11 +564,11 @@ class Utility(commands.Cog):
     '''
     result = []
     for member in inter.bot.users:
-      if user.lower() in member.name.lower() and not member.bot:
+      if user.lower() in member.name.lower():
         name = member.name
         i = name.lower().find(user.lower())
         found = name.replace(name[i:len(user) + i], f"**__{name[i:len(user) + i]}__**")
-        result.append(f"{found}\#{member.discriminator}")
+        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''}")
   
     fields, fi, mul = [[]], 0, 1
     for i, m in enumerate(result):
