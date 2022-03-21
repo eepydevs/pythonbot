@@ -35,6 +35,15 @@ if "bugcounter" not in db["bot"]:
 if "atr_log" not in db["bot"]:
   db["bot"]["atr_log"] = 0
 
+async def suggest_note(inter, input):
+  return [note for note in db['notes'][str(inter.author.id)].keys() if input.lower() in note.lower()][0:24]
+
+async def suggest_user(inter, input):
+  return [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:24]
+
+async def suggest_member(inter, input):
+  return [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
+
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
@@ -399,7 +408,7 @@ class Utility(commands.Cog):
         await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description =  "Replaces whole note text")
-  async def overwrite(inter, name, text):
+  async def overwrite(inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Replaces whole note text
 
@@ -419,7 +428,7 @@ class Utility(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end")
-  async def add(self, inter, name, text):
+  async def add(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Inserts text at the end
 
@@ -439,7 +448,7 @@ class Utility(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end on new line")
-  async def newline(self, inter, name, text):
+  async def newline(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Inserts text at the end on new line
 
@@ -459,7 +468,7 @@ class Utility(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Reads selected note")
-  async def read(self, inter, name):
+  async def read(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
     '''
     Reads selected note
 
@@ -475,7 +484,7 @@ class Utility(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Deletes selected note")
-  async def delete(self, inter, name):
+  async def delete(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
     '''
     Deletes selected note
 
@@ -502,7 +511,7 @@ class Utility(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Reads selected note but escapes markdown")
-  async def read_raw(self, inter, name):
+  async def read_raw(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
     '''
     Reads selected note but escapes markdown
 
@@ -552,9 +561,14 @@ class Utility(commands.Cog):
     e.set_footer(text = f"{inter.author}", icon_url = str(inter.author.avatar))
     await inter.send(embed = e)
 
-  #finduser command
-  @commands.slash_command(name = "finduser")
-  async def finduser(inter, user):
+  #find command
+  @commands.slash_command()
+  async def find(self, inter):
+    pass
+
+  #find command
+  @find.sub_command()
+  async def user(self, inter, user: str = commands.Param(autocomplete = suggest_user)):
     '''
     Find a user i guess
     
@@ -568,7 +582,7 @@ class Utility(commands.Cog):
         name = member.name
         i = name.lower().find(user.lower())
         found = name.replace(name[i:len(user) + i], f"**__{name[i:len(user) + i]}__**")
-        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''}")
+        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''}{' :beginner:' if member in inter.guild.members else ''}")
   
     fields, fi, mul = [[]], 0, 1
     for i, m in enumerate(result):
@@ -579,7 +593,41 @@ class Utility(commands.Cog):
       else:
         fields[fi].append(m)
         
-    e = discord.Embed(title = f"Searching for \"{user}\"", description = "This may be inaccurate", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Searching for \"{user}\"", description = "This may be inaccurate\n🔰 = User is in this server", color = random.randint(0, 16777215))
+    if result:
+      for i, field in enumerate(fields, start = 1):
+        e.add_field(name = f"Part {i}", value = "\n".join(field), inline = True)
+    else:
+      e.add_field(name = "No results found", value = "_ _")
+    await inter.send(embed = e, ephemeral = True)
+
+  @find.sub_command()
+  async def member(self, inter, qmember: str = commands.Param(autocomplete = suggest_member)):
+    '''
+    Find a member in current server i guess
+    
+    Parameters
+    ----------
+    qmember: Member here
+    '''
+    result = []
+    for member in inter.guild.members:
+      if qmember.lower() in member.name.lower():
+        name = member.name
+        i = name.lower().find(qmember.lower())
+        found = name.replace(name[i:len(qmember) + i], f"**__{name[i:len(qmember) + i]}__**")
+        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''}{' 🟢' if member.status == discord.Status.online else ''}{' 🟡' if member.status == discord.Status.idle else ''}{' 🔴' if member.status == discord.Status.dnd else ''}{' ⚫' if member.status == discord.Status.offline else ''}")
+  
+    fields, fi, mul = [[]], 0, 1
+    for i, m in enumerate(result):
+      if i == 20 * mul:
+        fields.append([])
+        fi += 1
+        mul += 1
+      else:
+        fields[fi].append(m)
+        
+    e = discord.Embed(title = f"Searching for \"{qmember}\" in this server", description = "This may be inaccurate", color = random.randint(0, 16777215))
     if result:
       for i, field in enumerate(fields, start = 1):
         e.add_field(name = f"Part {i}", value = "\n".join(field), inline = True)
