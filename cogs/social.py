@@ -13,6 +13,9 @@ if "account" not in db:
 if "subs" not in db:
   db["subs"] = {}
 
+async def suggest_posts(inter, input):
+  return [post for post in db['account'][str(inter.author.id)].keys() if input.lower() in post.lower()][0:24]
+  
 class Social(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
@@ -54,7 +57,7 @@ class Social(commands.Cog):
 
   #remove post command
   @commands.slash_command(description = "Remove your post. Account required")
-  async def removepost(inter, name):
+  async def removepost(inter, name: str = commands.Param(autocomplete = suggest_posts)):
     '''
     Remove your posts. Account required
     

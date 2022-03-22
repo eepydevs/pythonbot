@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "5.16.1" # major.sub.fix
+botbuild = "5.17.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -39,10 +39,10 @@ async def suggest_note(inter, input):
   return [note for note in db['notes'][str(inter.author.id)].keys() if input.lower() in note.lower()][0:24]
 
 async def suggest_user(inter, input):
-  return [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:24]
+  return [input] + [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:23] if input else [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:24]  
 
 async def suggest_member(inter, input):
-  return [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
+  return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
 class Utility(commands.Cog):
   def __init__(self, bot):

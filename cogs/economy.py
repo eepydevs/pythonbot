@@ -17,7 +17,8 @@ if "shop" not in db:
     "Discount card": 20000,
     "Computer": 6500,
     "Laptop": 2000,
-    "Smartphone": 500
+    "Smartphone": 500,
+    "Lottery": 100
   }
 
 if "inventory" not in db:
@@ -32,6 +33,26 @@ def iteminfo(name):
     return "Usable: mail Command/False\nType: Item\nInfo: You can mail someone with this"
   if name == "Discount card":
     return "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!"
+  if name == "Lottery":
+    return "Usable: True\nType: Item\nInfo: Gives random amount of cash... Sometimes huge amount of cash"
+
+async def suggest_buyitem(inter, input):
+  return [item for item in db['shop'].keys() if input.lower() in item.lower()][0:24]
+
+async def suggest_item(inter, input):
+  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24]
+  
+def lottery():
+  chance = random.randint(0, 100)
+  if chance >= 25 and chance <= 50:
+    win = random.randint(100, 500)
+  elif chance >= 25:
+    win = random.randint(25, 150)
+  elif chance >= 95:
+    win = random.randint(1000, 5000)
+  else:
+    win = 0
+  return win
 
 class Required2(str, Enum):
   info = "info"
@@ -43,7 +64,7 @@ class Economy(commands.Cog):
 
   #item group
   @commands.slash_command(name = "item")
-  async def slashitem(inter, action: Required2, itemname):
+  async def slashitem(inter, action: Required2, itemname: str = commands.Param(autocomplete = suggest_item)):
     '''
     See what you can do with your item
 
@@ -73,8 +94,19 @@ class Economy(commands.Cog):
         item = itemname.lower().capitalize()
         if item != None:
           if item in db["inventory"][str(inter.author.id)]:
-            if item in []:
-              pass
+            if item == "Lottery":
+              win = lottery()
+              if db["inventory"][str(inter.author.id)].get(item) >= 2:
+                updateinv = db["inventory"][str(inter.author.id)]
+                updateinv[item] -= 1
+                db["inventory"][str(inter.author.id)] = updateinv
+              else:
+                updateinv = db["inventory"][str(inter.author.id)]
+                updateinv.pop(item)
+                db["inventory"][str(inter.author.id)] = updateinv
+              e = discord.Embed(title = f"You won {win} 🪙!", description = "congratulations i guess...", color = random.randint(0, 16777215))
+              db["balance"][str(inter.author.id)] += win
+              await inter.send(embed = e)
             else:
               e = discord.Embed(title = "Error", description = f"Item `{itemname}` can't be used", color = random.randint(0, 16777215))
               await inter.send(embed = e, ephemeral = True)
@@ -90,7 +122,6 @@ class Economy(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = f"{action} doens't exist!\nAvailable actions: `info`, `use`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
-
   #balance command
   @commands.slash_command(name = "balance", description = "Look how much cash you have")
   async def slashbalance(inter, member: discord.Member = None):
@@ -575,7 +606,7 @@ class Economy(commands.Cog):
 
   #buy command
   @commands.slash_command(name = "buy", description = "Buy a thing (that is useless)")
-  async def slashbuy(inter, item_name):
+  async def slashbuy(inter, item_name: str = commands.Param(autocomplete = suggest_buyitem)):
       '''
       Buy a thing in shop
   
@@ -626,7 +657,7 @@ class Economy(commands.Cog):
 
   #sell command
   @commands.slash_command(name = "sell", description = "Sell any item you have")
-  async def slashsell(inter, itemname):
+  async def slashsell(inter, itemname: str = commands.Param(autocomplete = suggest_item)):
     '''
     Sell any item you have
   
