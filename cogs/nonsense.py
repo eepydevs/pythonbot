@@ -15,6 +15,9 @@ from replit import db
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
 
+if "tupper" not in db:
+  db["tupper"] = {}
+
 class Required1(str, Enum):
   You = "True"
   Everyone = ""
@@ -93,6 +96,9 @@ class buttonthing(discord.ui.View):
   
 def shuffle(x):
   return random.sample(x, len(x))
+
+async def suggest_tupper(inter, input):
+  return [tupper for tupper in db["tupper"][str(inter.author.id)].keys() if input.lower() in tupper.lower()] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
 
 def runbf(str):
   array = [0] * 30000
@@ -464,6 +470,102 @@ class Nonsense(commands.Cog):
       else:
         break
     await inter.send(member.mention)
-    
+
+  #tupper group
+  @commands.slash_command()
+  async def tupper(self, inter):
+    if str(inter.author.id) not in db["tupper"]:
+      db["tupper"][str(inter.author.id)] = {}
+
+  #create tupper
+  @tupper.sub_command()
+  async def create(self, inter, name, avatar):
+    '''
+    Create a tupper!
+
+    Parameters
+    ----------
+    name: Name for tupper
+    avatar: Avatar for tupper (MUST BE A LINK)
+    '''
+    if name not in db["tupper"][str(inter.author.id)]:
+      db["tupper"][str(inter.author.id)].update({str(name): str(avatar)})
+      e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
+      e.set_image(url = avatar)
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{name}` already exists!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  #use tupper
+  @tupper.sub_command()
+  async def say(self, inter, *, tupper: str = commands.Param(autocomplete = suggest_tupper), content):
+    '''
+    Use tupper to say something!
+
+    Parameters
+    ----------
+    tupper: Tupper you want to use
+    content: Text here
+    '''
+    if tupper in db["tupper"][str(inter.author.id)]:
+      e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      channel_webhooks = await inter.channel.webhooks()
+      webhook_count = 0
+
+      for webhook in channel_webhooks:
+        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
+            await webhook.send(
+                content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper)
+            )
+            return
+
+      new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
+      await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper))
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  #delete tupper
+  @tupper.sub_command()
+  async def delete(self, inter, tupper: str = commands.Param(autocomplete = suggest_tupper)):
+    '''
+    Delete existing tupper
+
+    Parameters
+    ----------
+    tupper: Tupper you want to delete
+    '''
+    if tupper in db["tupper"][str(inter.author.id)]:
+      del db["tupper"][str(inter.author.id)]
+      e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  #edit tupper
+  @tupper.sub_command()
+  async def edit(self, inter, *, tupper: str = commands.Param(autocomplete = suggest_tupper), new_name, avatar):
+    '''
+    Edit a tupper!
+
+    Parameters
+    ----------
+    tupper: Tupper you want to edit
+    new_name: New name for tupper
+    avatar: New avatar for tupper (MUST BE A LINK)
+    '''
+    if tupper in db["tupper"][str(inter.author.id)]:
+      del db["tupper"][str(inter.author.id)][tupper]
+      db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
+      e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
+      e.set_image(url = avatar)
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      
 def setup(bot):
   bot.add_cog(Nonsense(bot))
