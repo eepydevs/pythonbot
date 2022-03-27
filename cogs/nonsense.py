@@ -538,7 +538,7 @@ class Nonsense(commands.Cog):
     tupper: Tupper you want to delete
     '''
     if tupper in db["tupper"][str(inter.author.id)]:
-      del db["tupper"][str(inter.author.id)]
+      del db["tupper"][str(inter.author.id)][tupper]
       e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
     else:
