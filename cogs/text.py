@@ -8,7 +8,8 @@ def uwuize(text):
   emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", "u<u", "u>u", "o<o", "o>o", "O<O", "O>O", "U>U", "U<U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ".w.", ".~.", "'w'", "'~'" ">:3",":3", "3:", "3:<", ">:>", ":>", ">:<", ":<", ":V", ":U"]
   random.shuffle(emoticons)
   random.shuffle(endings)
-  vowels = ("a", "A", "e", "E", "i", "I", "u", "U", "o", "O")
+  vowels = "aAeEiIuUoO"
+  y = "dDgGnN"
   translation = ""
   chance = random.randint(0, 100)
   if chance >= 25:
@@ -25,6 +26,13 @@ def uwuize(text):
           else:
             translation += "w"
       else: 
+        chance = random.randint(0, 100)
+        if chance <= 30:
+          if letter in y:
+            if letter.isupper():
+              translation += "Y"
+            else:
+              translation += "y"
         translation += letter
         chance = random.randint(0, 100)
         if chance <= 20:
@@ -42,20 +50,27 @@ def uwuize(text):
     chance = random.randint(0, 100)
     if chance >= 25:
       translation += f" {random.choice(emoticons)}"
-    return translation
   else:
     for letter in text:
+      chance = random.randint(0, 100)
+      if chance <= 30:
+        if letter in y:
+          if letter.isupper():
+            translation += "Y"
+          else:
+            translation += "y"
       translation += letter
       chance = random.randint(0, 100)
       if chance <= 15:
         translation += "~"
+      
     chance = random.randint(0, 100)
     if chance <= 20:
       translation += f" {random.choice(endings)}"
     chance = random.randint(0, 100)
     if chance <= 50:
       translation += f" {random.choice(emoticons)}"
-    return translation
+  return translation
 
 def indicator(text):
   emojis = {"0": "0️⃣", "1": "1️⃣", "2": "2️⃣", "3": "3️⃣", "4": "4️⃣",

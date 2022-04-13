@@ -11,6 +11,7 @@ import requests
 import js2py
 import math
 import datetime, time
+import requests as rq
 from replit import db
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
@@ -98,7 +99,7 @@ def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_tupper(inter, input):
-  return [tupper for tupper in db["tupper"][str(inter.author.id)].keys() if input.lower() in tupper.lower()] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
+  return [tupper for tupper in db["tupper"][str(inter.author.id)][0:24].keys() if input.lower() in tupper.lower()] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
 
 def runbf(str):
   array = [0] * 30000
@@ -355,7 +356,7 @@ class Nonsense(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
     
   #eval brainfudge command
-  @commands.slash_command(name = "evalbf", description = "Execute brainfudge code and see results")
+  @commands.slash_command(name = "execbf", description = "Execute brainfudge code and see results")
   async def evalbf(inter, *, ephemeral: Required1 = Required1.You, code):
     '''
     Execute brainfudge code and see the results
@@ -430,7 +431,7 @@ class Nonsense(commands.Cog):
             )
             return
 
-      new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
+      new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
       await new_webhook.send(content = content, embed = e, username = inter.bot.user.display_name, avatar_url = inter.bot.user.avatar)
     else:
       await inter.send(content = content, embed = e, ephemeral = ephemeral)
@@ -470,6 +471,37 @@ class Nonsense(commands.Cog):
       else:
         break
     await inter.send(member.mention)
+
+  #qrcode group
+  @commands.slash_command()
+  async def qrcode(self, inter):
+    pass
+
+  #create
+  @qrcode.sub_command()
+  async def create(self, inter, content: str):
+    '''
+    Create a qrcode i guess
+
+    Parameters
+    ----------
+    content: Qrcode will contain content written here
+    '''
+    await inter.send(f"https://api.qrserver.com/v1/create-qr-code/?data={content[0:899].replace(' ', '%20').replace('/', '%2F').replace(':', '%3A').replace('=', '%3D').replace('?', '%3F')}&qzone=2&size=350x350")
+    
+  #read
+  @qrcode.sub_command()
+  async def read(self, inter, qrcode: str):
+    '''
+    Read a qrcode i guess
+    
+    Parameters
+    ----------
+    qrcode: Qrcode here (MUST BE A LINK)
+    '''
+    await inter.response.defer()
+    json = rq.get(f"http://api.qrserver.com/v1/read-qr-code/?fileurl={qrcode.replace(' ', '%20').replace('/', '%2F').replace(':', '%3A').replace('=', '%3D').replace('?', '%3F')}").json()
+    await inter.edit_original_message(content = f"Contents: {json[0]['symbol'][0]['data']}")
 
   #tupper group
   @commands.slash_command()
@@ -521,7 +553,7 @@ class Nonsense(commands.Cog):
             )
             return
 
-      new_webhook = await inter.channel.create_webhook(name="PythonBot Webook", reason="PythonBot webhook usage in commands")
+      new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
       await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper))
     else:
       e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
