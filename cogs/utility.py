@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "6.1.0" # major.sub.fix
+botbuild = "6.2.1" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -521,8 +521,9 @@ class Utility(commands.Cog):
     '''
     if str(inter.author.id) in db["notes"]:
       if name in db["notes"][str(inter.author.id)]:
-        text = db['notes'][str(inter.author.id)].get(name).replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
-        e = discord.Embed(title = f"Notes: {name}", description = text, color = random.randint(0, 16777215))
+        text = db['notes'][str(inter.author.id)].get(name)
+        rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
+        e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
       else:
         e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
