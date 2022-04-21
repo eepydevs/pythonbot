@@ -10,10 +10,13 @@ from disnake.ext import commands
 if "account" not in db:
   db["account"] = {}
 
-if "subs" not in db:
-  db["subs"] = {}
+#if "subs" not in db:
+#  db["subs"] = {}
 
 async def suggest_posts(inter, input):
+  return [post for post in db['account'][str(inter.author.id)].keys() if input.lower() in post.lower()][0:24]
+
+async def suggest_postsmember(inter, input):
   return [post for post in db['account'][str(inter.author.id)].keys() if input.lower() in post.lower()][0:24]
   
 class Social(commands.Cog):
@@ -25,7 +28,7 @@ class Social(commands.Cog):
   async def addaccount(inter):
     if str(inter.author.id) not in db["account"]:
       db["account"][str(inter.author.id)] = {}
-      db["subs"][str(inter.author.id)] = []
+      #db["subs"][str(inter.author.id)] = []
       e = discord.Embed(title = "Success", description = "Account created!", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     else:
@@ -35,7 +38,7 @@ class Social(commands.Cog):
   #post command
   @commands.slash_command(description = "Post something. Account required, Has cooldown of 10 minutes")
   @commands.cooldown(rate = 1, per = 600, type = commands.BucketType.user)
-  async def post(inter, name, text):
+  async def post(inter, name, text, imagelink = None):
     '''
     Post something. Account required, has cooldown of 10 minutes
 
@@ -43,10 +46,11 @@ class Social(commands.Cog):
     ----------
     name: Name of post
     text: Text of post
+    imagelink: Image link, Optional
     '''
     if str(inter.author.id) in db["account"]:
       updatedict = db["account"][str(inter.author.id)]
-      updatedict.update({name: text})
+      updatedict.update({name: [text, imagelink]})
       db["account"][str(inter.author.id)] = updatedict
       e = discord.Embed(title = "Success", description = f"You posted: `{name}: {text}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
@@ -116,17 +120,19 @@ class Social(commands.Cog):
         if len(dict(db["account"][str(member.id)])) != 0:
           posts = dict(db["account"][str(member.id)])
           list1, list2 = list(posts.keys()), list(posts.values())
-          names, texts = list1[-1], list2[-1]
-          e = discord.Embed(title = f"{member.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(member.id)])}", color = random.randint(0, 16777215))
-          e.add_field(name = names, value = texts)
-          for i in range(len(list1) - 1):
-            names = f"{list1[-i - 2]}"
-            texts = f"{list2[-i - 2]}"
-            e.add_field(name = names, value = texts)
+          list1.reverse()
+          list2.reverse()
+          list1, list2 = list1[0:24], list2[0:24][0:24].reverse() 
+          e = discord.Embed(title = f"{member.name}'s posts:", description = "Posts here", color = random.randint(0, 16777215)) #\nSubscribers count: {len(db['subs'][str(member.id)])}
+          for i1, i2 in zip(list1, list(list2)):
+            names = i1
+            texts = i2[0]
+            images = i2[1]
+            e.add_field(name = names, value = texts + (f'\n\n[IMAGE]({images})' if images else ''))
           e.set_thumbnail(url = member.avatar)
           await inter.send(embed = e)
         else:
-          e = discord.Embed(title = f"{member.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(member.id)])}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"{member.name}'s posts:", description = "Posts here", color = random.randint(0, 16777215)) #\nSubscribers count: {len(db['subs'][str(member.id)])}
           e.set_thumbnail(url = member.avatar)
           e.add_field(name = "No posts here", value = "Check later!")
           await inter.send(embed = e)
@@ -138,17 +144,19 @@ class Social(commands.Cog):
         if len(dict(db["account"][str(inter.author.id)])) != 0:
           posts = dict(db["account"][str(inter.author.id)])
           list1, list2 = list(posts.keys()), list(posts.values())
-          names, texts = list1[-1], list2[-1]
-          e = discord.Embed(title = f"{inter.author.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(inter.author.id)])}", color = random.randint(0, 16777215))
-          e.add_field(name = names, value = texts)
-          for i in range(len(list1) - 1):
-            names = f"{list1[-i - 2]}"
-            texts = f"{list2[-i - 2]}"
-            e.add_field(name = names, value = texts)
+          list1.reverse()
+          list2.reverse()
+          list1, list2 = list1[0:24], list2[0:24]
+          e = discord.Embed(title = f"{inter.author.name}'s posts:", description = "Posts here", color = random.randint(0, 16777215)) #\nSubscribers count: {len(db['subs'][str(member.id)])}
+          for i1, i2 in zip(list1, list(list2)):
+            names = i1
+            texts = i2[0]
+            images = i2[1]
+            e.add_field(name = names, value = texts + (f'\n\n[IMAGE]({images})' if images else ''))
           e.set_thumbnail(url = inter.author.avatar)
           await inter.send(embed = e)
         else:
-          e = discord.Embed(title = f"{inter.author.name}'s posts:", description = f"Posts here\nSubscribers count: {len(db['subs'][str(inter.author.id)])}", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"{inter.author.name}'s posts:", description = "Posts here", color = random.randint(0, 16777215)) #\nSubscribers count: {len(db['subs'][str(member.id)])}
           e.set_thumbnail(url = inter.author.avatar)
           e.add_field(name = "No posts here", value = "Check later!")
           await inter.send(embed = e)
@@ -157,8 +165,8 @@ class Social(commands.Cog):
         await inter.send(embed = e, ephemeral = True)
 
   #view command
-  @commands.slash_command(description = "See people's last post. Account required")
-  async def view(inter, member: discord.Member = None):
+  @commands.slash_command(description = "See selected people's post. Account required")
+  async def view(inter, member: discord.Member, postname: str = commands.Param(autocomplete = suggest_postsmember)):
     '''
     See people's last post. Account required
 
@@ -166,26 +174,28 @@ class Social(commands.Cog):
     ----------
     member: Member here
     '''
-    if member != None:
-      if str(member.id) in db["account"]:
-        if len(dict(db["account"][str(member.id)])) != 0:
-          posts = dict(db["account"][str(member.id)])
-          list1, list2 = list(posts.keys()), list(posts.values())
-          names, texts = list1[-1], list2[-1]
-          e = discord.Embed(title = f"{member.name}'s latest post:", description = "latest post here", color = random.randint(0, 16777215))
-          e.add_field(name = names, value = texts)
-          e.set_thumbnail(url = member.avatar)
-          await inter.send(embed = e)
-        else:
-          e = discord.Embed(title = f"{member.name}'s latest post:", description = "latest post here", color = random.randint(0, 16777215))
-          e.set_thumbnail(url = member.avatar)
-          e.add_field(name = "No posts here", value = "Check later!")
-          await inter.send(embed = e)
+    if str(member.id) in db["account"]:
+      if len(dict(db["account"][str(member.id)])) != 0:
+        posts = dict(db["account"][str(member.id)])[postname]
+        names = postname
+        texts = posts[0]
+        images = posts[1]
+        e = discord.Embed(title = f"{member.name}'s post:", description = "latest post here", color = random.randint(0, 16777215))
+        e.add_field(name = names, value = texts)
+        if images:
+          e.set_image(url = images)
+        e.set_thumbnail(url = member.avatar)
+        await inter.send(embed = e)
       else:
-        e = discord.Embed(title = "Error", description = "They have no account...", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+        e = discord.Embed(title = f"{member.name}'s post:", description = "latest post here", color = random.randint(0, 16777215))
+        e.set_thumbnail(url = member.avatar)
+        e.add_field(name = "No posts here", value = "Check later!")
+        await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "They have no account...", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
-  #subscribe command
+"""  #subscribe command
   @commands.slash_command(description = "Subscribe to people. Account required")
   async def subscribe(inter, member: discord.Member = None):
     '''
@@ -256,7 +266,7 @@ class Social(commands.Cog):
         await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = "Error", description = "Mention a person!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+      await inter.send(embed = e, ephemeral = True)"""
 
 def setup(bot):
   bot.add_cog(Social(bot))
