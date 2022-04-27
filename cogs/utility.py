@@ -307,13 +307,13 @@ class Utility(commands.Cog):
     e.set_footer(text = f"ID: {emoji.id}")
     await inter.send(embed = e)
 
-  #servers command
+  """#servers command
   @commands.slash_command(description = "See other servers' member counter")
   async def servers(inter):
     await inter.response.defer()
     counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
     e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    await inter.send(embed = e)"""
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
