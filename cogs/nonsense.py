@@ -598,6 +598,23 @@ class Nonsense(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
+
+  @commands.slash_command()
+  async def screenshot(inter, site: str):
+    '''
+    Screenshot a website
+
+    Parameters
+    ----------
+    site: Site URL
+    '''
+    if any([site.startswith("https://"), site.startswith("http://")]):
+      e = discord.Embed(title = site, description = "If you don't see image then url doesn't work", color = random.randint(0, 16777215))
+      e.set_image(url = f"https://api.popcat.xyz/screenshot?url={site}")
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = "Invalid URL", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
       
 def setup(bot):
   bot.add_cog(Nonsense(bot))
