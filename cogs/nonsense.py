@@ -90,16 +90,13 @@ class buttonthing(discord.ui.View):
 
   """@discord.ui.button(label = "Link", custom_id = "Link", emoji = "🔗", style = discord.ButtonStyle.gray)
   async def link_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
-    await interaction.send("You clicked Link", ephemeral = True)""" #this one i guess is useless lmao
-  # who useless? - UNKNOWN
-  # guess who writed this!
-
+    await interaction.send("You clicked Link", ephemeral = True)"""
   
 def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_tupper(inter, input):
-  return [tupper for tupper in db["tupper"][str(inter.author.id)][0:24].keys() if input.lower() in tupper.lower()] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
+  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys())[0:24] if input.lower() in tupper.lower()] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
 
 def runbf(str):
   array = [0] * 30000
