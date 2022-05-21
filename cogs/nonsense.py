@@ -96,7 +96,7 @@ def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_tupper(inter, input):
-  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys())[0:24] if input.lower() in tupper.lower()] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
+  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
 
 def runbf(str):
   array = [0] * 30000
