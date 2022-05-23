@@ -14,7 +14,7 @@ def uwuize(text):
   chance = random.randint(0, 100)
   if chance >= 25:
     for letter in text:
-      if letter in "rRwW":
+      if letter in "rRlL":
         if letter.lower() in "r":
           if letter.isupper():
             translation += "W"
@@ -26,6 +26,7 @@ def uwuize(text):
           else:
             translation += "w"
       else: 
+        translation += letter
         chance = random.randint(0, 100)
         if chance <= 30:
           if letter in y:
@@ -33,7 +34,6 @@ def uwuize(text):
               translation += "Y"
             else:
               translation += "y"
-        translation += letter
         chance = random.randint(0, 100)
         if chance <= 20:
           if letter in vowels:
@@ -43,7 +43,8 @@ def uwuize(text):
               translation += "w"
         chance = random.randint(0, 100)
         if chance <= 15:
-          translation += "~"
+          if letter != " ":
+            translation += "~"
     chance = random.randint(0, 100)
     if chance <= 20:
       translation += f" {random.choice(endings)}"
@@ -52,6 +53,7 @@ def uwuize(text):
       translation += f" {random.choice(emoticons)}"
   else:
     for letter in text:
+      translation += letter
       chance = random.randint(0, 100)
       if chance <= 30:
         if letter in y:
@@ -59,11 +61,10 @@ def uwuize(text):
             translation += "Y"
           else:
             translation += "y"
-      translation += letter
       chance = random.randint(0, 100)
       if chance <= 15:
-        translation += "~"
-      
+        if letter != " ":
+          translation += "~"
     chance = random.randint(0, 100)
     if chance <= 20:
       translation += f" {random.choice(endings)}"
@@ -229,7 +230,7 @@ class Text(commands.Cog):
     await inter.send(modtext)
   
   #uwuize command
-  @commands.slash_command(name = "uwuify", description = "UwUize your inputted text!")
+  @commands.slash_command(name = "fuwwify", description = "UwUize your inputted text!")
   async def uwuize(inter, *, text):
     '''
     UwUize your inputted text!
