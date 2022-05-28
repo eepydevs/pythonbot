@@ -179,7 +179,6 @@ class Economy(commands.Cog):
           e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}")
         await inter.send(embed = e)
       
-
   #work command
   @commands.slash_command(name = "work", description = "Work to get some cash. Has cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 60 * 30, type = commands.BucketType.user)
@@ -601,7 +600,7 @@ class Economy(commands.Cog):
 
   #buy command
   @commands.slash_command(name = "buy", description = "Buy a thing (that is useless)")
-  async def slashbuy(inter, item_name: str = commands.Param(autocomplete = suggest_buyitem)):
+  async def slashbuy(inter, item_name: str = commands.Param(autocomplete = suggest_buyitem), quantity: int = 1):
       '''
       Buy a thing in shop
   
@@ -611,48 +610,54 @@ class Economy(commands.Cog):
       '''
       modtext = item_name.lower()
       itemname = modtext.capitalize()
-      if itemname in db["shop"]:
-        if str(inter.author.id) in db["balance"]:
-          if db["shop"].get(itemname) < db["balance"][str(inter.author.id)] or int(db["shop"].get(itemname) * 0.75) < db["balance"][str(inter.author.id)]:
-            if str(inter.author.id) in db["inventory"]:
-              if itemname not in db["inventory"][str(inter.author.id)]:
-                if "Discount card" in db["inventory"][str(inter.author.id)]:
-                  db["balance"][str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75)
+      if quantity > 0:
+        if itemname in db["shop"]:
+          if str(inter.author.id) in db["balance"]:
+            if db["shop"].get(itemname) * quantity < db["balance"][str(inter.author.id)] or int(db["shop"].get(itemname) * 0.75) * quantity < db["balance"][str(inter.author.id)]:
+              if str(inter.author.id) in db["inventory"]:
+                if itemname not in db["inventory"][str(inter.author.id)]:
+                  if "Discount card" in db["inventory"][str(inter.author.id)]:
+                    db["balance"][str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75) * quantity
+                  else:
+                    db["balance"][str(inter.author.id)] -= db["shop"].get(itemname) * quantity
+                  updateinv = db["inventory"][str(inter.author.id)]
+                  updateinv[itemname] = quantity
+                  db["inventory"][str(inter.author.id)] = updateinv
+                  e = discord.Embed(title = "Shop", description = f"You got {quantity} {itemname}'s!", color = random.randint(0, 16777215))
+                  await inter.send(embed = e)
                 else:
-                  db["balance"][str(inter.author.id)] -= db["shop"].get(itemname)
-                updateinv = db["inventory"][str(inter.author.id)]
-                updateinv[itemname] = 1
-                db["inventory"][str(inter.author.id)] = updateinv
-                e = discord.Embed(title = "Shop", description = f"You got {itemname}!", color = random.randint(0, 16777215))
-                await inter.send(embed = e)
+                  if "Discount card" in db["inventory"][str(inter.author.id)]:
+                    db["balance"][str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75) * quantity
+                  else:
+                    db["balance"][str(inter.author.id)] -= db["shop"].get(itemname) * quantity
+                  updateinv = db["inventory"][str(inter.author.id)]
+                  updateinv[itemname] += quantity
+                  db["inventory"][str(inter.author.id)] = updateinv
+                  itemammount = db["inventory"][str(inter.author.id)].get(itemname)
+                  e = discord.Embed(title = "Shop", description = f"You got {quantity} {itemname}'s!", color = random.randint(0, 16777215))
+                  e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
+                  await inter.send(embed = e)
               else:
-                db["balance"][str(inter.author.id)] -= db["shop"].get(itemname)
+                db["inventory"][str(inter.author.id)] = {}
+                db["balance"][str(inter.author.id)] -= db["shop"].get(itemname) * quantity
                 updateinv = db["inventory"][str(inter.author.id)]
-                updateinv[itemname] += 1
+                updateinv[itemname] = quantity
                 db["inventory"][str(inter.author.id)] = updateinv
-                itemammount = db["inventory"][str(inter.author.id)].get(itemname)
                 e = discord.Embed(title = "Shop", description = f"You got {itemname}!", color = random.randint(0, 16777215))
-                e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
                 await inter.send(embed = e)
             else:
-              db["inventory"][str(inter.author.id)] = {}
-              db["balance"][str(inter.author.id)] -= db["shop"].get(itemname)
-              updateinv = db["inventory"][str(inter.author.id)]
-              updateinv[itemname] = 1
-              db["inventory"][str(inter.author.id)] = updateinv
-              e = discord.Embed(title = "Shop", description = f"You got {itemname}!", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
+              await inter.send(content = "Error: You have not enough money", ephemeral = True)
           else:
-            await inter.send(content = "You have not enough money", ephemeral = True)
+            db["balance"][str(inter.author.id)] = 0
+            await inter.send(content = "Error: Get some money first!", ephemeral = True)
         else:
-          db["balance"][str(inter.author.id)] = 0
-          await inter.send(content = "Error: Get some money first!", ephemeral = True)
+          await inter.send(content = "Error: You can't buy nothing!", ephemeral = True)
       else:
-        await inter.send(content = "Error: You can't buy nothing!", ephemeral = True)
+        await inter.send(content = "Error: You can't buy 0 or less items!", ephemeral = True)
 
   #sell command
   @commands.slash_command(name = "sell", description = "Sell any item you have")
-  async def slashsell(inter, itemname: str = commands.Param(autocomplete = suggest_item)):
+  async def slashsell(inter, itemname: str = commands.Param(autocomplete = suggest_item), quantity: int = 1):
     '''
     Sell any item you have
   
@@ -660,43 +665,53 @@ class Economy(commands.Cog):
     ----------
     itemname: Item name here
     '''
-    if itemname != None:
-      modtext = itemname.lower()
-      itemname = modtext.capitalize()
-      if itemname in db["shop"]:
-        if str(inter.author.id) in db["balance"]:
-          if str(inter.author.id) in db["inventory"]:
-            if itemname not in db["inventory"][str(inter.author.id)]:
-              e = discord.Embed(title = "Shop", description = "You can't sell nothing!", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-            else:
-              if db["inventory"][str(inter.author.id)].get(itemname) >= 2:
-                db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2)
-                updateinv = db["inventory"][str(inter.author.id)]
-                updateinv[itemname] -= 1
-                db["inventory"][str(inter.author.id)] = updateinv
-                itemammount = db["inventory"][str(inter.author.id)].get(itemname)
-                e = discord.Embed(title = "Shop", description = f"You sold {itemname}!", color = random.randint(0, 16777215))
-                e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
-                await inter.send(embed = e)
+    if quantity > 0:
+      if quantity <= db["inventory"][str(inter.author.id)].get(itemname):
+        if itemname != None:
+          modtext = itemname.lower()
+          itemname = modtext.capitalize()
+          if itemname in db["shop"]:
+            if str(inter.author.id) in db["balance"]:
+              if str(inter.author.id) in db["inventory"]:
+                if itemname not in db["inventory"][str(inter.author.id)]:
+                  e = discord.Embed(title = "Shop", description = "You can't sell nothing!", color = random.randint(0, 16777215))
+                  await inter.send(embed = e)
+                else:
+                  if db["inventory"][str(inter.author.id)].get(itemname) >= 2:
+                    db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2) * quantity
+                    updateinv = db["inventory"][str(inter.author.id)]
+                    if quantity == db["inventory"][str(inter.author.id)].get(itemname):
+                      updateinv.pop(itemname)
+                      itemammount = 0
+                    else:
+                      updateinv[itemname] -= quantity
+                      itemammount = db["inventory"][str(inter.author.id)].get(itemname)
+                    db["inventory"][str(inter.author.id)] = updateinv
+                    e = discord.Embed(title = "Shop", description = f"You sold {quantity} {itemname}'s!", color = random.randint(0, 16777215))
+                    e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
+                    await inter.send(embed = e)
+                  else:
+                    db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2)
+                    updateinv = db["inventory"][str(inter.author.id)]
+                    updateinv.pop(itemname)
+                    db["inventory"][str(inter.author.id)] = updateinv
+                    itemammount = db["inventory"][str(inter.author.id)].get(itemname)
+                    e = discord.Embed(title = "Shop", description = f"You sold {itemname}!", color = random.randint(0, 16777215))
+                    await inter.send(embed = e)
               else:
-                db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2)
-                updateinv = db["inventory"][str(inter.author.id)]
-                updateinv.pop(itemname)
-                db["inventory"][str(inter.author.id)] = updateinv
-                itemammount = db["inventory"][str(inter.author.id)].get(itemname)
-                e = discord.Embed(title = "Shop", description = f"You sold {itemname}!", color = random.randint(0, 16777215))
+                e = discord.Embed(title = "Shop", description = f"You can't sell nothing!", color = random.randint(0, 16777215))
                 await inter.send(embed = e)
+            else:
+              db["balance"][str(inter.author.id)] = 0
+              await inter.send(content = "Try again!", ephemeral = True)
           else:
-            e = discord.Embed(title = "Shop", description = f"You can't sell nothing!", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
+            await inter.send(content = "Error: You can't selll nothing!", ephemeral = True)
         else:
-          db["balance"][str(inter.author.id)] = 0
-          await inter.send(content = "Try again!", ephemeral = True)
+          await inter.send(content = "Error: You can't sell nothing!", ephemeral = True)
       else:
-        await inter.send(content = "Error: You can't selll nothing!", ephemeral = True)
+        await inter.send(content = "Error: You can't sell more than you have", ephemeral = True)
     else:
-      await inter.send(content ="Error: You can't sell nothing!", ephemeral = True)
+      await inter.send(content = "Error: You can't sell 0 or less items", ephemeral = True)
 
   #inventory command
   @commands.slash_command(name = "inventory", description = "See what do you have")
@@ -903,7 +918,6 @@ class Economy(commands.Cog):
       e.set_thumbnail(url = member.avatar)
       e.add_field(name = "Inventory", value = inventory, inline = False)
       await inter.send(embed = e)
-
 
 def setup(bot):
   bot.add_cog(Economy(bot))
