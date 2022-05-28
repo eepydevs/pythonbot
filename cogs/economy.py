@@ -85,6 +85,9 @@ class Economy(commands.Cog):
           updateinv = db["inventory"][str(inter.author.id)]
           updateinv[item] -= 1
           db["inventory"][str(inter.author.id)] = updateinv
+          e = discord.Embed(title = f"You won {win} 🪙!", description = "congratulations i guess...", color = random.randint(0, 16777215))
+          db["balance"][str(inter.author.id)] += win
+          await inter.send(embed = e)
         else:
           updateinv = db["inventory"][str(inter.author.id)]
           updateinv.pop(item)
