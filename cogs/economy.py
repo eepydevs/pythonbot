@@ -9,8 +9,8 @@ from replit import db
 item_info = {
 	"Computer": "Usable: hack Command/False\nType: Item\nInfo: You can hack people's data on this",
 	"Laptop": "Usable: postmeme Command/False\nType: Item\nInfo: You can post memes on this",
-	"Discount card": "Usable: mail Command/False\nType: Item\nInfo: You can mail someone with this",
-	"Smartphone": "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!",
+	"Discount card": "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!",
+	"Smartphone": "Usable: mail Command/False\nType: Item\nInfo: You can mail someone with this",
 	"Lottery": "Usable: True\nType: Item\nInfo: Gives random amount of cash... Sometimes huge amount of cash"
 }
 
@@ -85,14 +85,14 @@ class Economy(commands.Cog):
           updateinv = db["inventory"][str(inter.author.id)]
           updateinv[item] -= 1
           db["inventory"][str(inter.author.id)] = updateinv
-          e = discord.Embed(title = f"You won {win} 🪙!", description = "congratulations i guess...", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"You won {win} 💵!", description = "congratulations i guess...", color = random.randint(0, 16777215))
           db["balance"][str(inter.author.id)] += win
           await inter.send(embed = e)
         else:
           updateinv = db["inventory"][str(inter.author.id)]
           updateinv.pop(item)
           db["inventory"][str(inter.author.id)] = updateinv
-          e = discord.Embed(title = f"You won {win} 🪙!", description = "congratulations i guess...", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"You won {win} 💵!", description = "congratulations i guess...", color = random.randint(0, 16777215))
           db["balance"][str(inter.author.id)] += win
           await inter.send(embed = e)
       else:

@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "6.5.0" # major.sub.fix
+botbuild = "6.5.1" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -88,25 +88,10 @@ class Utility(commands.Cog):
   #ping command slash
   @commands.slash_command(name = "ping", description = "Shows bot's ping")
   async def slashping(inter):
-    await inter.response.defer()
-    try:
-      url = "https://api.uptimerobot.com/v2/getMonitors"
-      payload = "api_key=m789844302-2c9467e07ebf524406068312&format=json&custom_uptime_ratios=7-30"
-      headers = {
-      'content-type': "application/x-www-form-urlencoded",
-      'cache-control': "no-cache"
-      }
-      response = requests.request("POST", url, data=payload, headers=headers)          
-      resjson = response.json()
-      customtimeratio = resjson['monitors'][0]['custom_uptime_ratio'].split('-')
-      db["bot"]["atr_log"] = customtimeratio
-    except:
-      customtimeratio = db["bot"]["atr_log"]
-
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>\nThis week's uptime ratio: `{customtimeratio[0]}%`\nThis month's uptime ratio: `{customtimeratio[1]}%`", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
-    await inter.edit_original_message(embed = e)
+    await inter.send(embed = e)
 
   #report bug command
   @commands.slash_command(name = "bugreport", description = "report bug")
@@ -349,7 +334,7 @@ class Utility(commands.Cog):
       await msg.add_reaction(pollemojis[i])
 
   #group smh
-  @commands.slash_command(description = "Make notes with the bot (BETA)")
+  @commands.slash_command(description = "Make notes with the bot")
   async def note(self, inter):
     if str(inter.author.id) not in db["notes"]:
       db["notes"][str(inter.author.id)] = {}
