@@ -27,11 +27,6 @@ class Required2(str, Enum):
   Normal = "Normal"
   Await = "Await"
 
-class sendopt(str, Enum):
-  Slash = "Slash"
-  Seperate = "Seperate"
-  Webhook = "Webhook"
-
 class menuthing(discord.ui.Select):
   def __init__(self, inter: discord.Interaction):
     self.inter = inter
@@ -176,7 +171,7 @@ class Nonsense(commands.Cog):
         else:
           webhook = (await utils.Webhook((await self.bot.get_context(msg))))
           await msg.delete()
-          await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar)
+          await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
 
@@ -257,12 +252,12 @@ class Nonsense(commands.Cog):
     for webhook in channel_webhooks:
         if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
             await webhook.send(
-                content=content, username=member.display_name, avatar_url=member.avatar
+                content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none()
             )
             return
 
     new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
-    await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar)
+    await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none())
 
   @commands.slash_command()
   async def react(self, inter, emoji:discord.Emoji, message:discord.Message):
@@ -386,13 +381,12 @@ class Nonsense(commands.Cog):
   
   #embed command
   @commands.slash_command(name = "embed")
-  async def slashembed(inter, ephemeral: Required1, *, _send: sendopt = sendopt.Slash, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", color = random.randint(0, 16777215), thumbnail = "", image = ""):
+  async def slashembed(inter, ephemeral: Required1, *, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", color = random.randint(0, 16777215), thumbnail = "", image = ""):
     '''
     Makes an embed for you
     Parameters
     ----------
     ephemeral: Visibility of the embed, required
-    _send: How to send embed, default is slash
     content: Text outside embed, default is none
     author_name: Author name, default is your name
     author_icon: Author icon, default is your pfp
@@ -413,25 +407,7 @@ class Nonsense(commands.Cog):
     e.set_footer(text = footer, icon_url = footer_icon)
     e.set_thumbnail(url = thumbnail)
     e.set_image(url = image)
-    if _send == "Seperate":
-      await inter.send("Successfully sent seperated embed", ephemeral = True)
-      await inter.send(content = content, embed = e, ephemeral = ephemeral)
-    elif _send == "Webhook":
-      await inter.send("Successfully sent embed as webhook", ephemeral = True)
-      channel_webhooks = await inter.channel.webhooks()
-      webhook_count = 0
-
-      for webhook in channel_webhooks:
-        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
-            await webhook.send(
-                content = content, embed = e, username = inter.bot.user.display_name, avatar_url = inter.bot.user.avatar
-            )
-            return
-
-      new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
-      await new_webhook.send(content = content, embed = e, username = inter.bot.user.display_name, avatar_url = inter.bot.user.avatar)
-    else:
-      await inter.send(content = content, embed = e, ephemeral = ephemeral)
+    await inter.send(content = content, embed = e, ephemeral = ephemeral)
 
   #test 2 (buttons message) command
   @commands.slash_command(name = "button", description = "test command 2")
@@ -546,12 +522,12 @@ class Nonsense(commands.Cog):
       for webhook in channel_webhooks:
         if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
             await webhook.send(
-                content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper)
+                content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none()
             )
             return
 
       new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
-      await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper))
+      await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none())
     else:
       e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)

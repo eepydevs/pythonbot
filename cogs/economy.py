@@ -41,7 +41,10 @@ async def suggest_buyitem(inter, input):
   return [item for item in db['shop'].keys() if input.lower() in item.lower()][0:24]
 
 async def suggest_item(inter, input):
-  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24]
+  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] else ["You have nothing!"]
+
+async def suggest_usableitem(inter, input):
+  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] else ["You have nothing to use!"]
   
 def lottery():
   while True:
@@ -69,7 +72,7 @@ class Economy(commands.Cog):
       
   #use sub command
   @item.sub_command()
-  async def use(self, inter, itemname: str = commands.Param(autocomplete = suggest_item)):
+  async def use(self, inter, itemname: str = commands.Param(autocomplete = suggest_usableitem)):
     '''
     Use an item with this command
     

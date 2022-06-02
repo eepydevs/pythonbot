@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "6.5.1" # major.sub.fix
+botbuild = "6.6.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -85,14 +85,6 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Message info", description = f"Message ID: {message.id}\nChannel ID: {message.channel.id}\nServer ID: {message.guild.id}\n\nCreated at: <t:{str(time.mktime(message.created_at.timetuple()))[:-2]}:R>\nMessage author: {message.author.mention}\nMessage content: {message.content}\nLink: [Jump url]({message.jump_url})", color = random.randint(0, 16777215))
     await inter.response.send_message(embed = e, ephemeral = True)
 
-  #ping command slash
-  @commands.slash_command(name = "ping", description = "Shows bot's ping")
-  async def slashping(inter):
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    if str(inter.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
-    await inter.send(embed = e)
-
   #report bug command
   @commands.slash_command(name = "bugreport", description = "report bug")
   async def slashreport(inter, text):
@@ -144,10 +136,15 @@ class Utility(commands.Cog):
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
     await inter.send(embed = e)"""
-    
+
+  #bot group
+  @commands.slash_command()
+  async def bot(self, inter):
+    pass
+  
   #bot info command
-  @commands.slash_command(name = "botinfo", description = "Shows bot's info")
-  async def slashbotinfo(inter):
+  @bot.sub_command(name = "info", description = "Shows bot's info")
+  async def slashbotinfo(self, inter):
     await inter.response.defer()
     total_memory, used_memory, free_memory = map(
     int, os.popen('free -t -m').readlines()[-1].split()[1:])
@@ -159,10 +156,19 @@ class Utility(commands.Cog):
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
     await inter.edit_original_message(embed = e)
-  
-  @commands.slash_command(name = "contributors", description = "Shows contributor list")
-  async def credits(inter):
-    e = discord.Embed(title = "Contributors list", description = "[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
+
+  #bot ping command
+  @bot.sub_command(name = "ping", description = "Shows bot's ping")
+  async def slashping(self, inter):
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    if str(inter.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
+    await inter.send(embed = e)
+
+  #bot credits command
+  @bot.sub_command(name = "credits", description = "Shows contributor list")
+  async def credits(self, inter):
+    e = discord.Embed(title = "Contributors/credits list", description = "[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   #server info command
