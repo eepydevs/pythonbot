@@ -301,5 +301,19 @@ class Fun(commands.Cog):
     Scissors & Paper: Win 1
     """
 
+  #repleach command
+  @commands.slash_command()
+  async def repleach(inter, text: str, rwhat: str, rwith: str):
+    '''
+    Replace each RWHAT with RWITH (no regex here)
+    
+    Parameters
+    ----------
+    text: Text you want to use
+    rwhat: What to replace
+    rwith: Replace with what
+    '''
+    await inter.send(text.replace(rwhat, rwith))
+    
 def setup(bot):
   bot.add_cog(Fun(bot))

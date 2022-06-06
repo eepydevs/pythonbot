@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "6.6.0" # major.sub.fix
+botbuild = "6.7.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -34,6 +34,13 @@ if "bugcounter" not in db["bot"]:
 
 if "atr_log" not in db["bot"]:
   db["bot"]["atr_log"] = 0
+
+def sbs(members):
+  rval = {"offline": 0, "online": 0, "idle": 0, "dnd": 0}
+  for m in members:
+    if str(m.status) in rval:
+      rval[str(m.status)] += 1
+  return rval
 
 async def suggest_note(inter, input):
   return [note for note in db['notes'][str(inter.author.id)].keys() if input.lower() in note.lower()][0:24]
@@ -176,10 +183,11 @@ class Utility(commands.Cog):
   async def serverinfo(inter):
     server_role_count = len(inter.guild.roles)
     list_of_bots = [bot.mention for bot in inter.guild.members if bot.bot]
+    ms = sbs(inter.guild.members)
     e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
     e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {server_role_count}")
     e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels) - len(inter.guild.categories)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
-    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
+    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\n> ⚫ {ms['offline']}\n> 🟢 {ms['online']}\n> 🟡 {ms['idle']}\n> 🔴 {ms['dnd']}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
     if inter.guild.icon != None:
       e.set_thumbnail(url = str(inter.guild.icon))
     e.set_footer(text = f"ID: {inter.guild.id}")
@@ -250,6 +258,7 @@ class Utility(commands.Cog):
         e.add_field(name = "Administrator?", value = "True", inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
+      e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
       e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
       e.set_footer(text = f"ID: {member.id}")
       await inter.send(embed = e)
@@ -278,6 +287,7 @@ class Utility(commands.Cog):
         e.add_field(name = "Administrator?", value = "True", inline = False)
       else:
         e.add_field(name = "Administrator?", value = "False", inline = False)
+      e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(inter.author.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(inter.author.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(inter.author.mobile_status) != 'offline' else '❌'}", inline = False)
       e.add_field(name = "Icon url:", value = f"[Link here]({str(inter.author.avatar)[:-10]})", inline = False)
       e.add_field(name = "Quote:", value = f"{rgwai}")
       e.set_footer(text = f"ID: {inter.author.id}")

@@ -9,6 +9,7 @@ from replit import db
 item_info = {
 	"Computer": "Usable: hack Command/False\nType: Item\nInfo: You can hack people's data on this",
 	"Laptop": "Usable: postmeme Command/False\nType: Item\nInfo: You can post memes on this",
+  "Golden Coin": "Usable: False\nType: Collection\nInfo: Just buy a ton of those coins and flex to your friends",
 	"Discount card": "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!",
 	"Smartphone": "Usable: mail Command/False\nType: Item\nInfo: You can mail someone with this",
 	"Lottery": "Usable: True\nType: Item\nInfo: Gives random amount of cash... Sometimes huge amount of cash"
@@ -24,6 +25,7 @@ if "shop" not in db:
   db["shop"] = {
     "Discount card": 20000,
     "Computer": 6500,
+    "Golden Coin": 5000,
     "Laptop": 2000,
     "Smartphone": 500,
     "Lottery": 100
@@ -41,10 +43,10 @@ async def suggest_buyitem(inter, input):
   return [item for item in db['shop'].keys() if input.lower() in item.lower()][0:24]
 
 async def suggest_item(inter, input):
-  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] else ["You have nothing!"]
+  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24] else ["You have nothing!"]
 
 async def suggest_usableitem(inter, input):
-  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] else ["You have nothing to use!"]
+  return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
   
 def lottery():
   while True:
@@ -613,6 +615,7 @@ class Economy(commands.Cog):
       Parameters
       ----------
       item_name: Item name here
+      quantity: Self-explanatory
       '''
       modtext = item_name.lower()
       itemname = modtext.capitalize()
