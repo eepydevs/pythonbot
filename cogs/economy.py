@@ -9,7 +9,7 @@ from replit import db
 item_info = {
 	"Computer": "Usable: hack Command/False\nType: Item\nInfo: You can hack people's data on this",
 	"Laptop": "Usable: postmeme Command/False\nType: Item\nInfo: You can post memes on this",
-  "Golden Coin": "Usable: False\nType: Collection\nInfo: Just buy a ton of those coins and flex to your friends",
+  "Golden coin": "Usable: False\nType: Collection\nInfo: Just buy a ton of those coins and flex to your friends",
 	"Discount card": "Usable: False\nType: Item\nInfo: Gives 25% sale on every item in the shop!",
 	"Smartphone": "Usable: mail Command/False\nType: Item\nInfo: You can mail someone with this",
 	"Lottery": "Usable: True\nType: Item\nInfo: Gives random amount of cash... Sometimes huge amount of cash"
@@ -25,7 +25,7 @@ if "shop" not in db:
   db["shop"] = {
     "Discount card": 20000,
     "Computer": 6500,
-    "Golden Coin": 5000,
+    "Golden coin": 5000,
     "Laptop": 2000,
     "Smartphone": 500,
     "Lottery": 100
@@ -594,21 +594,25 @@ class Economy(commands.Cog):
         view.stop()
         break
 
-  #shop command
-  @commands.slash_command(name = "shop", description = "Buy something (spoiler: youre poor)")
-  async def slashshop(inter):
-    if str(inter.author.id) in db["inventory"]:
-      shop = '\n'.join(f'`{i+1}.` {item}: {price if "Discount card" not in db["inventory"][str(inter.author.id)] else int(price * 0.75)}' for i, (price,item) in enumerate(sorted(((price,item) for item,price in db['shop'].items()),reverse=True)))
-      e = discord.Embed(title = "Shop", description = shop, color = random.randint(0, 16777215))
-      await inter.send(embed = e)
-    else:
-      shop = '\n'.join(f'`{i+1}.` {item}: {price}' for i, (price,item) in enumerate(sorted(((price,item) for item,price in db['shop'].items()),reverse=True)))
-      e = discord.Embed(title = "Shop", description = shop, color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+  #shop group
+  @commands.slash_command()
+  async def shop(self, inter):
+    if str(inter.author.id) not in db["inventory"]:
+      db["inventory"][str(inter.author.id)] = {}
+      
+  #items sub command
+  @shop.sub_command()
+  async def items(inter):
+    '''
+    See prices of items here
+    '''
+    shop = '\n'.join(f'`{i+1}.` {item}: {price if "Discount card" not in db["inventory"][str(inter.author.id)] else int(price * 0.75)}' for i, (price,item) in enumerate(sorted(((price,item) for item,price in db['shop'].items()),reverse=True)))
+    e = discord.Embed(title = "Shop", description = shop, color = random.randint(0, 16777215))
+    await inter.send(embed = e)
 
-  #buy command
-  @commands.slash_command(name = "buy", description = "Buy a thing (that is useless)")
-  async def slashbuy(inter, item_name: str = commands.Param(autocomplete = suggest_buyitem), quantity: int = 1):
+  #buy sub command
+  @shop.sub_command()
+  async def buy(inter, item_name: str = commands.Param(autocomplete = suggest_buyitem), quantity: int = 1):
       '''
       Buy a thing in shop
   
@@ -664,9 +668,9 @@ class Economy(commands.Cog):
       else:
         await inter.send(content = "Error: You can't buy 0 or less items!", ephemeral = True)
 
-  #sell command
-  @commands.slash_command(name = "sell", description = "Sell any item you have")
-  async def slashsell(inter, itemname: str = commands.Param(autocomplete = suggest_item), quantity: int = 1):
+  #sell sub command
+  @shop.sub_command()
+  async def sell(inter, itemname: str = commands.Param(autocomplete = suggest_item), quantity: int = 1):
     '''
     Sell any item you have
   
