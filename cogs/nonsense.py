@@ -19,6 +19,9 @@ whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 6915
 if "tupper" not in db:
   db["tupper"] = {}
 
+if "customcmd" not in db:
+  db["customcmd"] = {}
+  
 class Required1(str, Enum):
   You = "True"
   Everyone = ""
@@ -144,7 +147,25 @@ def calc(text):
     return eval(text)
   else:
     raise ValueError("Something went wrong... (You may have used non-int)")
+    
+	#changeFrom = ["{author}", "{author_name}", "{server}", "{server_id}", "{channel}", "{channel_id}"]
+	#changeTo = [f"<@{author.id}>", author.name, guild.name, str(guild.id), channel.name, str(channel.id)]
 
+def express(inter, text):
+  table = {"{author}": inter.author.name, "{author.mention}": f"<@{inter.author.id}>",
+           "{server}": inter.guild.name, "{server.id}": str(inter.guild.id),
+           "{channel}": inter.channel.name, "{channel.id}": str(inter.channel.id)}
+
+  result = []
+  splitted = text.split(" ")
+  for word in splitted:
+    if word.lower() in table:
+      result.append(table[word.lower()])
+    else:
+      result.append(word)
+
+  return " ".join(result)
+    
 class Nonsense(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
@@ -588,6 +609,32 @@ class Nonsense(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = "Invalid URL", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
-      
+
+  @commands.slash_command()
+  async def cc(self, inter):
+    if str(inter.author.id) not in db["customcmd"]:
+      db["customcmd"][str(inter.author.id)] = {}
+                        
+  @cc.sub_command()
+  async def info(inter):
+    '''
+    Expression info here
+    '''
+    e = discord.Embed(title = "Expression info", description = "{author} = " + inter.author.name + "\n{author.mention} = " + f"<@{inter.author.id}>" + "\n{server} = " + inter.guild.name + "\n{server.id} = " + str(inter.guild.id) + "\n{channel} = " + inter.channel.name + "\n{channel.id} = " + str(inter.channel.id), color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
+
+  @cc.sub_command()
+  async def eval(inter, expr, ephemeral: Required1 = Required1.You):
+    '''
+    Eval Custom Command expressions
+
+    Parameters
+    ----------
+    expr: Expressions here\
+    ephemeral: True or False
+    '''
+    e = discord.Embed(title = "CC Eval", description = f"this is ultra beta alpha version\n```{expr}```\nResults:\n{express(inter, expr)}", color = random.randint(0, 16777215))
+    await inter.send(embed = e , ephemeral = ephemeral)
+    
 def setup(bot):
   bot.add_cog(Nonsense(bot))
