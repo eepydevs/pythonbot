@@ -94,7 +94,10 @@ def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_tupper(inter, input):
-  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] else ["You have nothing! Go create a tupper!"]
+  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
+
+async def suggest_command(inter, input):
+  return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
 def runbf(str):
   array = [0] * 30000
@@ -630,11 +633,61 @@ class Nonsense(commands.Cog):
 
     Parameters
     ----------
-    expr: Expressions here\
+    expr: Expressions here
     ephemeral: True or False
     '''
     e = discord.Embed(title = "CC Eval", description = f"this is ultra beta alpha version\n```{expr}```\nResults:\n{express(inter, expr)}", color = random.randint(0, 16777215))
     await inter.send(embed = e , ephemeral = ephemeral)
-    
+
+  @cc.sub_command()
+  async def create(inter, cmd_name, expr):
+    '''
+    Create a Custom Command for yourself
+
+    Parameters
+    ----------
+    cmd_name: Command name
+    expr: Expressions here
+    '''
+    if cmd_name not in db["customcmd"][str(inter.author.id)]:
+      db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
+      e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = "A command with this name already exists", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  @cc.sub_command()
+  async def use(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
+    '''
+    Use an exising command
+
+    Parameters
+    ----------
+    cmd_name: Command name
+    '''
+    if cmd_name in db["customcmd"][str(inter.author.id)]:
+      await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
+    else:
+      e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  @cc.sub_command()
+  async def delete(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
+    '''
+    Delete an existing command
+
+    Parameters
+    ----------
+    cmd_name: Command name
+    '''
+    if cmd_name in db["customcmd"][str(inter.author.id)]:
+      db["customcmd"][str(inter.author.id)].pop(cmd_name)
+      e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+  
 def setup(bot):
   bot.add_cog(Nonsense(bot))
