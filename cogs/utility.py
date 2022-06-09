@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.0.0" # major.sub.fix
+botbuild = "7.1.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -248,6 +248,8 @@ class Utility(commands.Cog):
         e.set_thumbnail(url = str(member.avatar))
       e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
       e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
+      if member.activity != None:
+        e.add_field(name = "Activity", value = f"{member.activity.type[0].capitalize()} **{member.activity.name}**", inline = False)
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
@@ -277,6 +279,8 @@ class Utility(commands.Cog):
         e.set_thumbnail(url = str(inter.author.avatar))
       e.add_field(name = "Joined", value = f"<t:{str(time.mktime(inter.author.joined_at.timetuple()))[:-2]}:R>", inline = True)
       e.add_field(name = "Registered", value = f"<t:{str(time.mktime(inter.author.created_at.timetuple()))[:-2]}:R>", inline = True)
+      if inter.author.activity != None:
+        e.add_field(name = "Activity", value = f"{inter.author.activity.type[0].capitalize()} **{inter.author.activity.name}**", inline = False)
       if len(role_list) != 0:
         e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
       else:
