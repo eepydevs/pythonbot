@@ -8,7 +8,6 @@ import utils
 import random
 import asyncio
 import requests
-import js2py
 import math
 import datetime, time
 import requests as rq
@@ -347,26 +346,6 @@ class Nonsense(commands.Cog):
             e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
             await inter.send(embed = e, ephemeral = ephemeral)
             await eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})
-    except Exception as error:
-      e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-
-  #eval javascript command
-  @commands.slash_command(name = "evaljs", description = "bot owner only. Execute javascript code and see results")
-  @commands.check(lambda inter: inter.author.id in whitelist_id)
-  async def evaljs(inter, *, ephemeral: Required1 = Required1.You, code):
-    '''
-    nobody can use this sadly
-
-    Parameters
-    ----------
-    ephemeral: Visibility of eval
-    code: Code here
-    '''
-    try:
-      if inter.author.id == inter.bot.owner.id:
-        e = discord.Embed(title = "JSEval:", description = f"```js\n{code}\n```\nResult: ```\n{js2py.eval_js(code)}\n```", color = random.randint(0, 16777215)) 
-        await inter.send(embed = e, ephemeral = ephemeral)
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
