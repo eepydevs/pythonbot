@@ -13,7 +13,7 @@ class EmbedMinimalHelp(commands.MinimalHelpCommand):
   async def send_pages(self):
     destination = self.get_destination()
     for page in self.paginator.pages:
-      e = discord.Embed(description = page, color = random.randint(0, 1677215))
+      e = discord.Embed(description = page, color = random.randint(0, 16777215))
     await destination.send(embed = e)
 
 bot.help_command = EmbedMinimalHelp()
