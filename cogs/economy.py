@@ -62,6 +62,50 @@ def lottery():
     break
   return win
 
+class lbbuttons(discord.ui.View):
+  def __init__(self, inter: discord.Interaction, color, lb):
+    super().__init__(timeout = 60)
+    self.inter = inter
+    self.page = 0
+    self.color = color
+    self.leaderboard = lb
+    
+  async def interaction_check(self, inter: discord.MessageInteraction):
+    if inter.author != self.inter.author:
+      await inter.send("Those buttons are not for you", ephemeral = True)
+      return False
+    return True
+
+  '''@discord.ui.button(label = "Primary", custom_id = "Primary", emoji = "1️⃣", style = discord.ButtonStyle.blurple)
+  async def primary_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await interaction.send("You clicked Primary", ephemeral = True)'''
+
+  @discord.ui.button(label = "", custom_id = "-10", emoji = "⬅️")
+  async def arrowleft(self, button: discord.ui.Button, interaction = discord.MessageInteraction):
+    self.page += int(interaction.data.custom_id)
+    self.page = min(max(self.page, 0), len(self.leaderboard) // 10 * 10)
+    e = discord.Embed(
+      title = "Leaderboard",
+      description = "\n".join(self.leaderboard[self.page:self.page + 10]),
+      color = self.color
+    )
+    if str(interaction.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
+    await interaction.response.edit_message(embed = e)
+
+  @discord.ui.button(label = "", custom_id = "10", emoji = "➡️")
+  async def arrowright(self, button: discord.ui.Button, interaction = discord.MessageInteraction):
+    self.page += int(interaction.data.custom_id)
+    self.page = min(max(self.page, 0), len(self.leaderboard) // 10 * 10)
+    e = discord.Embed(
+      title = "Leaderboard",
+      description = "\n".join(self.leaderboard[self.page:self.page + 10]),
+      color = self.color
+    )
+    if str(interaction.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
+    await interaction.response.edit_message(embed = e)
+    
 class Economy(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
@@ -367,94 +411,22 @@ class Economy(commands.Cog):
     await inter.send(embed = e)
 
   #leaderboard command
-  @commands.command(aliases = ["lb"], help = "Richest people here", description = "See other rich people in leaderboard")
+  @commands.slash_command(description = "See other rich people in leaderboard")
   @commands.guild_only()
-  async def leaderboard(self, ctx):
-        await ctx.trigger_typing()
-        leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-        color = random.randint(0, 16777215)
-        page = 0
-        view = discord.ui.View(timeout = 60)
-        view.add_item(discord.ui.Button(
-            label = "",
-            emoji = "⬅️",
-            custom_id = "-10"
-        ))
-        view.add_item(discord.ui.Button(
-            label = "",
-            emoji = "➡️",
-            custom_id = "10"
-        ))
-        message = await ctx.send(embed = discord.Embed(
-            title = "Leaderboard",
-            description = "\n".join(leaderboard[page:page + 10]),
-            color = color
-        ), view = view)
-        while True:
-            try:
-                interaction = await ctx.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-                if interaction.user == ctx.author:
-                    page += int(interaction.data.custom_id)
-                    page = min(max(page, 0), len(leaderboard) // 10 * 10)
-                    e = discord.Embed(
-                        title = "Leaderboard",
-                        description = "\n".join(leaderboard[page:page + 10]),
-                        color = color
-                    )
-                    if str(ctx.author.id) in db["debug"]:
-                      e.add_field(name = "Debug", value = f"Variables value:\n{page}")
-                    await interaction.response.edit_message(embed = e)
-                else:
-                    await interaction.response.send_message("This button is not for you.", ephemeral = True)
-            except discord.utils.asyncio.TimeoutError:
-                await message.edit(view = None)
-                view.stop()
-                break
+  async def leaderboard(self, inter):
+    leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+    color = random.randint(0, 16667215)
+    e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
+    await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
   
   #global leaderboard command
-  @commands.command(aliases = ["glb", "globallb"], help = "Richest people here", description = "See other rich people in leaderboard")
+  @commands.slash_command(description = "See other rich people in leaderboard")
   @commands.guild_only()
-  async def globalleaderboard(self, ctx):
-        await ctx.trigger_typing()
-        leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((ctx.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-        color = random.randint(0, 16777215)
-        page = 0
-        view = discord.ui.View(timeout = 60)
-        view.add_item(discord.ui.Button(
-            label = "",
-            emoji = "⬅️",
-            custom_id = "-10"
-        ))
-        view.add_item(discord.ui.Button(
-            label = "",
-            emoji = "➡️",
-            custom_id = "10"
-        ))
-        message = await ctx.send(embed = discord.Embed(
-            title = "Leaderboard",
-            description = "\n".join(leaderboard[page:page + 10]),
-            color = color
-        ), view = view)
-        while True:
-            try:
-                interaction = await ctx.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-                if interaction.user == ctx.author:
-                    page += int(interaction.data.custom_id)
-                    page = min(max(page, 0), len(leaderboard) // 10 * 10)
-                    e = discord.Embed(
-                        title = "Leaderboard",
-                        description = "\n".join(leaderboard[page:page + 10]),
-                        color = color
-                    )
-                    if str(ctx.author.id) in db["debug"]:
-                      e.add_field(name = "Debug", value = f"Variables value:\n{page}")
-                    await interaction.response.edit_message(embed = e)
-                else:
-                    await interaction.send("This button is not for you.", ephemeral = True)
-            except discord.utils.asyncio.TimeoutError:
-                await message.edit(view = None)
-                view.stop()
-                break
+  async def globalleaderboard(self, inter):
+    leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+    color = random.randint(0, 16667215)
+    e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
+    await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
 
   #rob command
   @commands.slash_command(name = "rob", description = "Get jailed, Has cooldown of 30 seconds")
@@ -546,7 +518,7 @@ class Economy(commands.Cog):
   @commands.command(aliases = ["find"], help = "Search for lost cash in places", description = "Some people may lost some of their cash like it fell out of pocket or something\nHas cooldown of 30 seconds")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
   async def search(self, ctx):
-    place = ["Car", "Forest", "House", "Grass", "Bushes", "Pocket", "Space", "Discord", "Castle", "Basement", "Street"]
+    place = ["Car", "Forest", "House", "Grass", "Bushes", "Pocket", "Space", "Discord", "Castle", "Basement", "Street", "Backpack", "Drawer", "Closet", "Couch"]
     place1 = place.pop(random.randint(0, int(len(place) - 1)))
     place2 = place.pop(random.randint(0, int(len(place) - 1)))
     place3 = place.pop(random.randint(0, int(len(place) - 1)))
