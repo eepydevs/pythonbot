@@ -5,7 +5,7 @@ import random
 
 def uwuize(text):
   endings = ["*purrrr...*", "*meooow!*", "*eeeeeeee*", "*quack!*", "*woooof!*"]
-  emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", "u<u", "u>u", "o<o", "o>o", "O<O", "O>O", "U>U", "U<U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ".w.", ".~.", "'w'", "'~'" ">:3",":3", "3:", "3:<", ">:>", ":>", ">:<", ":<", ":V", ":U"]
+  emoticons = ["owo", "o~o", "OwO", "O~O", "uwu", "u~u", "UwU", "U~U", "u<u", "u>u", "o<o", "o>o", "O<O", "O>O", "U>U", "U<U", ">w<", ">~<", "<w<", "<~<", "^w^", "^~^", ">~>", ">w>", "@w@", "@~@", "-w-", "-~-", "TwT", "T~T", ".w.", ".~.", "'w'", "'~'" ">:3",":3", "3:", "3:<", ">:>", ":>", ">:<", ":<", ":V", ":U", ">///<", "O///O", "=///=", "-///-", ">///>", "<///<", ".///.", "^///^"]
   random.shuffle(emoticons)
   random.shuffle(endings)
   vowels = "aAeEiIuUoO"
@@ -105,6 +105,17 @@ def ifyed(text):
         saveword += random.choice(endings)
     result.append(saveword)
   return " ".join(result)
+
+'''def morsify(text):
+  table = {"A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".", "F": "..-.", "G": "--.", "H": "....", "I": "..", "J": ".---", "K": "-.-", "L": ".-..", "M": "--", "N": "-.", "O": "---", "P": ".--.", "Q": "--.-", "R": ".-.", "S": "...", "T": "-", "U": "..-", "V": "...-", "W": ".--", "X": "-..-", "Y": "--.-", "Z": "--..", "/": " ", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...", "8": "---..", "9": "----.", "0": "-----"}
+  textt = text.upper()
+  result = []
+  for l in textt.split(" "):
+    if l in table:
+      result.append(table[l])
+    else:
+      result.append(" ")
+  return str().join(result)'''
 
 class Text(commands.Cog):
   def __init__(self, bot):
@@ -387,6 +398,20 @@ class Text(commands.Cog):
     '''
     modtext = ifyed(text)
     await inter.send(modtext)
+
+  """@commands.slash_command()
+  async def morse(inter, *, text):
+    '''
+    Morsify your inputted text
+    
+    Parameters
+    ----------
+    text: Text here
+    '''
+    if all([True if i in ".-/ " else False for i in text]):
+      await inter.send(morsify(text))
+    else:
+      await inter.send("none")"""
     
 def setup(bot):
   bot.add_cog(Text(bot))
