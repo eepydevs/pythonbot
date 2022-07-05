@@ -10,39 +10,56 @@ from replit import db
 responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly..", "Concentrate and ask again.", "Cannot predict now.", "Ask again later."]
 random.shuffle(responselist)
 
+class menurps(discord.ui.Select):
+  def __init__(self, inter: discord.Interaction):
+    self.inter = inter
+    options = [
+      discord.SelectOption(label = "Rock", emoji = "🪨", value = "Rock"),
+      discord.SelectOption(label = "Paper", emoji = "📄", value = "Paper"),
+      discord.SelectOption(label = "Scissors", emoji = "✂️", value = "Scissors")
+    ]
+
+    super().__init__(
+      placeholder="Select option",
+      min_values=1,
+      max_values=1,
+      options=options,
+    )
+  async def interaction_check(self, inter: discord.MessageInteraction):
+        if inter.author != self.inter.author:
+            await inter.send("This selection menu is not for you", ephemeral = True)
+            return False
+        return True
+    
+  async def callback(self, inter: discord.MessageInteraction):
+    moves = ("Rock", "Paper", "Scissors")
+    p1 = moves.index(self.values[0].capitalize())
+    p2 = random.randrange(0, len(moves))
+
+    if p1 - p2 in (-2, 1):
+      e = discord.Embed(title = f"{inter.author.name} won!", description = "Congratulations!", color = random.randint(0, 16777215))
+      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
+      await inter.response.edit_message(embed = e, view = None)
+      return
+    elif p1 - p2 in (-1, 2):
+      e = discord.Embed(title = f"{inter.author.name} lost!", description = "Be lucky next time!", color = random.randint(0, 16777215))
+      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
+      await inter.response.edit_message(embed = e, view = None)
+      return
+    else:
+      e = discord.Embed(title = "Tie!", description = "Quite lucky", color = random.randint(0, 16777215))
+      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
+      await inter.response.edit_message(embed = e, view = None)
+      return
+
+class rpsView(discord.ui.View):
+  def __init__(self, inter: discord.Interaction):
+      super().__init__(timeout = 30)
+      self.add_item(menurps(inter))
 
 class Fun(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
-
-  #clicker experiment command idk
-  @commands.command(aliases = ["click"], help = "(BETA)", description = "Play clicker in discord in a bot ultra hd 8k 144fps (BETA)")
-  async def clicker(self, ctx):
-    coins = 0
-    color = random.randint(0, 16777215)
-    e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = color)
-    e.set_author(name = ctx.author.name, icon_url = ctx.author.avatar)
-    view = discord.ui.View(timeout = 60)
-    style = discord.ButtonStyle.blurple
-    item = discord.ui.Button(style = style, label = "Click here", custom_id = "click", emoji = "🖱️")
-    view.add_item(item = item)
-    message = await ctx.send(embed = e, view = view)
-    while True:
-      try:
-        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-        if interaction.user.id == ctx.author.id:
-          if interaction.data.custom_id == "click":
-            #await interaction.response.send_message(content = f"You clicked {interaction.data.custom_id} {coins}!", ephemeral = True)
-            coins += 1
-            e = discord.Embed(title = "Clicker", description = f"You have {coins}", color = color)
-            e.set_author(name = ctx.author.name, icon_url = ctx.author.avatar)
-            await interaction.response.edit_message(embed = e)
-        else:
-          await interaction.response.send_message(content = "You can't click this button, Sorry!", ephemeral = True)
-      except:
-        await message.edit(view = None)
-        view.stop
-        break
   
   @commands.slash_command(name = "getmeme", description = "Get a meme lol")
   async def slashmeme(inter):
@@ -107,7 +124,7 @@ class Fun(commands.Cog):
     await inter.response.send_message(embed = e)
 
   #random command slash
-  @commands.slash_command(name = "random", description = "You can randomize numbers with this command\nUsage: pb!random (N1) (N2)\nUsage 2: pb!random (N1)")
+  @commands.slash_command(name = "random", description = "You can randomize numbers with this command")
   async def slashrandom(inter, num1: int, num2: int):
     '''
     You can randomize numbers with this command
@@ -220,7 +237,6 @@ class Fun(commands.Cog):
       if message.content.lower() != "stop" and message.content.lower() != "close" and message.content.lower() != "leave" and message.content.lower() != "quit" and message.content.lower() != "exit":
         try:
           if int(message.content) == botnum:
-            rng = random.randint(250, 1000)
             e = discord.Embed(title = "Correct!", description = f"Congrats you won\nIt was {botnum}", color = random.randint(0, 16777215))
             e.set_footer(text = f"Took you: {tries} tries")
             await inter.send(embed = e)
@@ -256,41 +272,10 @@ class Fun(commands.Cog):
         break
 
   #rps command
-  @commands.command(help = "Play rock paper scissors", description = "Moves: Rock, Paper, Scissors")
-  async def rps(self, ctx):
-    moves = ("Rock", "Paper", "Scissors")
-    view = discord.ui.View(timeout = 60)
-    view.add_item(discord.ui.Select(placeholder = "Select an option", options = [discord.SelectOption(label = "Rock", emoji = "🪨", value = "Rock"), discord.SelectOption(label = "Paper", emoji = "📄", value = "Paper"), discord.SelectOption(label = "Scissors", emoji = "✂️", value = "Scissors")]))
+  @commands.slash_command(description = "Play rock paper scissors")
+  async def rps(self, inter):
     e = discord.Embed(title = "RPS", description = "Choose a move below!", color = random.randint(0, 16777215))
-    message = await ctx.send(embed = e, view = view)
-    while True:
-      try:
-        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-        p1 = moves.index(view.children[0].values[0].capitalize())
-        p2 = random.randrange(0, len(moves))
-
-        if p1 - p2 in (-2, 1):
-          e = discord.Embed(title = f"{ctx.author.name} won!", description = "Congratulations!", color = random.randint(0, 16777215))
-          e.set_footer(text = f"{ctx.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
-          await message.edit(embed = e, view = None)
-          view.stop()
-          break
-        elif p1 - p2 in (-1, 2):
-          e = discord.Embed(title = f"{ctx.author.name} lost!", description = "Be lucky next time!", color = random.randint(0, 16777215))
-          e.set_footer(text = f"{ctx.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
-          await message.edit(embed = e, view = None)
-          view.stop()
-          break
-        else:
-          e = discord.Embed(title = "Tie!", description = "Quite lucky", color = random.randint(0, 16777215))
-          e.set_footer(text = f"{ctx.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
-          await message.edit(embed = e, view = None)
-          view.stop()
-          break
-      except asyncio.TimeoutError:
-        await message.edit(content = "Timed out")
-        view.stop()
-        break
+    await inter.send(embed = e, view = rpsView(inter))
   
     """
     Rock & Paper: Lose -1

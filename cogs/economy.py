@@ -105,7 +105,107 @@ class lbbuttons(discord.ui.View):
     if str(interaction.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
+
+class menusearch(discord.ui.Select):
+  def __init__(self, inter: discord.Interaction):
+    self.inter = inter
+    places = ["Car", "Forest", "House", "Grass", "Bushes", "Pocket", "Space", "Discord", "Castle", "Basement", "Street", "Backpack", "Drawer", "Closet", "Couch"]
+    p1 = places.pop(random.randint(0, int(len(places) - 1)))
+    p2 = places.pop(random.randint(0, int(len(places) - 1)))
+    p3 = places.pop(random.randint(0, int(len(places) - 1)))
+    options = [
+      discord.SelectOption(label = p1, emoji = "1️⃣", value = p1),
+      discord.SelectOption(label = p2, emoji = "2️⃣", value = p2),
+      discord.SelectOption(label = p3, emoji = "3️⃣", value = p3)
+    ]
+
+    super().__init__(
+      placeholder="Select a place",
+      min_values=1,
+      max_values=1,
+      options=options
+    )
+  async def interaction_check(self, inter: discord.MessageInteraction):
+        if inter.author != self.inter.author:
+            await inter.send("This selection menu is not for you", ephemeral = True)
+            return False
+        return True
     
+  async def callback(self, inter: discord.MessageInteraction):
+    if str(inter.author.id) in db["balance"]:
+      chance = random.randint(0, 100)
+      if chance > 25:
+        rng = random.randint(100, 500)
+        db["balance"][str(inter.author.id)] += rng
+        e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+        if str(inter.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
+        await inter.response.edit_message(embed = e, view = None)
+        return
+      else:
+        e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+        if str(inter.author.id) in db["debug"]:
+          e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}")
+        await inter.response.edit_message(embed = e, view = None)
+        return
+    else:
+      db["balance"][str(inter.author.id)] = 0
+      rng = random.randint(100, 500)
+      db["balance"][str(inter.author.id)] += rng
+      e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+      if str(inter.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
+      await inter.response.edit_message(embed = e, view = None)
+      return
+
+class searchview(discord.ui.View):
+  def __init__(self, inter: discord.Interaction):
+      super().__init__(timeout = 30)
+      self.add_item(menusearch(inter))
+
+class menupm(discord.ui.Select):
+  def __init__(self, inter: discord.Interaction):
+    self.inter = inter
+    options = [
+      discord.SelectOption(label = "Fresh", emoji = "🍋", value = "Fresh"),
+      discord.SelectOption(label = "Repost", emoji = "🔁", value = "Repost"),
+      discord.SelectOption(label = "Intellectual", emoji = "🧠", value = "Intellectual"),
+      discord.SelectOption(label = "Copypasta", emoji = "📄", value = "Copypasta"),
+      discord.SelectOption(label = "Kind", emoji = "😄", value = "Kind")
+    ]
+
+    super().__init__(
+      placeholder="Select an option",
+      min_values=1,
+      max_values=1,
+      options=options
+    )
+  async def interaction_check(self, inter: discord.MessageInteraction):
+        if inter.author != self.inter.author:
+            await inter.send("This selection menu is not for you", ephemeral = True)
+            return False
+        return True
+    
+  async def callback(self, inter: discord.MessageInteraction):
+    chance = random.randint(0, 100)
+    if chance > 45:
+      rng = random.randint(250, 1000)
+      db["balance"][str(inter.author.id)] += rng
+      e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+      if str(inter.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
+      await inter.response.edit_message(embed = e, view = None)
+      return
+    else:
+      e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+      await inter.response.edit_message(embed = e, view = None)
+      return
+
+class pmview(discord.ui.View):
+  def __init__(self, inter: discord.Interaction):
+      super().__init__(timeout = 30)
+      self.add_item(menupm(inter))
+
 class Economy(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
@@ -515,56 +615,11 @@ class Economy(commands.Cog):
       await inter.send(embed = e)
 
   #search command
-  @commands.command(aliases = ["find"], help = "Search for lost cash in places", description = "Some people may lost some of their cash like it fell out of pocket or something\nHas cooldown of 30 seconds")
+  @commands.slash_command(description = "Just find something already, Has cooldown of 30 seconds")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
-  async def search(self, ctx):
-    place = ["Car", "Forest", "House", "Grass", "Bushes", "Pocket", "Space", "Discord", "Castle", "Basement", "Street", "Backpack", "Drawer", "Closet", "Couch"]
-    place1 = place.pop(random.randint(0, int(len(place) - 1)))
-    place2 = place.pop(random.randint(0, int(len(place) - 1)))
-    place3 = place.pop(random.randint(0, int(len(place) - 1)))
-    view = discord.ui.View(timeout = 30)
-    view.add_item(discord.ui.Select(placeholder = "Select an option", options = [discord.SelectOption(label = place1, emoji = "1️⃣", value = place1), discord.SelectOption(label = place2, emoji = "2️⃣", value = place2), discord.SelectOption(label = place3, emoji = "3️⃣", value = place3)]))
+  async def search(self, inter):
     e = discord.Embed(title = "Search", description = "Search one of places below to get some cash!", color = random.randint(0, 16777215))
-    message = await ctx.send(embed = e, view = view)
-    while True:
-      try:
-        interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-        if interaction.user.id == ctx.author.id:
-          if str(ctx.author.id) in db["balance"]:
-            chance = random.randint(0, 100)
-            if chance > 25:
-              rng = random.randint(100, 500)
-              db["balance"][str(ctx.author.id)] += rng
-              e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-              if str(ctx.author.id) in db["debug"]:
-                e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
-              await message.edit(embed = e, view = None)
-              view.stop()
-              break
-            else:
-              e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
-              if str(ctx.author.id) in db["debug"]:
-                e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(ctx.author.id)]}")
-              await message.edit(embed = e, view = None)
-              view.stop()
-              break
-          else:
-            db["balance"][str(ctx.author.id)] = 0
-            rng = random.randint(100, 500)
-            db["balance"][str(ctx.author.id)] += rng
-            e = discord.Embed(title = f"{ctx.author.name} searched: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-            if str(ctx.author.id) in db["debug"]:
-              e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
-            await message.edit(embed = e, view = None)
-            view.stop()
-            break
-        else:
-          await interaction.send(content = "Sorry you can't use this menu!", ephemeral = True)
-      except asyncio.TimeoutError:
-        e = discord.Embed(title = f"{ctx.author.name} Didn't search anywhere", description = f"Oh okay.", color = random.randint(0, 16777215))
-        await message.edit(embed = e, view = None)
-        view.stop()
-        break
+    await inter.send(embed = e, view = searchview(inter))
 
   #shop group
   @commands.slash_command()
@@ -758,67 +813,27 @@ class Economy(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   #post meme command
-  @commands.command(aliases = ["pm"], help = "Post memes and get money!", description = "Post memes and get money from it (spoiler: youre unfunny)\nRequirement: 1 Laptop")
+  @commands.slash_command(description = "Post memes and get money from it, Requirement: a Laptop")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
-  async def postmeme(self, ctx):
-    if str(ctx.author.id) in db["balance"]:
-      if str(ctx.author.id) in db["inventory"]:
-        if "Laptop" in db["inventory"][str(ctx.author.id)]:
-          view = discord.ui.View(timeout = 30)
-          view.add_item(discord.ui.Select(placeholder = "Select an option", options = [discord.SelectOption(label = "Fresh", emoji = "1️⃣", value = "Fresh"), discord.SelectOption(label = "Repost", emoji = "2️⃣", value = "Repost"), discord.SelectOption(label = "Intellectual", emoji = "3️⃣", value = "Intellectual"), discord.SelectOption(label = "Copypasta", emoji = "4️⃣", value = "Copypasta"), discord.SelectOption(label = "Kind", emoji = "5️⃣", value = "Kind")]))
+  async def postmeme(self, inter):
+    if str(inter.author.id) in db["balance"]:
+      if str(inter.author.id) in db["inventory"]:
+        if "Laptop" in db["inventory"][str(inter.author.id)]:
           e = discord.Embed(title = "Post meme", description = "Post one of meme types below to get some cash!", color = random.randint(0, 16777215))
-          message = await ctx.send(embed = e, view = view)
-          while True:
-            try:
-              interaction = await self.bot.wait_for("interaction", check = lambda interaction: interaction.message == message, timeout = 60)
-              if interaction.user.id == ctx.author.id:
-                if str(ctx.author.id) in db["balance"]:
-                  chance = random.randint(0, 100)
-                  if chance > 45:
-                    rng = random.randint(250, 1000)
-                    db["balance"][str(ctx.author.id)] += rng
-                    e = discord.Embed(title = f"{ctx.author.name} posted: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-                    if str(ctx.author.id) in db["debug"]:
-                      e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
-                    await message.edit(embed = e, view = None)
-                    view.stop()
-                    break
-                  else:
-                    e = discord.Embed(title = f"{ctx.author.name} posted: {view.children[0].values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
-                    await message.edit(embed = e, view = None)
-                    view.stop()
-                    break
-                else:
-                  db["balance"][str(ctx.author.id)] = 0
-                  rng = random.randint(250, 1000)
-                  db["balance"][str(ctx.author.id)] += rng
-                  e = discord.Embed(title = f"{ctx.author.name} posted: {view.children[0].values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-                  if str(ctx.author.id) in db["debug"]:
-                      e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(ctx.author.id)]}, {view.children[0].values[0]}")
-                  await message.edit(embed = e, view = None)
-                  view.stop()
-                  break
-              else:
-                await interaction.send(content = "Sorry you can't use this menu!", ephemeral = True)
-            except asyncio.TimeoutError:
-              e = discord.Embed(title = f"{ctx.author.name} Didn't post anything", description = f"Oh okay.", color = random.randint(0, 16777215))
-              await message.edit(embed = e, view = None)
-              view.stop()
-              break
-
+          await inter.send(embed = e, view = pmview(inter))
         else:
           e = discord.Embed(title = "Error", description = "Buy a laptop!", color = random.randint(0, 16777215))
-          await ctx.send(embed = e)
-          ctx.command.reset_cooldown(ctx)
+          await inter.send(embed = e)
+          inter.command.reset_cooldown(inter)
       else:
-        db["inventory"][str(ctx.author.id)] = {}
+        db["inventory"][str(inter.author.id)] = {}
         e = discord.Embed(title = "Error", description = "Buy a laptop!", color = random.randint(0, 16777215))
-        await ctx.send(embed = e)
-        ctx.command.reset_cooldown(ctx)
+        await inter.send(embed = e)
+        inter.command.reset_cooldown(inter)
     else:
       e = discord.Embed(title = "Error", description = "Get some money and buy a laptop!", color = random.randint(0, 16777215))
-      await ctx.send(embed = e)
-      ctx.command.reset_cooldown(ctx)
+      await inter.send(embed = e)
+      inter.command.reset_cooldown(inter)
 
   #mail command
   @commands.slash_command(name = "mail", description = "Mail someone with the bot. Requirement: Both you and mentioned member must have atleast 1 smartphone")
