@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.3.0" # major.sub.fix
+botbuild = "7.3.1" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
@@ -56,6 +56,12 @@ class Utility(commands.Cog):
     self.bot = bot
     bot.help_command.cog = self
 
+  #x reaction
+  @commands.Cog.listener()
+  async def on_reaction_add(self, reaction, user):
+    if reaction.message.author == self.bot.user and reaction.emoji == "❌" and user.guild_permissions.manage_messages:
+      await reaction.message.delete()
+    
   #context menu user info command
   @commands.user_command(name="User Info")  
   async def userinfo(self, inter, member: discord.Member):
@@ -345,8 +351,8 @@ class Utility(commands.Cog):
     name: Name of your poll
     options: Example: Hello option 1!, Hello option 2!, Hello option 3!
     '''  
-    optionstuple = options.split(', ')[:10]
-    e = discord.Embed(title = f"Poll from {inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i]}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
+    optionstuple = options.split(',')[:10]
+    e = discord.Embed(title = f"Poll from {inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i].strip()}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
     #await inter.send("Successfully sent poll", ephemeral = True)
     await inter.send(embed = e)
     msg = await inter.original_message()
