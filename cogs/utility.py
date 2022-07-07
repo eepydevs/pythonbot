@@ -9,11 +9,10 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.3.1" # major.sub.fix
+botbuild = "7.3.2" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.4.0"
 
-waiquotes = ["Your cool", "Your pro", "I dont know who are you", "Your 228 iq", "Your The Le` Pro!", "Que pro", "You are the best!"]
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
@@ -65,32 +64,35 @@ class Utility(commands.Cog):
   #context menu user info command
   @commands.user_command(name="User Info")  
   async def userinfo(self, inter, member: discord.Member):
-      role_list = []
+    role_list = []
 
-      for role in member.roles:
-        if role.name != "@everyone":
-          role_list.append(role.mention)
+    for role in member.roles:
+      if role.name != "@everyone":
+        role_list.append(role.mention)
           
-      role_list.reverse()
-      b = ", ".join(role_list)
-      e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
-      if member.avatar != None:
-        e.set_thumbnail(url = str(member.avatar))
-      e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
-      e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
-      if len(role_list) != 0:
-        e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
-      else:
-        e.add_field(name = "Roles (0)", value = "None")
-      if member.top_role != None:
-        e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
-      if member.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True", inline = False)
-      else:
-        e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
-      e.set_footer(text = f"ID: {member.id}")
-      await inter.send(embed = e)
+    role_list.reverse()
+    b = ", ".join(role_list)
+    e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
+    if member.avatar != None:
+      e.set_thumbnail(url = str(member.avatar))
+    e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
+    e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
+    if member.activity != None:
+      e.add_field(name = "Activity", value = f"{member.activity.type[0].capitalize()} **{member.activity.name}**", inline = False)
+    if len(role_list) != 0:
+      e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]) if len("".join([b])) < 1024 else "Too many roles to show", inline = False)
+    else:
+      e.add_field(name = "Roles (0)", value = "None")
+    if member.top_role != None:
+      e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
+    if member.guild_permissions.administrator:
+      e.add_field(name = "Administrator?", value = "True", inline = False)
+    else:
+      e.add_field(name = "Administrator?", value = "False", inline = False)
+    e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
+    e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
+    e.set_footer(text = f"ID: {member.id}")
+    await inter.send(embed = e, ephemeral = True)
 
   #context menu message info command
   @commands.message_command(name="Message Info") 
@@ -240,68 +242,38 @@ class Utility(commands.Cog):
     ----------
     member: Mention member
     '''
-    if member != None:
-      role_list = []
+    if member == None:
+      member = inter.author
+      
+    role_list = []
 
-      for role in member.roles:
-        if role.name != "@everyone":
-          role_list.append(role.mention)
+    for role in member.roles:
+      if role.name != "@everyone":
+        role_list.append(role.mention)
           
-      role_list.reverse()
-      b = ", ".join(role_list)
-      e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
-      if member.avatar != None:
-        e.set_thumbnail(url = str(member.avatar))
-      e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
-      e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
-      if member.activity != None:
-        e.add_field(name = "Activity", value = f"{member.activity.type[0].capitalize()} **{member.activity.name}**", inline = False)
-      if len(role_list) != 0:
-        e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
-      else:
-        e.add_field(name = "Roles (0)", value = "None")
-      if member.top_role != None:
-        e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
-      if member.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True", inline = False)
-      else:
-        e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
-      e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
-      e.set_footer(text = f"ID: {member.id}")
-      await inter.send(embed = e)
+    role_list.reverse()
+    b = ", ".join(role_list)
+    e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
+    if member.avatar != None:
+      e.set_thumbnail(url = str(member.avatar))
+    e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
+    e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
+    if member.activity != None:
+      e.add_field(name = "Activity", value = f"{member.activity.type[0].capitalize()} **{member.activity.name}**", inline = False)
+    if len(role_list) != 0:
+      e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]) if len("".join([b])) < 1024 else "Too many roles to show", inline = False)
     else:
-      rgwai = waiquotes[random.randint(0, len(waiquotes) - 1)]
-      role_list = []
-
-      for role in inter.author.roles:
-        if role.name != "@everyone":
-          role_list.append(role.mention)
-
-      role_list.reverse()
-      b = ", ".join(role_list)
-      e = discord.Embed(title = f"Member info: {inter.author}", description = f"{inter.author.mention}", color = random.randint(0, 16777215))
-      if inter.author.avatar != None:
-        e.set_thumbnail(url = str(inter.author.avatar))
-      e.add_field(name = "Joined", value = f"<t:{str(time.mktime(inter.author.joined_at.timetuple()))[:-2]}:R>", inline = True)
-      e.add_field(name = "Registered", value = f"<t:{str(time.mktime(inter.author.created_at.timetuple()))[:-2]}:R>", inline = True)
-      if inter.author.activity != None:
-        e.add_field(name = "Activity", value = f"{inter.author.activity.type[0].capitalize()} **{inter.author.activity.name}**", inline = False)
-      if len(role_list) != 0:
-        e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]), inline = False)
-      else:
-        e.add_field(name = "Roles (0):", value = "None")
-      if inter.author.top_role != None:
-        e.add_field(name = "Top role:", value = inter.author.top_role.mention, inline = False)
-      if inter.author.guild_permissions.administrator:
-        e.add_field(name = "Administrator?", value = "True", inline = False)
-      else:
-        e.add_field(name = "Administrator?", value = "False", inline = False)
-      e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(inter.author.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(inter.author.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(inter.author.mobile_status) != 'offline' else '❌'}", inline = False)
-      e.add_field(name = "Icon url:", value = f"[Link here]({str(inter.author.avatar)[:-10]})", inline = False)
-      e.add_field(name = "Quote:", value = f"{rgwai}")
-      e.set_footer(text = f"ID: {inter.author.id}")
-      await inter.send(embed = e)
+      e.add_field(name = "Roles (0)", value = "None")
+    if member.top_role != None:
+      e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
+    if member.guild_permissions.administrator:
+      e.add_field(name = "Administrator?", value = "True", inline = False)
+    else:
+      e.add_field(name = "Administrator?", value = "False", inline = False)
+    e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
+    e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
+    e.set_footer(text = f"ID: {member.id}")
+    await inter.send(embed = e)
        
   #emoji command
   @commands.slash_command(name = "emoji", description = "See emoji info")
