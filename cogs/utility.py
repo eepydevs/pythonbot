@@ -9,9 +9,9 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.3.2" # major.sub.fix
+botbuild = "7.4.0b" # major.sub.fix
 pyver = "3.8.2"
-dnver = "2.4.0"
+dnver = "2.5.1"
 
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 

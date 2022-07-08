@@ -20,6 +20,9 @@ if "tupper" not in db:
 
 if "customcmd" not in db:
   db["customcmd"] = {}
+
+if "linkchannels" not in db:
+  db["linkchannels"] = {}
   
 class Required1(str, Enum):
   You = "True"
@@ -149,9 +152,6 @@ def calc(text):
     return eval(text)
   else:
     raise ValueError("Something went wrong... (You may have used non-int)")
-    
-	#changeFrom = ["{author}", "{author_name}", "{server}", "{server_id}", "{channel}", "{channel_id}"]
-	#changeTo = [f"<@{author.id}>", author.name, guild.name, str(guild.id), channel.name, str(channel.id)]
 
 def express(inter, text):
   table = {"{author}": inter.author.name, "{author.mention}": f"<@{inter.author.id}>",
@@ -174,7 +174,7 @@ class Nonsense(commands.Cog):
 
   @commands.Cog.listener()
   async def on_message(self, msg):
-    if msg.author.bot:
+    if msg.author.bot or msg.author.discriminator == 0000:
       return
     try:
       if str(msg.guild.id) in db["serversetting"]["nqn"]:
@@ -195,9 +195,41 @@ class Nonsense(commands.Cog):
           webhook = (await utils.Webhook((await self.bot.get_context(msg))))
           await msg.delete()
           await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+      if str(msg.channel.id) in list(db["linkchannels"].keys()):
+        webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(db["linkchannels"][str(msg.channel.id)])))
+        await webhook.send(content=msg.content, username=f"{msg.author.name}#{msg.author.discriminator}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
 
+  @commands.slash_command()
+  async def link(self, inter):
+    pass
+
+  @link.sub_command()
+  @commands.is_owner()
+  async def channel(self, inter, id):
+    if inter.channel.id not in db["linkchannels"]:
+      db["linkchannels"][str(inter.channel.id)] = int(id)
+      db["linkchannels"][id] = inter.channel.id
+      e = discord.Embed(title = "Success", description = f"Linked `{id}` and this channel", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = "This channel is already linked with another channel", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    
+  @link.sub_command()
+  @commands.is_owner()
+  async def delete(self, inter, id):
+    if inter.channel.id in db["linkchannels"]:
+      del db["linkchannels"][str(inter.channel.id)]
+      del db["linkchannels"][id]
+      e = discord.Embed(title = "Success", description = f"Deleted link of `{id}` and this channel", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = "This channel isnt linked with any other channel", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+      
   @commands.slash_command(name = "urban")
   async def slashurban(inter, query):
     '''
