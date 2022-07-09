@@ -545,8 +545,13 @@ class Utility(commands.Cog):
     e.set_footer(text = f"{inter.author}", icon_url = str(inter.author.avatar))
     await inter.send(embed = e)
 
-  @commands.slash_command(name = "GeneratePassword", description = "Password Generator")
-  async def GeneratePassword(inter): await inter.send(embed = discord.Embed(title = "Generated Password", description = "Your Generated Password Is: `"+requests.post("https://API.parham125.repl.co/API/Password-Generator").json()["Generated Password"]+"`", color = random.randint(0, 16777215)), ephemeral = True)
+  @commands.slash_command()
+  async def genpass(inter): 
+    '''
+    Password generator
+    '''
+    e = discord.Embed(title = "Generated password", description = f'`{requests.post("https://API.parham125.repl.co/API/Password-Generator").json()["Generated Password"]}`', color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
   #find command
   @commands.slash_command()
