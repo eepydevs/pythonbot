@@ -208,6 +208,10 @@ class Nonsense(commands.Cog):
   @link.sub_command()
   @commands.is_owner()
   async def channel(self, inter, id):
+    if inter.bot.get_channel(int(id)) is None:
+      e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
     if inter.channel.id not in db["linkchannels"]:
       db["linkchannels"][str(inter.channel.id)] = int(id)
       db["linkchannels"][id] = inter.channel.id
@@ -222,12 +226,15 @@ class Nonsense(commands.Cog):
   async def delete(self, inter, id):
     if inter.channel.id in db["linkchannels"]:
       del db["linkchannels"][str(inter.channel.id)]
-      del db["linkchannels"][id]
       e = discord.Embed(title = "Success", description = f"Deleted link of `{id}` and this channel", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = "Error", description = "This channel isnt linked with any other channel", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    if id in db["linkchannels"]:
+      del db["linkchannels"][id]
+      e = discord.Embed(title = "Success", description = f"Deleted link of `{id}` and this channel", color = random.randint(0, 16777215))
+    else:
+      e = discord.Embed(title = "Error", description = "This channel isnt linked with any other channel", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
       
   @commands.slash_command(name = "urban")
