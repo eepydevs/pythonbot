@@ -197,7 +197,8 @@ class Nonsense(commands.Cog):
           await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
       if str(msg.channel.id) in list(db["linkchannels"].keys()):
         webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(db["linkchannels"][str(msg.channel.id)])))
-        await webhook.send(content=msg.content, username=f"{msg.author.name}#{msg.author.discriminator}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+        atch = ' '.join([i.url for i in msg.attachments])
+        await webhook.send(content=msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''), username=f"{msg.author.name}#{msg.author.discriminator}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
 
@@ -208,6 +209,13 @@ class Nonsense(commands.Cog):
   @link.sub_command()
   @commands.is_owner()
   async def channel(self, inter, id):
+    '''
+    Creates a link with current server and mentioned channel (ID)
+    
+    Parameters
+    ----------
+    id: Channel ID
+    '''
     if inter.bot.get_channel(int(id)) is None:
       e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
