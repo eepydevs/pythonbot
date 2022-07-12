@@ -197,11 +197,14 @@ class Nonsense(commands.Cog):
           await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
       if str(msg.channel.id) in list(db["linkchannels"].keys()):
         webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(db["linkchannels"][str(msg.channel.id)])))
-        atch = ' '.join([i.url for i in msg.attachments])
-        await webhook.send(content=msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''), username=f"{msg.author.name}#{msg.author.discriminator}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+        atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+        rlatch = None
+        if not msg.reference is None:
+          rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+        await webhook.send(content= ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "") + f"\n@{msg.reference.resolved.author.name}\n" if not msg.reference is None else "") + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''), username=f"{msg.author.name}#{msg.author.discriminator}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
-
+      
   @commands.slash_command()
   async def link(self, inter):
     pass
