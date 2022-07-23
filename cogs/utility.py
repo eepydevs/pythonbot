@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.4.0b" # major.sub.fix
+botbuild = "7.5.0" # major.sub.fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
@@ -199,6 +199,18 @@ class Utility(commands.Cog):
     if inter.guild.icon != None:
       e.set_thumbnail(url = str(inter.guild.icon))
     e.set_footer(text = f"ID: {inter.guild.id}")
+    await inter.send(embed = e)
+
+  #role info command
+  @commands.slash_command(name = "roleinfo", description = "Shows role's info")
+  async def roleinfo(inter, role: discord.Role):
+    e = discord.Embed(title = f"Role info: {role.name}", description = f"{role.mention}\n\nRole position: {role.position}\nRole creation date: <t:{str(time.mktime(role.created_at.timetuple()))[:-2]}:R>\nCan be mentioned by other users?: {role.mentionable}\nIs separated from other roles?: {role.hoist}\n{('Icon link: ' + role.icon.url) if role.icon != None else ''}", color = role.color)
+    if len(role.members) != 0:
+      rm = '\n'.join([f"{m}" for m in role.members[0:9]])
+      e.add_field(name = f"{len(role.members) if len(role.members) < 10 else f'More than 10 ({len(role.members)})'} People have this role:", value = rm)
+    if role.icon != None:
+      e.set_thumbnail(url = role.icon.url)
+    e.set_footer(text = f"ID: {role.id}")
     await inter.send(embed = e)
 
   #suggest command
