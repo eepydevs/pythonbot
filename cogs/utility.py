@@ -51,12 +51,13 @@ async def suggest_member(inter, input):
   return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
 class rbbuttons(discord.ui.View):
-  def __init__(self, inter: discord.Interaction, color, lb):
+  def __init__(self, inter: discord.Interaction, color, lb, rolename):
     super().__init__(timeout = 60)
     self.inter = inter
     self.page = 0
     self.color = color
     self.leaderboard = lb
+    self.rn = rolename
     
   async def interaction_check(self, inter: discord.MessageInteraction):
     if inter.author != self.inter.author:
@@ -73,7 +74,7 @@ class rbbuttons(discord.ui.View):
     self.page += int(interaction.data.custom_id)
     self.page = min(max(self.page, 0), len(self.leaderboard) // 10 * 10)
     e = discord.Embed(
-      title = "Role board",
+      title = f"Role board: {self.rn}",
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
@@ -86,7 +87,7 @@ class rbbuttons(discord.ui.View):
     self.page += int(interaction.data.custom_id)
     self.page = min(max(self.page, 0), len(self.leaderboard) // 10 * 10)
     e = discord.Embed(
-      title = "Role board",
+      title = f"Role board: {self.rn}"  ,
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
@@ -269,8 +270,8 @@ class Utility(commands.Cog):
     '''
     board = tuple(f"{index}. `{member}`" for index, member in enumerate(role.members, start = 1))
     color = role.color
-    e = discord.Embed(title = "Leaderboard", description = "\n".join(board[0:9]), color = color)
-    await inter.send(embed = e, view = rbbuttons(inter, color, board))
+    e = discord.Embed(title = f"Role board: {role.name}", description = "\n".join(board[0:9]), color = color)
+    await inter.send(embed = e, view = rbbuttons(inter, color, board, role.name))
 
   #suggest command
   @commands.slash_command(name = "suggest", description = "suggest")
