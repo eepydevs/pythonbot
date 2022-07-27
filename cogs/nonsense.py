@@ -210,12 +210,12 @@ class Nonsense(commands.Cog):
         await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
       
   @commands.slash_command()
-  async def link(self, inter):
+  async def channel(self, inter):
     pass
 
-  @link.sub_command()
+  @channel.sub_command()
   @commands.is_owner()
-  async def channel(self, inter, id):
+  async def link(self, inter, id):
     '''
     Creates a link with current server and mentioned channel (ID)
     
@@ -233,14 +233,39 @@ class Nonsense(commands.Cog):
       db["linkchannels"][id] = []
 
     if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
-      db["linkchannels"][id].append(inter.channel.id)
+      db["linkchannels"][id].append(str(inter.channel.id))
       db["linkchannels"][str(inter.channel.id)].append(id)
       e = discord.Embed(title = "Success", description = f"Linked `{id}` and this channel", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = "Error", description = "This channel is already linked with another channel", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
-      
+
+  @channel.sub_command()
+  @commands.is_owner()
+  async def unlink(self, inter, id):
+    if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
+      e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    e = discord.Embed(title = "Successfully deleted", color = random.randint(0, 16777215))
+    id2 = db["linkchannels"][str(inter.channel.id)]
+    id1 = db["linkchannels"][id]
+    if str(inter.channel.id) in id1:
+      if len(id1) == 1:
+        del db["linkchannels"][str(inter.channel.id)]
+      else:
+        del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
+      e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
+    id1 = db["linkchannels"][id]
+    if id in id2:
+      if len(id2) == 1:
+        del db["linkchannels"][id]
+      else:
+        del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
+      e.add_field(name = f"{inter.channel.id} > {id}", value = "_ _", inline = False)
+    await inter.send(embed = e, ephemeral = True)
+    
   @commands.slash_command(name = "urban")
   async def slashurban(inter, query):
     '''
