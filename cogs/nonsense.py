@@ -1,4 +1,4 @@
-#cog by Number1#4325
+  #cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
@@ -23,6 +23,9 @@ if "customcmd" not in db:
 
 if "linkchannels" not in db:
   db["linkchannels"] = {}
+
+if "bookmarks" not in db:
+  db["bookmarks"] = {}
   
 class Required1(str, Enum):
   You = "True"
@@ -100,6 +103,9 @@ async def suggest_tupper(inter, input):
 
 async def suggest_command(inter, input):
   return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
+
+async def suggest_bookmark(inter, input):
+  return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
 
 def runbf(str):
   array = [0] * 30000
@@ -208,6 +214,69 @@ class Nonsense(commands.Cog):
           rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
           rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
         await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+
+  @commands.slash_command()
+  async def bookmarks(self, inter):
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
+
+  @bookmarks.sub_command()
+  async def add(self, inter, bmname, msgid: discord.Message):
+    '''
+    Add a message to your bookmarks (private pins)
+    
+    Parameters
+    ----------
+    bmname: Name of bookmark
+    msgid: Message id to pin
+    '''
+    if inter.bot.get_message(msgid.id) is None:
+      e = discord.Embed(title = "Error", description = "Invalid message id", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    if bmname in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    
+    db["bookmarks"][str(inter.author.id)].update({bmname: msgid.id})
+    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
+
+  @bookmarks.sub_command()
+  async def remove(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
+    '''
+    Remove a pinned message in your bookmarks (private pins)
+    
+    Parameters
+    ----------
+    bmname: Name of bookmark
+    '''
+    if bmname not in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+      
+    del db["bookmarks"][str(inter.author.id)][bmname]
+    e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
+
+  @bookmarks.sub_command()
+  async def show(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
+    '''
+    See a pinned message in your bookmarks (private pins)
+    
+    Parameters
+    ----------
+    bmname: Name of bookmark
+    '''
+    if bmname not in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    e = discord.Embed(title = f"Bookmark: {bmname}", description = inter.bot.get_message(db["bookmarks"][str(inter.author.id)][bmname]).content, color = random.randint(0, 16777215), url = inter.bot.get_message(db["bookmarks"][str(inter.author.id)][bmname]).jump_url)
+    await inter.send(embed = e, ephemeral = True)
+
       
   @commands.slash_command()
   async def channel(self, inter):
@@ -257,7 +326,6 @@ class Nonsense(commands.Cog):
       else:
         del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
       e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
-    id1 = db["linkchannels"][id]
     if id in id2:
       if len(id2) == 1:
         del db["linkchannels"][id]
