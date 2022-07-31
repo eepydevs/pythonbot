@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.7.0" # major.sub.minor/fix
+botbuild = "7.7.1" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
@@ -50,6 +50,9 @@ async def suggest_user(inter, input):
 async def suggest_member(inter, input):
   return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
+async def suggest_bookmark(inter, input):
+  return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
+  
 class rbbuttons(discord.ui.View):
   def __init__(self, inter: discord.Interaction, color, lb, rolename):
     super().__init__(timeout = 60)
@@ -145,6 +148,81 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Message info", description = f"Message ID: {message.id}\nChannel ID: {message.channel.id}\nServer ID: {message.guild.id}\n\nCreated at: <t:{str(time.mktime(message.created_at.timetuple()))[:-2]}:R>\nMessage author: {message.author.mention}\nMessage content: {message.content}\nLink: [Jump url]({message.jump_url})", color = random.randint(0, 16777215))
     await inter.response.send_message(embed = e, ephemeral = True)
 
+  @commands.message_command(name="Add bookmark") 
+  async def addbm(self, inter, msgid: discord.Message):
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
+
+    if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+
+    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+    db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
+  @commands.slash_command()
+  async def bookmarks(self, inter):
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
+    
+  @bookmarks.sub_command()
+  async def add(self, inter, *, bmname = None, msgid: discord.Message):
+    '''
+    Add a message to your bookmarks (private pins)
+    
+    Parameters
+    ----------
+    bmname: Name of bookmark
+    msgid: Message id to pin
+    '''
+    if bmname is None:
+      bmname = str(msgid.id)
+    if bmname in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+
+    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+    db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
+
+  @bookmarks.sub_command()
+  async def remove(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
+    '''
+    Remove a pinned message in your bookmarks (private pins)
+    
+    Parameters
+    ----------
+    bmname: Name of bookmark
+    '''
+    if bmname not in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+      
+    del db["bookmarks"][str(inter.author.id)][bmname]
+    e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
+
+  @bookmarks.sub_command()
+  async def show(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
+    '''
+    See a pinned message in your bookmarks (private pins)
+    
+    Parameters
+    ----------
+    bmname: Name of bookmark
+    '''
+    if bmname not in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
+    await inter.send(embed = e, ephemeral = True)
+    
   #report bug command
   @commands.slash_command(name = "bugreport", description = "report bug")
   async def slashreport(inter, text):
