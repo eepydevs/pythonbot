@@ -10,6 +10,9 @@ from replit import db
 responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly..", "Concentrate and ask again.", "Cannot predict now.", "Ask again later."]
 random.shuffle(responselist)
 
+if "queue" not in db:
+  db["queue"] = []
+
 class menurps(discord.ui.Select):
   def __init__(self, inter: discord.Interaction):
     self.inter = inter
@@ -76,6 +79,84 @@ class Fun(commands.Cog):
     e.set_footer(text = f"👍: {rjson['ups']}")
     await inter.send(embed = e)
 
+  @commands.slash_command()
+  async def call(self, inter):
+    pass
+    
+  @call.sub_command()
+  async def userphone(self, inter):
+    '''
+    Call someone with the phone!
+    '''
+    if str(inter.channel.id) in db["linkchannels"]:
+      await inter.send("Error: This channel is linked with other channel")
+      return
+    if str(inter.channel.id) in db["queue"]:
+      await inter.send("Error: This channel is already calling someone")
+      return
+    
+    tries, maxtries = 0, 25
+    await inter.response.defer()
+    db["queue"].append(str(inter.channel.id))
+    while True:
+      queue = list(db["queue"]).copy()
+      if len(queue) > 1:
+          id = queue.pop(random.randint(1, len(queue)) - 1)
+        #try:
+          if id != inter.channel.id:
+            db["queue"].pop(db["queue"].index(str(id)))  
+            if str(inter.channel.id) not in db["linkchannels"]:
+              db["linkchannels"][str(inter.channel.id)] = []
+            if str(id) not in db["linkchannels"]:
+              db["linkchannels"][str(id)] = []
+        
+            if str(inter.channel.id) not in db["linkchannels"][str(id)] and str(id) not in db["linkchannels"][str(inter.channel.id)]:
+              db["linkchannels"][str(id)].append(str(inter.channel.id))
+              db["linkchannels"][str(inter.channel.id)].append(str(id))
+            if str(inter.channel.id) in db["queue"]:
+              db["queue"].pop(db["queue"].index(str(inter.channel.id)))
+            msg = "Success! Connection has been made, say hi!"
+            break
+        #except: 
+        #  msg = "Something went wrong"
+        #  break
+      if str(inter.channel.id) in db["linkchannels"]:
+        msg = "Success! Connection has been made, say hi!"
+        break
+      tries += 1
+      if tries == maxtries:
+        db["queue"].pop(db["queue"].index(str(inter.channel.id)))
+        msg = "Error: Reached max tries (25)"
+        break
+      await asyncio.sleep(1)
+      continue
+    await inter.edit_original_message(msg)
+
+  @call.sub_command()
+  async def hangup(self, inter):
+    '''
+    Stop the call
+    '''
+    if str(inter.channel.id) not in db["linkchannels"] or len(db["linkchannels"][str(inter.channel.id)]) > 1:
+      await inter.send("Error: There is no call in this channel")
+      return
+    id = db["linkchannels"][str(inter.channel.id)][0]
+    id2 = db["linkchannels"][str(inter.channel.id)]
+    id1 = db["linkchannels"][id]
+    if str(inter.channel.id) in id1:
+      if len(id1) == 1:
+        del db["linkchannels"][str(inter.channel.id)]
+      else:
+        del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
+      await inter.bot.get_channel(int(id)).send("The other party hang up the call")
+    if id in id2:
+      if len(id2) == 1:
+        del db["linkchannels"][id]
+      else:
+        del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
+    await inter.send("Hang up the call")
+    
+    
   #say command slash
   @commands.slash_command(name = "say", description = "Repeats the thing you said")
   async def slashsay(inter, text):

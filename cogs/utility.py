@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.7.1" # major.sub.minor/fix
+botbuild = "7.8.0" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
@@ -52,6 +52,9 @@ async def suggest_member(inter, input):
 
 async def suggest_bookmark(inter, input):
   return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
+
+async def suggest_sbookmark(inter, input):
+  return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
   
 class rbbuttons(discord.ui.View):
   def __init__(self, inter: discord.Interaction, color, lb, rolename):
@@ -222,7 +225,7 @@ class Utility(commands.Cog):
       return
     e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
     await inter.send(embed = e, ephemeral = True)
-    
+      
   #report bug command
   @commands.slash_command(name = "bugreport", description = "report bug")
   async def slashreport(inter, text):
@@ -316,9 +319,9 @@ class Utility(commands.Cog):
     list_of_bots = [bot.mention for bot in inter.guild.members if bot.bot]
     ms = sbs(inter.guild.members)
     e = discord.Embed(title = f"Server info: {inter.guild.name}", description = f"Icon url: {str(inter.guild.icon)[:-10]}\nServer creation date: <t:{str(time.mktime(inter.guild.created_at.timetuple()))[:-2]}:R>", color = random.randint(0, 16777215))
-    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.name}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {server_role_count}")
+    e.add_field(name = "Moderation", value = f"Server owner: {inter.guild.owner.mention}\nVerification level: {str(inter.guild.verification_level)}\nNumber of roles: {server_role_count}")
     e.add_field(name = "Channels", value = f"Total: {len(inter.guild.channels) - len(inter.guild.categories)}\nText: {len(inter.guild.text_channels)}\nVoice: {len(inter.guild.voice_channels)}\nStage: {len(inter.guild.stage_channels)}")
-    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\n> ⚫ {ms['offline']}\n> 🟢 {ms['online']}\n> 🟡 {ms['idle']}\n> 🔴 {ms['dnd']}\nHumans: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
+    e.add_field(name = "Members", value = f"Total: {inter.guild.member_count}\n> ⚫ {ms['offline']}\n> 🟢 {ms['online']}\n> 🟡 {ms['idle']}\n> 🔴 {ms['dnd']}\nPeople: {inter.guild.member_count - len(list_of_bots)}\nBots: {len(list_of_bots)}")
     if inter.guild.icon != None:
       e.set_thumbnail(url = str(inter.guild.icon))
     e.set_footer(text = f"ID: {inter.guild.id}")
@@ -694,14 +697,6 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Quote", description = f"{text}", color = random.randint(0, 16777215))
     e.set_footer(text = f"{inter.author}", icon_url = str(inter.author.avatar))
     await inter.send(embed = e)
-
-  @commands.slash_command()
-  async def genpass(inter): 
-    '''
-    Password generator
-    '''
-    e = discord.Embed(title = "Generated password", description = f'`{requests.post("https://API.parham125.repl.co/API/Password-Generator").json()["Generated Password"]}`', color = random.randint(0, 16777215))
-    await inter.send(embed = e, ephemeral = True)
 
   #find command
   @commands.slash_command()
