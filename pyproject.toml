@@ -11,6 +11,7 @@ Flask = "^2.0.2"
 app = "^0.0.1"
 disnake = "^2.5.1"
 psutil = "^5.9.0"
+roblox = "^2.0.0"
 
 [tool.poetry.dev-dependencies]
 

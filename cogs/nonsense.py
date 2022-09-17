@@ -1,4 +1,4 @@
-  #cog by Number1#4325
+#cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
@@ -9,11 +9,15 @@ import random
 import asyncio
 import requests
 import math
+import roblox as rblx
+from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
 import requests as rq
 from replit import db
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
+
+crblx = rblx.Client()
 
 if "tupper" not in db:
   db["tupper"] = {}
@@ -100,6 +104,13 @@ def shuffle(x):
 
 async def suggest_tupper(inter, input):
   return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
+
+async def suggest_rblxuser(inter, input):
+  if not input:
+    input = "ROBLOX"
+  if len(input) < 4:
+    return ["Username is too short"]
+  return [user.name async for user in crblx.user_search(input, max_items = 30) if input.lower() in user.name.lower()][0:24] if [user.name async for user in crblx.user_search(input, max_items=30) if input.lower() in user.name.lower()][0:24] else ["Users not found"]
 
 async def suggest_command(inter, input):
   return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
@@ -198,21 +209,66 @@ class Nonsense(commands.Cog):
           webhook = (await utils.Webhook((await self.bot.get_context(msg))))
           await msg.delete()
           await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+          
+      if "linkchannels" in db:
+        pass
+      if str(msg.channel.id) in list(db["linkchannels"].keys()):
+        for channel in db["linkchannels"][str(msg.channel.id)]:
+          webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(int(channel))))
+          atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+          rlatch = None
+          rmsg = ''
+          if not msg.reference is None:
+            rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+            rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+          await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+          await asyncio.sleep(0.2)
     
     except:
       pass
-    if str(msg.channel.id) in list(db["linkchannels"].keys()):
-      for channel in db["linkchannels"][str(msg.channel.id)]:
-        webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(int(channel))))
-        atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
-        rlatch = None
-        rmsg = ''
-        if not msg.reference is None:
-          rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-          rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-        await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-        await asyncio.sleep(0.2)
-      
+
+  @commands.slash_command()
+  async def roblox(self, inter):
+    pass
+
+  @roblox.sub_command()
+  async def user(self, inter, username: str = commands.Param(autocomplete = suggest_rblxuser)): #: str = commands.Param(autocomplete = suggest_rblxuser)
+    '''
+    See users info by username
+    
+    Parameters
+    ----------
+    username: Name of a user'''
+    user = await crblx.get_user_by_username(username, expand = True)
+    avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
+    
+    e = discord.Embed(title = f"{(user.display_name + ' ' + f'({user.name})') if user.name != user.display_name else f'{user.name}'}'s profile:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/users/{user.id}/profile")
+    e.add_field(name = "Created at:", value = f"<t:{str(time.mktime(user.created.timetuple()))[:-2]}:R>", inline = False)
+    if user.description:
+      e.add_field(name = "Description:", value = user.description, inline = False)
+    e.set_footer(text = f"ID: {user.id}")
+    e.set_thumbnail(url = avatar[0].image_url)
+    await inter.send(embed = e, ephemeral = True)
+
+  @roblox.sub_command()
+  async def id(self, inter, userid: int):
+    '''
+    See users info by username
+    
+    Parameters
+    ----------
+    userid: ID of a user'''
+    user = await crblx.get_user(int(userid))
+    avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
+    
+    e = discord.Embed(title = f"{(user.display_name + ' ' + f'({user.name})') if user.name != user.display_name else f'{user.name}'}'s profile:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/users/{user.id}/profile")
+    e.add_field(name = "Created at:", value = f"<t:{str(time.mktime(user.created.timetuple()))[:-2]}:R>", inline = False)
+    if user.description:
+      e.add_field(name = "Description:", value = user.description, inline = False)
+    e.set_footer(text = f"ID: {user.id}")
+    e.set_thumbnail(url = avatar[0].image_url)
+    await inter.send(embed = e, ephemeral = True)
+    
   @commands.slash_command()
   async def channel(self, inter):
     pass
@@ -221,7 +277,7 @@ class Nonsense(commands.Cog):
   @commands.is_owner()
   async def link(self, inter, id):
     '''
-    Creates a link with current server and mentioned channel (ID)
+    Creates a link with current channelimp and mentioned channel (ID)
     
     Parameters
     ----------
@@ -248,6 +304,13 @@ class Nonsense(commands.Cog):
   @channel.sub_command()
   @commands.is_owner()
   async def unlink(self, inter, id):
+    '''
+    Unlinks current channel and mentioned channel (ID)
+    
+    Parameters
+    ----------
+    id: Channel ID
+    '''
     if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
       e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
