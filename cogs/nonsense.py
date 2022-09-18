@@ -238,11 +238,18 @@ class Nonsense(commands.Cog):
     
     Parameters
     ----------
-    username: Name of a user'''
-    user = await crblx.get_user_by_username(username, expand = True)
-    avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
+    username: Name of a user
+    '''
     
-    e = discord.Embed(title = f"{(user.display_name + ' ' + f'({user.name})') if user.name != user.display_name else f'{user.name}'}'s profile:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/users/{user.id}/profile")
+    try: 
+      user = await crblx.get_user_by_username(username, expand = True)
+      avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
+    except rblx.UserNotFound:
+      e = discord.Embed(title = "Error", description = "Invalid username", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+      
+    e = discord.Embed(title = f"{(user.display_name + ' ' + f'(@{user.name})') if user.name != user.display_name else f'{user.name}'}'s profile:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/users/{user.id}/profile")
     e.add_field(name = "Created at:", value = f"<t:{str(time.mktime(user.created.timetuple()))[:-2]}:R>", inline = False)
     if user.description:
       e.add_field(name = "Description:", value = user.description, inline = False)
@@ -253,20 +260,55 @@ class Nonsense(commands.Cog):
   @roblox.sub_command()
   async def id(self, inter, userid: int):
     '''
-    See users info by username
+    See users info by ID
     
     Parameters
     ----------
-    userid: ID of a user'''
-    user = await crblx.get_user(int(userid))
-    avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
+    userid: ID of a user
+    '''
     
-    e = discord.Embed(title = f"{(user.display_name + ' ' + f'({user.name})') if user.name != user.display_name else f'{user.name}'}'s profile:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/users/{user.id}/profile")
+    try:
+      user = await crblx.get_user(int(userid))
+      avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
+    except rblx.UserNotFound:
+      e = discord.Embed(title = "Error", description = "Invalid ID", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    
+    e = discord.Embed(title = f"{(user.display_name + ' ' + f'(@{user.name})') if user.name != user.display_name else f'{user.name}'}'s profile:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/users/{user.id}/profile")
     e.add_field(name = "Created at:", value = f"<t:{str(time.mktime(user.created.timetuple()))[:-2]}:R>", inline = False)
     if user.description:
       e.add_field(name = "Description:", value = user.description, inline = False)
     e.set_footer(text = f"ID: {user.id}")
     e.set_thumbnail(url = avatar[0].image_url)
+    await inter.send(embed = e, ephemeral = True)
+
+  @roblox.sub_command()
+  async def group(self, inter, groupid):
+    '''
+    See groups info by ID
+    
+    Parameters
+    ----------
+    groupid: ID of a group
+    '''
+    
+    try:
+      group = await crblx.get_group(int(groupid))
+      icon = await crblx.thumbnails.get_group_icons(groups = [group], size = (420, 420))
+      
+    except rblx.GroupNotFound:
+      e = discord.Embed(title = "Error", description = "Invalid ID", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+
+    e = discord.Embed(title = f"{group.name}'s Info:", color = random.randint(0, 16777215))
+    e.add_field(name = f"Amount of members:", value = f"{group.member_count}", inline = False)
+    e.add_field(name = "Owner:", value = f"{(group.owner.display_name + ' ' + f'(@{group.owner.name})') if group.owner.name != group.owner.display_name else f'{group.owner.name}'}", inline = False)
+    if group.shout:
+      e.add_field(name = "Shout:", value = f"{(group.shout.poster.display_name + ' ' + f'(@{group.shout.poster.name})') if group.shout.poster.name != group.shout.poster.display_name else f'{group.shout.poster.name}'}" + "\n" + f"> {group.shout.body}" + "\n" + f"> <t:{str(time.mktime(group.shout.updated.timetuple()))[:-2]}:R>")
+    e.set_footer(text = f"ID: {group.id}")
+    e.set_thumbnail(url = icon[0].image_url)
     await inter.send(embed = e, ephemeral = True)
     
   @commands.slash_command()
