@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.9.1" # major.sub.minor/fix
+botbuild = "7.9.2" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 

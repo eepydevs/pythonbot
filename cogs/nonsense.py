@@ -302,7 +302,7 @@ class Nonsense(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
       return
 
-    e = discord.Embed(title = f"{group.name}'s Info:", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"{group.name}'s Info:", color = random.randint(0, 16777215), url = f"https://www.roblox.com/groups/{group.id}/LSPLASH#!/about")
     e.add_field(name = f"Amount of members:", value = f"{group.member_count}", inline = False)
     e.add_field(name = "Owner:", value = f"{(group.owner.display_name + ' ' + f'(@{group.owner.name})') if group.owner.name != group.owner.display_name else f'{group.owner.name}'}", inline = False)
     if group.shout:
