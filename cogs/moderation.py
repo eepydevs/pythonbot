@@ -9,9 +9,6 @@ from replit import db
 purgequotes = ["Stop spamming!", "Spamming is bad.", "Purge the chat! Haha!", "Purge after these silly young spammers...", "Is it just me, or is spamming more likely now than notime else?"]
 modquotes = ["I hope they learned their lesson.", "Make them cry!", "Haha!", "Gotcha!", "They should've readed the rules.", "Why they didn't readed the rules...", "That's lesson for you to read rules!", "'no reason ban' they say... Right at your eyes broke rule number 1337!", "Oops!"]
 
-if "prefix" not in db:
-  db["prefix"] = {}
-
 if "warns" not in db:
   db["warns"] = {}
 
@@ -185,37 +182,6 @@ class Moderation(commands.Cog):
     '''
     await message.pin()
     await inter.send(f"[Message]({message.jump_url}) pinned successfully")
-
-  #prefix command
-  @commands.slash_command(name = "prefix", description = "See current prefix or change it")
-  async def slashprefix(inter, prefix = None):
-    '''
-    Set or see current prefix
-
-    Parameters
-    ----------
-    prefix: Prefix here
-    '''
-    if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
-      if not prefix:
-        e = discord.Embed(title = "Prefix", description = f"Current prefix is: `{db['prefix'][str(inter.guild.id)]}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-      else:
-        if len(prefix) > 5:
-          db["prefix"][str(inter.guild.id)] = prefix[:5]
-          e = discord.Embed(title = "Prefix", description = f"Prefix got changed to: `{prefix[:5]}`", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-        else:
-          db["prefix"][str(inter.guild.id)] = prefix
-          e = discord.Embed(title = "Prefix", description = f"Prefix got changed to: `{prefix}`", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-    else:
-      if not prefix:
-        e = discord.Embed(title = "Prefix", description = f"Current prefix is: `{db['prefix'][str(inter.guild.id)]}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Prefix", description = f"You can't change bot's prefix: No admin perms\nCurrent prefix is: `{db['prefix'][str(inter.guild.id)]}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
 
   @commands.slash_command(name = "warn", description = "Warn people (BETA)")
   @commands.has_permissions(kick_members = True)

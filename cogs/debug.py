@@ -3,12 +3,18 @@ import asyncio
 import disnake as discord
 import random
 import os
+from main import bot
+from enum import Enum
 import datetime, time
 from replit import db
 from disnake.ext import commands
 
 if "debug" not in db:
   db["debug"] = {}
+
+class Required1(str, Enum):
+  true = "True"
+  false = ""
 
 class Debug(commands.Cog):
   def __init__(self, bot):
@@ -41,10 +47,13 @@ class Debug(commands.Cog):
       e = discord.Embed(title = "Error", description = f"Triggered by: `{ctx.message.content}` from {ctx.author}\n{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
     await ctx.send(embed = e)
 
-  #debug command
-  @commands.slash_command(name = "debug", description = "bot owner only")
-  @commands.is_owner()
-  async def slashdebug(inter, text = None):
+  #debug group
+  @commands.slash_command()
+  async def debug(self, inter):
+    pass
+
+  @debug.sub_command()
+  async def toggle(self, inter, toggler: Required1 = Required1.true):
     '''
     debug,,
 
@@ -52,22 +61,59 @@ class Debug(commands.Cog):
     ----------
     text: None
     '''
-    if text != None:
-      if str(inter.author.id) not in db["debug"]:
-        db["debug"][str(inter.author.id)] = "True"
-        e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        del db["debug"][str(inter.author.id)]
-        e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-    else:
-      if str(inter.author.id) in db["debug"]:
-        e = discord.Embed(title = "Debug info", description = "Debug mode is enabled", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = "Debug info", description = "Debug mode is disabled", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    if str(inter.author.id) not in db["debug"] and toggler:
+      db["debug"][str(inter.author.id)] = "True"
+      e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    if str(inter.author.id) in db["debug"] and not toggler:
+      del db["debug"][str(inter.author.id)]
+      e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
+        
+  #load extension command
+  @debug.sub_command()
+  @commands.is_owner()
+  async def load(self, inter, extension):
+    '''
+    Loads an extension
+
+    Parameters
+    ----------
+    extension: Cog name
+    '''
+    bot.load_extension(f"cogs.{extension}")
+    await inter.send(f"cogs.{extension} is loaded", ephemeral = True)
+    
+  #reload extension command
+  @debug.sub_command()
+  @commands.is_owner()
+  async def reload(self, inter, extension):
+    '''
+    Loads an extension
+
+    Parameters
+    ----------
+    extension: Cog name
+    '''
+    bot.unload_extension(f"cogs.{extension}")
+    bot.load_extension(f"cogs.{extension}")
+    await inter.send(f"cogs.{extension} is reloaded", ephemeral = True)
+  
+  #unload extension command
+  @debug.sub_command()
+  @commands.is_owner()
+  async def unload(self, inter, extension):
+    '''
+    Loads an extension
+
+    Parameters
+    ----------
+    extension: Cog name
+    '''
+    bot.unload_extension(f"cogs.{extension}")
+    await inter.send(f"cogs.{extension} is unloaded", ephemeral = True)
+  
 def setup(bot):
   bot.add_cog(Debug(bot))

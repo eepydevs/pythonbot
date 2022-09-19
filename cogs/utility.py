@@ -1,4 +1,4 @@
-#cog by Number1#4325
+  #cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
 import random
@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "7.9.2" # major.sub.minor/fix
+botbuild = "8.0.0" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
@@ -104,7 +104,6 @@ class rbbuttons(discord.ui.View):
 class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
-    bot.help_command.cog = self
 
   #x reaction
   @commands.Cog.listener()
@@ -231,7 +230,6 @@ class Utility(commands.Cog):
   async def slashreport(inter, text):
     '''
     Report a bug to bot owner
-
     Parameters
     ----------
     text: Tell your bug here
@@ -253,7 +251,6 @@ class Utility(commands.Cog):
   async def slashremind(inter, ctime = "1h", *, text):
     '''
     Make a reminder for yourself
-
     Parameters
     ----------
     ctime: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1h
@@ -291,7 +288,7 @@ class Utility(commands.Cog):
     int, os.popen('free -t -m').readlines()[-1].split()[1:])
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [Number1#4325](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
-    e.add_field(name = "Bot", value = f"Total amount of commands: {len(tuple(command for command in inter.bot.commands if not command.hidden)) + len(inter.bot.slash_commands)}/{len(inter.bot.commands) + len(inter.bot.slash_commands)} ({len(inter.bot.commands) - len(tuple(command for command in inter.bot.commands if not command.hidden))} hidden) ({len(inter.bot.slash_commands)} slash)\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
+    e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
     e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `1024MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)\n[Python Bot plans Trello board](https://trello.com/b/G33MTATB/python-bot-plans)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
@@ -359,7 +356,6 @@ class Utility(commands.Cog):
   async def slashsuggest(inter, text):
     '''
     Suggest an improvement for server
-
     Parameters
     ----------
     text: Tell your suggestion here
@@ -390,7 +386,6 @@ class Utility(commands.Cog):
   async def slashmemberinfo(inter, member: discord.Member = None):
     '''
     Shows mentioned member's info
-
     Parameters
     ----------
     member: Mention member
@@ -433,7 +428,6 @@ class Utility(commands.Cog):
   async def emoji(inter, emoji: discord.Emoji):
     '''
     See emoji info
-
     Parameters
     ----------
     emoji: Emoji here
@@ -470,7 +464,6 @@ class Utility(commands.Cog):
   async def slashpoll(inter, name, options):
     '''
     Make a poll
-
     Parameters
     ----------
     name: Name of your poll
@@ -504,7 +497,6 @@ class Utility(commands.Cog):
   async def create(self, inter, name, text):
     '''
     Creates note
-
     Parameters
     ----------
     name: Note's name here
@@ -547,7 +539,6 @@ class Utility(commands.Cog):
   async def overwrite(inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Replaces whole note text
-
     Parameters
     ----------
     name: Note's name here
@@ -567,7 +558,6 @@ class Utility(commands.Cog):
   async def add(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Inserts text at the end
-
     Parameters
     ----------
     name: Note's name here
@@ -587,7 +577,6 @@ class Utility(commands.Cog):
   async def newline(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Inserts text at the end on new line
-
     Parameters
     ----------
     name: Note's name here
@@ -607,7 +596,6 @@ class Utility(commands.Cog):
   async def read(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
     '''
     Reads selected note
-
     Parameters
     ----------
     name: Note's name here
@@ -623,7 +611,6 @@ class Utility(commands.Cog):
   async def delete(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
     '''
     Deletes selected note
-
     Parameters
     ----------
     name: Note's name here
@@ -650,7 +637,6 @@ class Utility(commands.Cog):
   async def read_raw(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
     '''
     Reads selected note but escapes markdown
-
     Parameters
     ----------
     name: Note's name here
@@ -674,7 +660,6 @@ class Utility(commands.Cog):
   async def slashexec(inter, code):
     '''
     bot owner only
-
     Parameters
     ----------
     code: Code here
@@ -689,7 +674,6 @@ class Utility(commands.Cog):
   async def quote(inter, text):
     '''
     Quote command or whatever idk
-
     Parameters
     ----------
     text: Your text here

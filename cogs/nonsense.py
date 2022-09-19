@@ -17,7 +17,7 @@ from replit import db
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
 
-crblx = rblx.Client()
+crblx = rblx.Client(os.getenv('rblxs'))
 
 if "tupper" not in db:
   db["tupper"] = {}
@@ -227,12 +227,13 @@ class Nonsense(commands.Cog):
     except:
       pass
 
+  #roblox group
   @commands.slash_command()
   async def roblox(self, inter):
     pass
 
   @roblox.sub_command()
-  async def user(self, inter, username: str = commands.Param(autocomplete = suggest_rblxuser)): #: str = commands.Param(autocomplete = suggest_rblxuser)
+  async def user(self, inter, username: str = commands.Param(autocomplete = suggest_rblxuser)):
     '''
     See users info by username
     
@@ -310,7 +311,37 @@ class Nonsense(commands.Cog):
     e.set_footer(text = f"ID: {group.id}")
     e.set_thumbnail(url = icon[0].image_url)
     await inter.send(embed = e, ephemeral = True)
+
+  """@roblox.sub_command()
+  async def place(self, inter, placeid):
+    '''
+    See places info by ID
     
+    Parameters
+    ----------
+    placeid: ID of a place
+    '''
+    user = await crblx.get_authenticated_user()
+    print("ID:", user.id)
+    print("Name:", user.name)
+    try:
+      place = await crblx.get_place(int(placeid))
+      #icon = await crblx.thumbnails.get_place_icons(places = [place], size = (420, 420))
+      
+    except rblx.PlaceNotFound:
+      e = discord.Embed(title = "Error", description = "Invalid ID", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    
+    e = discord.Embed(title = f"{place.name}", color = random.randint(0, 16777215), url = f"https://www.roblox.com/games/{place.id}/")
+    e.add_field(name = "Created at:", value = f"<t:{str(time.mktime(place.created.timetuple()))[:-2]}:R>", inline = False)
+    if place.description:
+      e.add_field(name = "Description:", value = place.description, inline = False)
+    e.set_footer(text = f"ID: {place.id}")
+    #e.set_thumbnail(url = icon[0].image_url)
+    await inter.send(embed = e, ephemeral = False)"""
+
+  #channel group
   @commands.slash_command()
   async def channel(self, inter):
     pass
