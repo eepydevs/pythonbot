@@ -110,7 +110,10 @@ async def suggest_rblxuser(inter, input):
     input = "ROBLOX"
   if len(input) < 4:
     return ["Username is too short"]
-  return [user.name async for user in crblx.user_search(input, max_items = 30) if input.lower() in user.name.lower()][0:24] if [user.name async for user in crblx.user_search(input, max_items=30) if input.lower() in user.name.lower()][0:24] else ["Users not found"]
+  try:
+    return [user.name async for user in crblx.user_search(input, max_items = 30) if input.lower() in user.name.lower()][0:24] if [user.name async for user in crblx.user_search(input, max_items = 30) if input.lower() in user.name.lower()][0:24] else ["Users not found"]
+  except rblx.InternalServerError:
+    return ["Users not found"]
 
 async def suggest_command(inter, input):
   return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
