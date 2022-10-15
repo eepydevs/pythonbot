@@ -259,7 +259,7 @@ class Nonsense(commands.Cog):
       e.add_field(name = "Description:", value = user.description, inline = False)
     e.set_footer(text = f"ID: {user.id}")
     e.set_thumbnail(url = avatar[0].image_url)
-    await inter.send(embed = e, ephemeral = True)
+    await inter.send(embed = e  )
 
   @roblox.sub_command()
   async def id(self, inter, userid: int):
@@ -285,7 +285,7 @@ class Nonsense(commands.Cog):
       e.add_field(name = "Description:", value = user.description, inline = False)
     e.set_footer(text = f"ID: {user.id}")
     e.set_thumbnail(url = avatar[0].image_url)
-    await inter.send(embed = e, ephemeral = True)
+    await inter.send(embed = e)
 
   @roblox.sub_command()
   async def group(self, inter, groupid):
@@ -313,36 +313,7 @@ class Nonsense(commands.Cog):
       e.add_field(name = "Shout:", value = f"{(group.shout.poster.display_name + ' ' + f'(@{group.shout.poster.name})') if group.shout.poster.name != group.shout.poster.display_name else f'{group.shout.poster.name}'}" + "\n" + f"> {group.shout.body}" + "\n" + f"> <t:{str(time.mktime(group.shout.updated.timetuple()))[:-2]}:R>")
     e.set_footer(text = f"ID: {group.id}")
     e.set_thumbnail(url = icon[0].image_url)
-    await inter.send(embed = e, ephemeral = True)
-
-  """@roblox.sub_command()
-  async def place(self, inter, placeid):
-    '''
-    See places info by ID
-    
-    Parameters
-    ----------
-    placeid: ID of a place
-    '''
-    user = await crblx.get_authenticated_user()
-    print("ID:", user.id)
-    print("Name:", user.name)
-    try:
-      place = await crblx.get_place(int(placeid))
-      #icon = await crblx.thumbnails.get_place_icons(places = [place], size = (420, 420))
-      
-    except rblx.PlaceNotFound:
-      e = discord.Embed(title = "Error", description = "Invalid ID", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-      return
-    
-    e = discord.Embed(title = f"{place.name}", color = random.randint(0, 16777215), url = f"https://www.roblox.com/games/{place.id}/")
-    e.add_field(name = "Created at:", value = f"<t:{str(time.mktime(place.created.timetuple()))[:-2]}:R>", inline = False)
-    if place.description:
-      e.add_field(name = "Description:", value = place.description, inline = False)
-    e.set_footer(text = f"ID: {place.id}")
-    #e.set_thumbnail(url = icon[0].image_url)
-    await inter.send(embed = e, ephemeral = False)"""
+    await inter.send(embed = e)
 
   #channel group
   @commands.slash_command()

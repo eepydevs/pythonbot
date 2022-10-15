@@ -105,7 +105,7 @@ class Fun(commands.Cog):
     await inter.response.send_message(embed = e)    
 
   #8ball command slash
-  @commands.slash_command(name = "8ball",description = "Usage: pb!eightball (text)")
+  @commands.slash_command(name = "8ball", description = "Usage: pb!eightball (text)")
   async def slasheightball(inter, text):
     '''
     Ask 8ball a Y/N question
