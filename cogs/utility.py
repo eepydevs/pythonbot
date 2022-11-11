@@ -1,4 +1,4 @@
-  #cog by Number1#4325
+#cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
 import random
@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 from replit import db
 
-botbuild = "8.0.1" # major.sub.minor/fix
+botbuild = "8.1.0" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 

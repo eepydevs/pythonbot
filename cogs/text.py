@@ -106,21 +106,60 @@ def ifyed(text):
     result.append(saveword)
   return " ".join(result)
 
-'''def morsify(text):
-  table = {"A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".", "F": "..-.", "G": "--.", "H": "....", "I": "..", "J": ".---", "K": "-.-", "L": ".-..", "M": "--", "N": "-.", "O": "---", "P": ".--.", "Q": "--.-", "R": ".-.", "S": "...", "T": "-", "U": "..-", "V": "...-", "W": ".--", "X": "-..-", "Y": "--.-", "Z": "--..", "/": " ", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...", "8": "---..", "9": "----.", "0": "-----"}
+def morsifyen(text):
+  table = {"A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".", "F": "..-.", "G": "--.", "H": "....", "I": "..", "J": ".---", "K": "-.-", "L": ".-..", "M": "--", "N": "-.", "O": "---", "P": ".--.", "Q": "--.-", "R": ".-.", "S": "...", "T": "-", "U": "..-", "V": "...-", "W": ".--", "X": "-..-", "Y": "-.--", "Z": "--..", "/": "-..-.", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...", "8": "---..", "9": "----.", "0": "-----", ",": "--..--", ".": ".-.-.-", "?": "..--..", "!": "-.-.--", " ": "/"}
   textt = text.upper()
   result = []
-  for l in textt.split(" "):
+  for l in textt:
     if l in table:
-      result.append(table[l])
-    else:
-      result.append(" ")
-  return str().join(result)'''
+      result.append(f"{table[l]} ")
+  return str().join(result)
+
+def morsifyde(text):
+  table = {".-": "A", "-...": "B", "-.-.": "C", "-..": "D", ".": "E", "..-.": "F", "--.": "G", "....": "H", "..": "I", ".---": "J", "-.-": "K", ".-..": "L", "--": "M", "-.": "N", "---": "O", ".--.": "P", "--.-": "Q", ".-.": "R", "...": "S", "-": "T", "..-": "U", "...-": "V", ".--": "W", "-..-": "X", "-.--": "Y", "--..": "Z", "-..-.": "/", ".----": "1", "..---": "2", "...--": "3", "....-": "4", ".....": "5", "-....": "6", "--...": "7", "---..": "8", "----.": "9", "-----": "0", "--..--": ",", ".-.-.-": "." ,"..--..": "?", "-.-.--": "!", "/": " "}
+  textt = text.replace("_", "-")
+  result = []
+  if all([True if i in ".-/ " else False for i in textt]):
+    for l in textt.split(" "):
+      if l in table:
+        result.append(table[l])
+    return str().join(result)
+  else:
+    return "none"
 
 class Text(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
 
+  @commands.slash_command(name = "morse", description = "Encode or Decode your morse text!")
+  async def morse(self, inter):
+    pass
+
+  @morse.sub_command()
+  async def encode(self, inter, text):
+    '''
+    Morse encode your inputted text
+    
+    Parameters
+    ----------
+    text: Text here
+    '''
+    await inter.response.defer()
+    await inter.send(morsifyen(text))
+
+  @morse.sub_command()
+  async def decode(self, inter, text):
+    '''
+    Morse decode your inputted text
+    
+    Parameters
+    ----------
+    text: Text here
+    '''
+    await inter.response.defer()
+    await inter.send(morsifyde(text))
+
+    
   #lowcase command
   @commands.slash_command(name = "lowify", description = "Low case your inputted text!")
   async def slashlowcase(inter, *, text):
@@ -398,20 +437,6 @@ class Text(commands.Cog):
     '''
     modtext = ifyed(text)
     await inter.send(modtext)
-
-  """@commands.slash_command()
-  async def morse(inter, *, text):
-    '''
-    Morsify your inputted text
-    
-    Parameters
-    ----------
-    text: Text here
-    '''
-    if all([True if i in ".-/ " else False for i in text]):
-      await inter.send(morsify(text))
-    else:
-      await inter.send("none")"""
     
 def setup(bot):
   bot.add_cog(Text(bot))
