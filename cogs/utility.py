@@ -17,9 +17,6 @@ reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
 with shelve.open("db", writeback = True) as db:
-  if "afk" not in db:
-    db["afk"] = {}
-
   if "notes" not in db:
     db["notes"] = {}
 
@@ -688,10 +685,11 @@ class Utility(commands.Cog):
     ----------
     code: Code here
     '''
-    exec(code)
-    print(f"{code} is executed")
-    e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
-    await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      exec(code)
+      print(f"{code} is executed")
+      e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   #quote command
   @commands.slash_command(name = "quote")

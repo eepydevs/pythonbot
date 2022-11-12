@@ -34,6 +34,7 @@ class Debug(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = f"{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
     await inter.send(embed = e, ephemeral = True)
+    
   #when normal error 
   @commands.Cog.listener()
   async def on_command_error(self, ctx, error):
