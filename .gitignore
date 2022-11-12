@@ -2,3 +2,7 @@ __pycache__/
 cogs/__pycache__/
 poetry.lock
 .breakpoints
+.env
+db.bak
+db.dat
+db.dir

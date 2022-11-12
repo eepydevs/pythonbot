@@ -6,11 +6,12 @@ import os
 from main import bot
 from enum import Enum
 import datetime, time
-from replit import db
 from disnake.ext import commands
+import shelve
 
-if "debug" not in db:
-  db["debug"] = {}
+with shelve.open("db", writeback = True) as db:
+  if "debug" not in db:
+    db["debug"] = {}
 
 class Required1(str, Enum):
   true = "True"
@@ -62,12 +63,14 @@ class Debug(commands.Cog):
     text: None
     '''
     if str(inter.author.id) not in db["debug"] and toggler:
-      db["debug"][str(inter.author.id)] = "True"
+      with shelve.open("db", writeback = True) as db:
+        db["debug"][str(inter.author.id)] = "True"
       e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       return
     if str(inter.author.id) in db["debug"] and not toggler:
-      del db["debug"][str(inter.author.id)]
+      with shelve.open("db", writeback = True) as db:
+        del db["debug"][str(inter.author.id)]
       e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 

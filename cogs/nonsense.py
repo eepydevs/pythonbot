@@ -13,23 +13,26 @@ import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
 import requests as rq
-from replit import db
+import shelve
+from dotenv import load_dotenv
+load_dotenv()
 
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
 
 crblx = rblx.Client(os.getenv('rblxs'))
 
-if "tupper" not in db:
-  db["tupper"] = {}
+with shelve.open("db", writeback = True) as db:
+  if "tupper" not in db:
+    db["tupper"] = {}
 
-if "customcmd" not in db:
-  db["customcmd"] = {}
+  if "customcmd" not in db:
+    db["customcmd"] = {}
 
-if "linkchannels" not in db:
-  db["linkchannels"] = {}
+  if "linkchannels" not in db:
+    db["linkchannels"] = {}
 
-if "bookmarks" not in db:
-  db["bookmarks"] = {}
+  if "bookmarks" not in db:
+    db["bookmarks"] = {}
   
 class Required1(str, Enum):
   You = "True"
@@ -103,7 +106,8 @@ def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_tupper(inter, input):
-  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
+  with shelve.open("db", writeback = True) as db:
+    return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
 
 async def suggest_rblxuser(inter, input):
   if not input:
@@ -116,7 +120,8 @@ async def suggest_rblxuser(inter, input):
     return ["Users not found"]
 
 async def suggest_command(inter, input):
-  return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
+  with shelve.open("db", writeback = True) as db:
+    return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
 def runbf(str):
   array = [0] * 30000
@@ -194,38 +199,39 @@ class Nonsense(commands.Cog):
     if msg.author.bot or msg.author.discriminator == 0000:
       return
     try:
-      if str(msg.guild.id) in db["serversetting"]["nqn"]:
-        reg = ':[a-zA-Z]+:'
-        other = re.split(reg, msg.content)
-        emjs = re.findall(reg, msg.content)
-        content=other[0]
-        for i in range(len(emjs)):
-          myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
-          emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
-          content+=emj+other[i+1]
-          
-        if content==msg.content: return
-        if msg.reference and len(msg.content.split())==1:
-          await msg.delete()
-          await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
-        else:
-          webhook = (await utils.Webhook((await self.bot.get_context(msg))))
-          await msg.delete()
-          await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-          
-      if "linkchannels" in db:
-        pass
-      if str(msg.channel.id) in list(db["linkchannels"].keys()):
-        for channel in db["linkchannels"][str(msg.channel.id)]:
-          webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(int(channel))))
-          atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
-          rlatch = None
-          rmsg = ''
-          if not msg.reference is None:
-            rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-            rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-          await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-          await asyncio.sleep(0.2)
+      with shelve.open("db", writeback = True) as db:
+        if str(msg.guild.id) in db["serversetting"]["nqn"]:
+          reg = ':[a-zA-Z]+:'
+          other = re.split(reg, msg.content)
+          emjs = re.findall(reg, msg.content)
+          content=other[0]
+          for i in range(len(emjs)):
+            myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
+            emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
+            content+=emj+other[i+1]
+            
+          if content==msg.content: return
+          if msg.reference and len(msg.content.split())==1:
+            await msg.delete()
+            await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
+          else:
+            webhook = (await utils.Webhook((await self.bot.get_context(msg))))
+            await msg.delete()
+            await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+            
+        if "linkchannels" in db:
+          pass
+        if str(msg.channel.id) in list(db["linkchannels"].keys()):
+          for channel in db["linkchannels"][str(msg.channel.id)]:
+            webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(int(channel))))
+            atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+            rlatch = None
+            rmsg = ''
+            if not msg.reference is None:
+              rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+              rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+            await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+            await asyncio.sleep(0.2)
     
     except:
       pass
@@ -334,19 +340,20 @@ class Nonsense(commands.Cog):
       e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       return
-    if str(inter.channel.id) not in db["linkchannels"]:
-      db["linkchannels"][str(inter.channel.id)] = []
-    if id not in db["linkchannels"]:
-      db["linkchannels"][id] = []
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.channel.id) not in db["linkchannels"]:
+        db["linkchannels"][str(inter.channel.id)] = []
+      if id not in db["linkchannels"]:
+        db["linkchannels"][id] = []
 
-    if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
-      db["linkchannels"][id].append(str(inter.channel.id))
-      db["linkchannels"][str(inter.channel.id)].append(id)
-      e = discord.Embed(title = "Success", description = f"Linked `{id}` and this channel", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = "Error", description = "This channel is already linked with another channel", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+      if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
+        db["linkchannels"][id].append(str(inter.channel.id))
+        db["linkchannels"][str(inter.channel.id)].append(id)
+        e = discord.Embed(title = "Success", description = f"Linked `{id}` and this channel", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = "This channel is already linked with another channel", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @channel.sub_command()
   @commands.is_owner()
@@ -358,26 +365,27 @@ class Nonsense(commands.Cog):
     ----------
     id: Channel ID
     '''
-    if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
-      e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
+    with shelve.open("db", writeback = True) as db:
+      if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
+        e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+        return
+      e = discord.Embed(title = "Successfully deleted", color = random.randint(0, 16777215))
+      id2 = db["linkchannels"][str(inter.channel.id)]
+      id1 = db["linkchannels"][id]
+      if str(inter.channel.id) in id1:
+        if len(id1) == 1:
+          del db["linkchannels"][str(inter.channel.id)]
+        else:
+          del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
+        e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
+      if id in id2:
+        if len(id2) == 1:
+          del db["linkchannels"][id]
+        else:
+          del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
+        e.add_field(name = f"{inter.channel.id} > {id}", value = "_ _", inline = False)
       await inter.send(embed = e, ephemeral = True)
-      return
-    e = discord.Embed(title = "Successfully deleted", color = random.randint(0, 16777215))
-    id2 = db["linkchannels"][str(inter.channel.id)]
-    id1 = db["linkchannels"][id]
-    if str(inter.channel.id) in id1:
-      if len(id1) == 1:
-        del db["linkchannels"][str(inter.channel.id)]
-      else:
-        del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
-      e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
-    if id in id2:
-      if len(id2) == 1:
-        del db["linkchannels"][id]
-      else:
-        del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
-      e.add_field(name = f"{inter.channel.id} > {id}", value = "_ _", inline = False)
-    await inter.send(embed = e, ephemeral = True)
     
   @commands.slash_command(name = "urban")
   async def slashurban(inter, query):
@@ -663,8 +671,9 @@ class Nonsense(commands.Cog):
   #tupper group
   @commands.slash_command()
   async def tupper(self, inter):
-    if str(inter.author.id) not in db["tupper"]:
-      db["tupper"][str(inter.author.id)] = {}
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) not in db["tupper"]:
+        db["tupper"][str(inter.author.id)] = {}
 
   #create tupper
   @tupper.sub_command()
@@ -697,24 +706,25 @@ class Nonsense(commands.Cog):
     tupper: Tupper you want to use
     content: Text here
     '''
-    if tupper in db["tupper"][str(inter.author.id)]:
-      e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-      channel_webhooks = await inter.channel.webhooks()
-      webhook_count = 0
+    with shelve.open("db", writeback = True) as db:
+      if tupper in db["tupper"][str(inter.author.id)]:
+        e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+        channel_webhooks = await inter.channel.webhooks()
+        webhook_count = 0
 
-      for webhook in channel_webhooks:
-        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
-            await webhook.send(
-                content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none()
-            )
-            return
+        for webhook in channel_webhooks:
+          if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
+              await webhook.send(
+                  content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none()
+              )
+              return
 
-      new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
-      await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none())
-    else:
-      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+        new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
+        await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none())
+      else:
+        e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   #delete tupper
   @tupper.sub_command()
@@ -726,13 +736,14 @@ class Nonsense(commands.Cog):
     ----------
     tupper: Tupper you want to delete
     '''
-    if tupper in db["tupper"][str(inter.author.id)]:
-      del db["tupper"][str(inter.author.id)][tupper]
-      e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if tupper in db["tupper"][str(inter.author.id)]:
+        del db["tupper"][str(inter.author.id)][tupper]
+        e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   #edit tupper
   @tupper.sub_command()
@@ -746,15 +757,16 @@ class Nonsense(commands.Cog):
     new_name: New name for tupper
     avatar: New avatar for tupper (MUST BE A LINK)
     '''
-    if tupper in db["tupper"][str(inter.author.id)]:
-      del db["tupper"][str(inter.author.id)][tupper]
-      db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
-      e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
-      e.set_image(url = avatar)
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if tupper in db["tupper"][str(inter.author.id)]:
+        del db["tupper"][str(inter.author.id)][tupper]
+        db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
+        e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
+        e.set_image(url = avatar)
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @commands.slash_command()
   async def screenshot(inter, site: str):
@@ -775,8 +787,9 @@ class Nonsense(commands.Cog):
 
   @commands.slash_command()
   async def cc(self, inter):
-    if str(inter.author.id) not in db["customcmd"]:
-      db["customcmd"][str(inter.author.id)] = {}
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) not in db["customcmd"]:
+        db["customcmd"][str(inter.author.id)] = {}
                         
   @cc.sub_command()
   async def info(inter):
@@ -809,13 +822,14 @@ class Nonsense(commands.Cog):
     cmd_name: Command name
     expr: Expressions here
     '''
-    if cmd_name not in db["customcmd"][str(inter.author.id)]:
-      db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
-      e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = "Error", description = "A command with this name already exists", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if cmd_name not in db["customcmd"][str(inter.author.id)]:
+        db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
+        e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = "A command with this name already exists", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @cc.sub_command()
   async def use(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
@@ -826,11 +840,12 @@ class Nonsense(commands.Cog):
     ----------
     cmd_name: Command name
     '''
-    if cmd_name in db["customcmd"][str(inter.author.id)]:
-      await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
-    else:
-      e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if cmd_name in db["customcmd"][str(inter.author.id)]:
+        await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
+      else:
+        e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @cc.sub_command()
   async def delete(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
@@ -841,13 +856,14 @@ class Nonsense(commands.Cog):
     ----------
     cmd_name: Command name
     '''
-    if cmd_name in db["customcmd"][str(inter.author.id)]:
-      db["customcmd"][str(inter.author.id)].pop(cmd_name)
-      e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if cmd_name in db["customcmd"][str(inter.author.id)]:
+        db["customcmd"][str(inter.author.id)].pop(cmd_name)
+        e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
   
 def setup(bot):
   bot.add_cog(Nonsense(bot))

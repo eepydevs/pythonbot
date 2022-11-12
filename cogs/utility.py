@@ -7,32 +7,33 @@ import os
 import requests
 import asyncio
 import datetime, time
-from replit import db
+import shelve
 
-botbuild = "8.1.0" # major.sub.minor/fix
+botbuild = "8.2.0" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
-if "afk" not in db:
-  db["afk"] = {}
+with shelve.open("db", writeback = True) as db:
+  if "afk" not in db:
+    db["afk"] = {}
 
-if "notes" not in db:
-  db["notes"] = {}
+  if "notes" not in db:
+    db["notes"] = {}
 
-if "reminders" not in db:
-  db["reminders"] = {}
+  if "reminders" not in db:
+    db["reminders"] = {}
 
-if "bot" not in db:
-  db["bot"] = {}
+  if "bot" not in db:
+    db["bot"] = {}
 
-if "bugcounter" not in db["bot"]:
-  db["bot"]["bugcounter"] = 0
+  if "bugcounter" not in db["bot"]:
+    db["bot"]["bugcounter"] = 0
 
-if "atr_log" not in db["bot"]:
-  db["bot"]["atr_log"] = 0
+  if "atr_log" not in db["bot"]:
+    db["bot"]["atr_log"] = 0
 
 def sbs(members):
   rval = {"offline": 0, "online": 0, "idle": 0, "dnd": 0}
@@ -42,7 +43,8 @@ def sbs(members):
   return rval
 
 async def suggest_note(inter, input):
-  return [note for note in db['notes'][str(inter.author.id)].keys() if input.lower() in note.lower()][0:24]
+  with shelve.open("db", writeback = True) as db:
+    return [note for note in db['notes'][str(inter.author.id)].keys() if input.lower() in note.lower()][0:24]
 
 async def suggest_user(inter, input):
   return [input] + [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:23] if input else [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:24]  
@@ -51,10 +53,12 @@ async def suggest_member(inter, input):
   return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
 async def suggest_bookmark(inter, input):
-  return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
+  with shelve.open("db", writeback = True) as db:
+    return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
 
 async def suggest_sbookmark(inter, input):
-  return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
+  with shelve.open("db", writeback = True) as db:
+    return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
   
 class rbbuttons(discord.ui.View):
   def __init__(self, inter: discord.Interaction, color, lb, rolename):
@@ -84,8 +88,9 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    if str(interaction.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
+    with shelve.open("db", writeback = True) as db:
+      if str(interaction.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
 
   @discord.ui.button(label = "", custom_id = "10", emoji = "➡️")
@@ -97,8 +102,9 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    if str(interaction.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
+    with shelve.open("db", writeback = True) as db:
+      if str(interaction.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
 
 class Utility(commands.Cog):
@@ -152,22 +158,25 @@ class Utility(commands.Cog):
 
   @commands.message_command(name="Add bookmark") 
   async def addbm(self, inter, msgid: discord.Message):
-    if str(inter.author.id) not in db["bookmarks"]:
-      db["bookmarks"][str(inter.author.id)] = {}
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) not in db["bookmarks"]:
+        db["bookmarks"][str(inter.author.id)] = {}
 
-    if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
-      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+      if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
+        e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+        return
+
+      msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+      db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+      e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
-      return
 
-    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-    db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
-    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
-    await inter.send(embed = e, ephemeral = True)
   @commands.slash_command()
   async def bookmarks(self, inter):
-    if str(inter.author.id) not in db["bookmarks"]:
-      db["bookmarks"][str(inter.author.id)] = {}
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) not in db["bookmarks"]:
+        db["bookmarks"][str(inter.author.id)] = {}
     
   @bookmarks.sub_command()
   async def add(self, inter, *, bmname = None, msgid: discord.Message):
@@ -181,15 +190,16 @@ class Utility(commands.Cog):
     '''
     if bmname is None:
       bmname = str(msgid.id)
-    if bmname in db["bookmarks"][str(inter.author.id)]:
-      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-      return
+    with shelve.open("db", writeback = True) as db:
+      if bmname in db["bookmarks"][str(inter.author.id)]:
+        e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+        return
 
-    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-    db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
-    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
-    await inter.send(embed = e, ephemeral = True)
+      msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+      db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+      e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @bookmarks.sub_command()
   async def remove(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
@@ -200,14 +210,15 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    if bmname not in db["bookmarks"][str(inter.author.id)]:
-      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+    with shelve.open("db", writeback = True) as db:
+      if bmname not in db["bookmarks"][str(inter.author.id)]:
+        e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+        return
+        
+      del db["bookmarks"][str(inter.author.id)][bmname]
+      e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
-      return
-      
-    del db["bookmarks"][str(inter.author.id)][bmname]
-    e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
-    await inter.send(embed = e, ephemeral = True)
 
   @bookmarks.sub_command()
   async def show(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
@@ -218,12 +229,13 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    if bmname not in db["bookmarks"][str(inter.author.id)]:
-      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+    with shelve.open("db", writeback = True) as db:
+      if bmname not in db["bookmarks"][str(inter.author.id)]:
+        e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+        return
+      e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
       await inter.send(embed = e, ephemeral = True)
-      return
-    e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
-    await inter.send(embed = e, ephemeral = True)
       
   #report bug command
   @commands.slash_command(name = "bugreport", description = "report bug")
@@ -234,17 +246,18 @@ class Utility(commands.Cog):
     ----------
     text: Tell your bug here
     '''
-    if str(inter.author.id) not in reportblacklist:
-      with open("buglist.txt", "a") as report:
-        db['bot']['bugcounter'] += 1
-        report.write("\n")
-        report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
-        report.close()
-      e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bot']['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
-    else:
-      e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) not in reportblacklist:
+        with open("buglist.txt", "a") as report:
+          db['bot']['bugcounter'] += 1
+          report.write("\n")
+          report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
+          report.close()
+        e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bot']['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
 
   """#remind command
   @commands.slash_command(name = "remind", description = "reminder")
@@ -289,7 +302,7 @@ class Utility(commands.Cog):
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [Number1#4325](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `1024MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
+    #e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `1024MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)\n[Python Bot plans Trello board](https://trello.com/b/G33MTATB/python-bot-plans)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
@@ -299,8 +312,9 @@ class Utility(commands.Cog):
   @bot.sub_command(name = "ping", description = "Shows bot's ping")
   async def slashping(self, inter):
     e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    if str(inter.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.send(embed = e)
 
   #bot credits command
@@ -455,7 +469,8 @@ class Utility(commands.Cog):
       ----------
       reason: Reason for afk
       '''
-      db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+      with shelve.open("db", writeback = True) as db:
+        db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
       e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
@@ -480,18 +495,20 @@ class Utility(commands.Cog):
   #group smh
   @commands.slash_command(description = "Make notes with the bot")
   async def note(self, inter):
-    if str(inter.author.id) not in db["notes"]:
-      db["notes"][str(inter.author.id)] = {}
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) not in db["notes"]:
+        db["notes"][str(inter.author.id)] = {}
   
   @note.sub_command(description = "Shows list of notes you have")
   async def list(self, inter):
-    if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
-      notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
-      e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
+        notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
+        e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Creates note")
   async def create(self, inter, name, text):
@@ -502,38 +519,39 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    if str(inter.author.id) in db["notes"]:
-      if name not in db["notes"][str(inter.author.id)]:
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) in db["notes"]:
+        if name not in db["notes"][str(inter.author.id)]:
+          if text != None:
+            updatenotes = db["notes"][str(inter.author.id)]
+            updatenotes[name] = text
+            db["notes"][str(inter.author.id)] = updatenotes
+            e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = True)
+          else:
+            updatenotes = db["notes"][str(inter.author.id)]
+            updatenotes[name] = "New note"
+            db["notes"][str(inter.author.id)] = updatenotes
+            e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = True)
+        else:
+          e = discord.Embed(title = "Error", description = "This name is used!", color = random.randint(0, 16777215))
+          await inter.send(embed = e, ephemeral = True)
+      else:
         if text != None:
+          db["notes"][str(inter.author.id)] = {}
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = text
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
         else:
+          db["notes"][str(inter.author.id)] = {}
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = "New note"
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = "Error", description = "This name is used!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-    else:
-      if text != None:
-        db["notes"][str(inter.author.id)] = {}
-        updatenotes = db["notes"][str(inter.author.id)]
-        updatenotes[name] = text
-        db["notes"][str(inter.author.id)] = updatenotes
-        e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        db["notes"][str(inter.author.id)] = {}
-        updatenotes = db["notes"][str(inter.author.id)]
-        updatenotes[name] = "New note"
-        db["notes"][str(inter.author.id)] = updatenotes
-        e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description =  "Replaces whole note text")
   async def overwrite(inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
@@ -544,15 +562,16 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here, // to newline
     '''
-    try:
-      updatenotes = db["notes"][str(inter.author.id)]
-      updatenotes[name] = text.replace("//", "\n")
-      db["notes"][str(inter.author.id)] = updatenotes
-      e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    except KeyError:
-      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      try:
+        updatenotes = db["notes"][str(inter.author.id)]
+        updatenotes[name] = text.replace("//", "\n")
+        db["notes"][str(inter.author.id)] = updatenotes
+        e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      except KeyError:
+        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end")
   async def add(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
@@ -563,15 +582,16 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    try:
-      updatenotes = db["notes"][str(inter.author.id)]
-      updatenotes[name] += f" {text}"
-      db["notes"][str(inter.author.id)] = updatenotes
-      e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    except KeyError:
-      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      try:
+        updatenotes = db["notes"][str(inter.author.id)]
+        updatenotes[name] += f" {text}"
+        db["notes"][str(inter.author.id)] = updatenotes
+        e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      except KeyError:
+        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end on new line")
   async def newline(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
@@ -582,15 +602,16 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    try:
-      updatenotes = db["notes"][str(inter.author.id)]
-      updatenotes[name] += f"\n{text}"
-      db["notes"][str(inter.author.id)] = updatenotes
-      e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    except KeyError:
-      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      try:
+        updatenotes = db["notes"][str(inter.author.id)]
+        updatenotes[name] += f"\n{text}"
+        db["notes"][str(inter.author.id)] = updatenotes
+        e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      except KeyError:
+        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Reads selected note")
   async def read(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
@@ -600,12 +621,13 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    if name in db["notes"][str(inter.author.id)]:
-      e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if name in db["notes"][str(inter.author.id)]:
+        e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Deletes selected note")
   async def delete(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
@@ -615,23 +637,24 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    if str(inter.author.id) in db["notes"]:
-      if name != None:
-        if name in db["notes"][str(inter.author.id)]:
-          updatenotes = db["notes"][str(inter.author.id)]
-          e = discord.Embed(title = "Success", description = f"Note named `{name}` is deleted!", color = random.randint(0, 16777215))
-          await inter.send(embed = e, ephemeral = True)
-          updatenotes.pop(name)
-          db["notes"][str(inter.author.id)] = updatenotes
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) in db["notes"]:
+        if name != None:
+          if name in db["notes"][str(inter.author.id)]:
+            updatenotes = db["notes"][str(inter.author.id)]
+            e = discord.Embed(title = "Success", description = f"Note named `{name}` is deleted!", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = True)
+            updatenotes.pop(name)
+            db["notes"][str(inter.author.id)] = updatenotes
+          else:
+            e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
+            await inter.send(embed = e, ephemeral = True)
         else:
-          e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"Error", description = "You can't delete nothing!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
       else:
-        e = discord.Embed(title = f"Error", description = "You can't delete nothing!", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Reads selected note but escapes markdown")
   async def read_raw(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
@@ -641,18 +664,19 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    if str(inter.author.id) in db["notes"]:
-      if name in db["notes"][str(inter.author.id)]:
-        text = db['notes'][str(inter.author.id)].get(name)
-        rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
-        e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback = True) as db:
+      if str(inter.author.id) in db["notes"]:
+        if name in db["notes"][str(inter.author.id)]:
+          text = db['notes'][str(inter.author.id)].get(name)
+          rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
+          e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
+          await inter.send(embed = e, ephemeral = True)
+        else:
+          e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
+          await inter.send(embed = e, ephemeral = True)
       else:
-        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
 
   #exec command
   @commands.slash_command(name = "exec", description = "bot owner only")

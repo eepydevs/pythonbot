@@ -4,18 +4,19 @@ from disnake.ext import commands
 import asyncio
 from enum import Enum
 import random
-from replit import db
+import shelve
 
 purgequotes = ["Stop spamming!", "Spamming is bad.", "Purge the chat! Haha!", "Purge after these silly young spammers...", "Is it just me, or is spamming more likely now than notime else?"]
 modquotes = ["I hope they learned their lesson.", "Make them cry!", "Haha!", "Gotcha!", "They should've readed the rules.", "Why they didn't readed the rules...", "That's lesson for you to read rules!", "'no reason ban' they say... Right at your eyes broke rule number 1337!", "Oops!"]
 
-if "warns" not in db:
-  db["warns"] = {}
+with shelve.open("db", writeback = True) as db:
+  if "warns" not in db:
+    db["warns"] = {}
 
-if "serversetting" not in db:
-  db["serversetting"] = {}
-  db["serversetting"]["gpd"] = {}
-  db["serversetting"]["nqn"] = {}
+  if "serversetting" not in db:
+    db["serversetting"] = {}
+    db["serversetting"]["gpd"] = {}
+    db["serversetting"]["nqn"] = {}
 
 class Requiredc(str, Enum):
   Text_Channel = "text"
@@ -195,25 +196,26 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the warn, will be shown in /warns member: @mention
     '''
-    if not inter.author.top_role < member.top_role:
-      if str(inter.guild.id) not in db["warns"]:
-        db["warns"][str(inter.guild.id)] = {}
-      if str(member.id) not in db["warns"][str(inter.guild.id)]:
-        db["warns"][str(inter.guild.id)][str(member.id)] = []
-        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
-        updatelist.append(reason)
-        db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
-        e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+    with shelve.open("db", writeback = True) as db:
+      if not inter.author.top_role < member.top_role:
+        if str(inter.guild.id) not in db["warns"]:
+          db["warns"][str(inter.guild.id)] = {}
+        if str(member.id) not in db["warns"][str(inter.guild.id)]:
+          db["warns"][str(inter.guild.id)][str(member.id)] = []
+          updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+          updatelist.append(reason)
+          db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+          e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+          await inter.send(embed = e)
+        else:
+          updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+          updatelist.append(reason)
+          db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+          e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+          await inter.send(embed = e)
       else:
-        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
-        updatelist.append(reason)
-        db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
-        e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
         await inter.send(embed = e)
-    else:
-      e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
 
   @commands.slash_command(name = "warns", description =  "See people's warns (BETA)")
   @commands.has_permissions(kick_members = True)
@@ -226,23 +228,24 @@ class Moderation(commands.Cog):
     ----------
     member: Mention member
     '''
-    if not inter.author.top_role < member.top_role:
-      if str(inter.guild.id) not in db["warns"]:
-        db["warns"][str(inter.guild.id)] = {}
-      if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
-        list = db["warns"][str(inter.guild.id)][str(member.id)]
-        text = ""
-        text += f"1. `{list[0]}`"
-        for i in range(len(list) - 1):
-          text += f"\n{i + 2}. `{list[i + 1]}`"
-        e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+    with shelve.open("db", writeback = True) as db:
+      if not inter.author.top_role < member.top_role:
+        if str(inter.guild.id) not in db["warns"]:
+          db["warns"][str(inter.guild.id)] = {}
+        if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
+          list = db["warns"][str(inter.guild.id)][str(member.id)]
+          text = ""
+          text += f"1. `{list[0]}`"
+          for i in range(len(list) - 1):
+            text += f"\n{i + 2}. `{list[i + 1]}`"
+          e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
+          await inter.send(embed = e)
+        else:
+          e = discord.Embed(title = f"{member.name}'s Warns:", description = "They have no warns", color = random.randint(0, 16777215))
+          await inter.send(embed = e)
       else:
-        e = discord.Embed(title = f"{member.name}'s Warns:", description = "They have no warns", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
         await inter.send(embed = e)
-    else:
-      e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
 
   @commands.slash_command(name = "removewarn", description = "Remove people's warns (BETA)")
   @commands.has_permissions(kick_members = True)
@@ -257,25 +260,26 @@ class Moderation(commands.Cog):
     index: index of the warn, shown in /warns member: @mention
     '''
     if not inter.author.top_role < member.top_role:
-      if str(inter.guild.id) not in db["warns"]:
-        db["warns"][str(inter.guild.id)] = {}
-      if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
-        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
-        try:
-          if not len(updatelist) < index or not 0 > index:
-            reason = updatelist.pop(int(index - 1))
-            db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
-            e = discord.Embed(title = "Success!", description = f"`{member.name}`'s warn: {index}: `{reason}` is deleted!", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
+      with shelve.open("db", writeback = True) as db:
+        if str(inter.guild.id) not in db["warns"]:
+          db["warns"][str(inter.guild.id)] = {}
+        if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
+          updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+          try:
+            if not len(updatelist) < index or not 0 > index:
+              reason = updatelist.pop(int(index - 1))
+              db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+              e = discord.Embed(title = "Success!", description = f"`{member.name}`'s warn: {index}: `{reason}` is deleted!", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+            else:
+              e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+          except IndexError:
             e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
             await inter.send(embed = e)
-        except IndexError:
-          e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
+        else:
+          e = discord.Embed(title = "Error", description = "They have no warns", color = random.randint(0, 16777215))
           await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = "They have no warns", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "You can't remove warns from a person higher than you", color = random.randint(0, 16777215))
       await inter.send(embed = e)
@@ -292,41 +296,42 @@ class Moderation(commands.Cog):
     setting: Available settings: gpd, nqn
     switch: basically anything
     '''
-    if switch != "info":
-      if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
-        if setting == "gpd":
-          if str(inter.guild.id) in db["serversetting"]["gpd"]:
-            del db["serversetting"]["gpd"][str(inter.guild.id)]
-            e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
-            db["serversetting"]["gpd"][str(inter.guild.id)] = "True"
-            e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-        if setting == "nqn":
-          if str(inter.guild.id) in db["serversetting"]["nqn"]:
-            del db["serversetting"]["nqn"][str(inter.guild.id)]
-            e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
-            db["serversetting"]["nqn"][str(inter.guild.id)] = "True"
-            e = discord.Embed(title = "Success", description = "You enabled NQN feature for this server", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-      else:
-        if setting == "gpd":
-          if str(inter.guild.id) in db["serversetting"]["gpd"]:
-            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
-            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-        if setting == "nqn":
-          if str(inter.guild.id) in db["serversetting"]["nqn"]:
-            e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature enabled", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
-            e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
+    with shelve.open("db", writeback = True) as db:
+      if switch != "info":
+        if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
+          if setting == "gpd":
+            if str(inter.guild.id) in db["serversetting"]["gpd"]:
+              del db["serversetting"]["gpd"][str(inter.guild.id)]
+              e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+            else:
+              db["serversetting"]["gpd"][str(inter.guild.id)] = "True"
+              e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+          if setting == "nqn":
+            if str(inter.guild.id) in db["serversetting"]["nqn"]:
+              del db["serversetting"]["nqn"][str(inter.guild.id)]
+              e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+            else:
+              db["serversetting"]["nqn"][str(inter.guild.id)] = "True"
+              e = discord.Embed(title = "Success", description = "You enabled NQN feature for this server", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+        else:
+          if setting == "gpd":
+            if str(inter.guild.id) in db["serversetting"]["gpd"]:
+              e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+            else:
+              e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+          if setting == "nqn":
+            if str(inter.guild.id) in db["serversetting"]["nqn"]:
+              e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature enabled", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
+            else:
+              e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
+              await inter.send(embed = e)
 
 
   @commands.slash_command(name = "createchannel", description = "Create a channel")
