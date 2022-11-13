@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 import shelve
 
-botbuild = "8.2.0" # major.sub.minor/fix
+botbuild = "8.2.1" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
@@ -294,12 +294,10 @@ class Utility(commands.Cog):
   @bot.sub_command(name = "info", description = "Shows bot's info")
   async def slashbotinfo(self, inter):
     await inter.response.defer()
-    total_memory, used_memory, free_memory = map(
-    int, os.popen('free -t -m').readlines()[-1].split()[1:])
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [Number1#4325](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    #e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `1024MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
+    e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `4096MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False) #
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)\n[Python Bot plans Trello board](https://trello.com/b/G33MTATB/python-bot-plans)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
@@ -455,21 +453,6 @@ class Utility(commands.Cog):
     counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
     e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
     await inter.send(embed = e)"""
-
-  #afk command
-  @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
-  async def slashafk(inter, reason = "None"):
-      '''
-      Set your afk and reason for it
-  
-      Parameters
-      ----------
-      reason: Reason for afk
-      '''
-      with shelve.open("db", writeback = True) as db:
-        db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
-      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
 
   #poll command
   @commands.slash_command(name = "poll", description = "Example: /poll Hello name! Hello option 1!, Hello option 2!, Hello option 3!")
