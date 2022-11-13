@@ -300,8 +300,8 @@ class Moderation(commands.Cog):
       if switch != "info":
         if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
           if setting == "gpd":
-            if str(inter.guild.id) in db["serversetting"]["gpd"]:
-              del db["serversetting"]["gpd"][str(inter.guild.id)]
+            if str(inter.guild.id) in db["serversetting"]["gpd"] and db["serversetting"]["gpd"][str(inter.guild.id)]:
+              db["serversetting"]["gpd"][str(inter.guild.id)] = None
               e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
             else:
@@ -309,8 +309,8 @@ class Moderation(commands.Cog):
               e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
           if setting == "nqn":
-            if str(inter.guild.id) in db["serversetting"]["nqn"]:
-              del db["serversetting"]["nqn"][str(inter.guild.id)]
+            if str(inter.guild.id) in db["serversetting"]["nqn"] and db["serversetting"]["nqn"][str(inter.guild.id)]:
+              db["serversetting"]["nqn"][str(inter.guild.id)] = None
               e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
             else:

@@ -375,15 +375,15 @@ class Nonsense(commands.Cog):
       id1 = db["linkchannels"][id]
       if str(inter.channel.id) in id1:
         if len(id1) == 1:
-          del db["linkchannels"][str(inter.channel.id)]
+          db["linkchannels"][str(inter.channel.id)] = None
         else:
-          del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
+          db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)] = None
         e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
       if id in id2:
         if len(id2) == 1:
-          del db["linkchannels"][id]
+          db["linkchannels"][id] = None
         else:
-          del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
+          db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))] = None
         e.add_field(name = f"{inter.channel.id} > {id}", value = "_ _", inline = False)
       await inter.send(embed = e, ephemeral = True)
     
@@ -707,7 +707,7 @@ class Nonsense(commands.Cog):
     content: Text here
     '''
     with shelve.open("db", writeback = True) as db:
-      if tupper in db["tupper"][str(inter.author.id)]:
+      if tupper in db["tupper"][str(inter.author.id)] and db["tupper"][str(inter.author.id)][tupper]:
         e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         channel_webhooks = await inter.channel.webhooks()
@@ -737,8 +737,8 @@ class Nonsense(commands.Cog):
     tupper: Tupper you want to delete
     '''
     with shelve.open("db", writeback = True) as db:
-      if tupper in db["tupper"][str(inter.author.id)]:
-        del db["tupper"][str(inter.author.id)][tupper]
+      if tupper in db["tupper"][str(inter.author.id)] and db["tupper"][str(inter.author.id)][tupper]:
+        db["tupper"][str(inter.author.id)][tupper] = None
         e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
       else:
@@ -759,7 +759,7 @@ class Nonsense(commands.Cog):
     '''
     with shelve.open("db", writeback = True) as db:
       if tupper in db["tupper"][str(inter.author.id)]:
-        del db["tupper"][str(inter.author.id)][tupper]
+        db["tupper"][str(inter.author.id)][tupper] = None
         db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
         e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
         e.set_image(url = avatar)

@@ -626,8 +626,8 @@ class Economy(commands.Cog):
   @commands.cooldown(rate = 1, per = 1800, type = commands.BucketType.user)
   async def slashpassive(inter):
     with shelve.open("db", writeback = True) as db:
-      if str(inter.author.id) in db["passive"]:
-        del db["passive"][str(inter.author.id)]
+      if str(inter.author.id) in db["passive"] and db["passive"][str(inter.author.id)]:
+        db["passive"][str(inter.author.id)] = None
         e = discord.Embed(title = "Success", description = "Youre now a normal person", color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:

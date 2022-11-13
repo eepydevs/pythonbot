@@ -63,15 +63,15 @@ class Debug(commands.Cog):
     ----------
     text: None
     '''
-    if str(inter.author.id) not in db["debug"] and toggler:
+    if str(inter.author.id) not in db["debug"] and db["debug"][str(inter.author.id)] and toggler:
       with shelve.open("db", writeback = True) as db:
         db["debug"][str(inter.author.id)] = "True"
       e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       return
-    if str(inter.author.id) in db["debug"] and not toggler:
+    if str(inter.author.id) in db["debug"] and not db["debug"][str(inter.author.id)] and not toggler:
       with shelve.open("db", writeback = True) as db:
-        del db["debug"][str(inter.author.id)]
+        db["debug"][str(inter.author.id)] = None
       e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 

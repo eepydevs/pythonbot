@@ -208,12 +208,12 @@ class Utility(commands.Cog):
     bmname: Name of bookmark
     '''
     with shelve.open("db", writeback = True) as db:
-      if bmname not in db["bookmarks"][str(inter.author.id)]:
+      if bmname not in db["bookmarks"][str(inter.author.id)] and db["bookmarks"][str(inter.author.id)][bmname]:
         e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
         
-      del db["bookmarks"][str(inter.author.id)][bmname]
+      db["bookmarks"][str(inter.author.id)][bmname] = None
       e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
@@ -284,6 +284,21 @@ class Utility(commands.Cog):
     if str(inter.author.id) in db["debug"]:
       e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
     await inter.send(embed = e)"""
+
+  #afk command
+  @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
+  async def slashafk(inter, reason = "None"):
+      '''
+      Set your afk and reason for it
+  
+      Parameters
+      ----------
+      reason: Reason for afk
+      '''
+      with shelve.open("db", writeback = True) as db:
+        db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #bot group
   @commands.slash_command()
