@@ -10,7 +10,7 @@ import datetime, time
 import shelve
 
 botbuild = "8.2.4" # major.sub.minor/fix
-pyver = "3.8.2"
+pyver = "3.10.7"
 dnver = "2.5.1"
 
 reportblacklist = []
