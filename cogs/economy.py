@@ -42,15 +42,15 @@ def iteminfo(name):
 
 async def suggest_buyitem(inter, input):
   with shelve.open("db", writeback = True) as db:
-    return [item for item in db['shop'].keys() if input.lower() in item.lower()][0:24]
+    return [item for item in list(db['shop'].keys()) if input.lower() in item.lower()][0:24]
 
 async def suggest_item(inter, input):
   with shelve.open("db", writeback = True) as db:
-    return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower()][0:24] else ["You have nothing!"]
+    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] else ["You have nothing!"]
 
 async def suggest_usableitem(inter, input):
   with shelve.open("db", writeback = True) as db:
-    return [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in db['inventory'][str(inter.author.id)].keys() if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
+    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
   
 def lottery():
   while True:

@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 import shelve
 
-botbuild = "8.2.1" # major.sub.minor/fix
+botbuild = "8.2.2" # major.sub.minor/fix
 pyver = "3.8.2"
 dnver = "2.5.1"
 
@@ -41,7 +41,7 @@ def sbs(members):
 
 async def suggest_note(inter, input):
   with shelve.open("db", writeback = True) as db:
-    return [note for note in db['notes'][str(inter.author.id)].keys() if input.lower() in note.lower()][0:24]
+    return [note for note in list(db['notes'][str(inter.author.id)].keys()) if input.lower() in note.lower()][0:24]
 
 async def suggest_user(inter, input):
   return [input] + [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:23] if input else [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:24]  
@@ -498,7 +498,7 @@ class Utility(commands.Cog):
   async def list(self, inter):
     with shelve.open("db", writeback = True) as db:
       if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
-        notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
+        notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(list(db["notes"][str(inter.author.id)].keys()), start = 1))
         e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
       else:
