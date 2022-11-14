@@ -44,13 +44,13 @@ async def suggest_buyitem(inter, input):
   with shelve.open("db", writeback = True) as db:
     return [item for item in list(db['shop'].keys()) if input.lower() in item.lower()][0:24]
 
-async def suggest_item(inter, input):
-  with shelve.open("db", writeback = True) as db:
-    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] else ["You have nothing!"]
+#async def suggest_item(inter, input):
+#  with shelve.open("db", writeback = True) as db:
+#    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] else ["You have nothing!"]
 
-async def suggest_usableitem(inter, input):
-  with shelve.open("db", writeback = True) as db:
-    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
+#async def suggest_usableitem(inter, input):
+#  with shelve.open("db", writeback = True) as db:
+#    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
   
 def lottery():
   while True:
@@ -229,7 +229,7 @@ class Economy(commands.Cog):
       
   #use sub command
   @item.sub_command()
-  async def use(self, inter, itemname: str = commands.Param(autocomplete = suggest_usableitem)):
+  async def use(self, inter, itemname: str): #str = commands.Param(autocomplete = suggest_usableitem)
     '''
     Use an item with this command
     
@@ -265,7 +265,7 @@ class Economy(commands.Cog):
 
   #info sub command
   @item.sub_command()
-  async def info(self, inter, itemname: str = commands.Param(autocomplete = suggest_item)):
+  async def info(self, inter, itemname: str): #str = commands.Param(autocomplete = suggest_item)
     '''
     See info about items you have with this command
     
@@ -720,7 +720,7 @@ class Economy(commands.Cog):
 
   #sell sub command
   @shop.sub_command()
-  async def sell(inter, itemname: str = commands.Param(autocomplete = suggest_item), quantity: int = 1):
+  async def sell(inter, itemname: str, quantity: int = 1): #str = commands.Param(autocomplete = suggest_item)
     '''
     Sell any item you have
   
@@ -769,7 +769,7 @@ class Economy(commands.Cog):
                 db["balance"][str(inter.author.id)] = 0
                 await inter.send(content = "Try again!", ephemeral = True)
             else:
-              await inter.send(content = "Error: You can't selll nothing!", ephemeral = True)
+              await inter.send(content = "Error: You can't sell nothing!", ephemeral = True)
           else:
             await inter.send(content = "Error: You can't sell nothing!", ephemeral = True)
         else:
