@@ -53,7 +53,7 @@ async def on_ready():
   await bot.change_presence(status = discord.Status.online, activity = discord.Game("Restarted"))
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("/ | Made in Python 3.8.2!"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game("/ | Made in Python 3.10.7!"))
   """while True:
     print(f"{int(time.time())}")
     if len(db["reminders"]) == 1:
