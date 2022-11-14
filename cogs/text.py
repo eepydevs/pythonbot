@@ -127,28 +127,50 @@ def morsifyde(text):
   else:
     return "none"
 
+def braillede(text):
+  table = {"⠟": "Q", "⠺": "W", "⠑": "E", "⠗": "R", "⠞": "T", "⠽": "Y", "⠥": "U", "⠊": "I", "⠕": "O", "⠏": "P", "⠁": "A", "⠎": "S", "⠙": "D", "⠋": "F", "⠛": "G", "⠓": "H", "⠚": "J", "⠅": "K", "⠇": "L", "⠵": "Z", "⠭": "X", "⠉": "C", "⠧": "V", "⠃": "B", "⠝": "N", "⠍": "M", "⠖": "!", "⠢": "?", "⠲": ".", "⠂": ",", " ": " "}
+  result = []
+  for l in text:
+    if l in table:
+      result.append(table[l])
+  if result:
+    return str().join(result)
+  else: return "none"
+
+def brailleen(text):
+  table = {"Q": "⠟", "W": "⠺", "E": "⠑", "R": "⠗", "T": "⠞", "Y": "⠽", "U": "⠥", "I": "⠊", "O": "⠕", "P": "⠏", "A": "⠁", "S": "⠎", "D": "⠙", "F": "⠋", "G": "⠛", "H": "⠓", "J": "⠚", "K": "⠅", "L": "⠇", "Z": "⠵", "X": "⠭", "C": "⠉", "V": "⠧", "B": "⠃", "N": "⠝", "M": "⠍", "!": "⠖", "?": "⠢", ".": "⠲", ",": "⠂", " ": " "}  
+  textt = text.upper()
+  result = []
+  for l in textt:
+    if l in table:
+      result.append(table[l])
+  if result:
+    return str().join(result)
+  else: return "none"
+
 class Text(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
 
-  @commands.slash_command(name = "morse", description = "Encode or Decode your morse text!")
-  async def morse(self, inter):
+  @commands.slash_command(name = "decode", description = "Decode encoded text")
+  async def decode(self, inter):
     pass
 
-  @morse.sub_command()
-  async def encode(self, inter, text):
+  @decode.sub_command()
+  async def braille(self, inter, text):
     '''
-    Morse encode your inputted text
+    Braille decode your inputted text
     
     Parameters
     ----------
     text: Text here
     '''
     await inter.response.defer()
-    await inter.send(morsifyen(text))
+    await inter.send(braillede(text))
+    pass
 
-  @morse.sub_command()
-  async def decode(self, inter, text):
+  @decode.sub_command()
+  async def morse(self, inter, text):
     '''
     Morse decode your inputted text
     
@@ -159,7 +181,35 @@ class Text(commands.Cog):
     await inter.response.defer()
     await inter.send(morsifyde(text))
 
+  @commands.slash_command(name = "encode", description = "Encode text")
+  async def encode(self, inter):
+    pass
+
+  @encode.sub_command()
+  async def braille(self, inter, text):
+    '''
+    Braille decode your inputted text
     
+    Parameters
+    ----------
+    text: Text here
+    '''
+    await inter.response.defer()
+    await inter.send(brailleen(text))
+    pass
+
+  @encode.sub_command()
+  async def morse(self, inter, text):
+    '''
+    Morse encode your inputted text
+    
+    Parameters
+    ----------
+    text: Text here
+    '''
+    await inter.response.defer()
+    await inter.send(morsifyen(text))
+
   #lowcase command
   @commands.slash_command(name = "lowify", description = "Low case your inputted text!")
   async def slashlowcase(inter, *, text):
