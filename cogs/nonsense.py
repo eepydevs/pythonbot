@@ -672,7 +672,7 @@ class Nonsense(commands.Cog):
   @commands.slash_command()
   async def tupper(self, inter):
     with shelve.open("db", writeback = True) as db:
-      if str(inter.author.id) not in db["tupper"]:
+      if not str(inter.author.id) in db["tupper"]:
         db["tupper"][str(inter.author.id)] = {}
 
   #create tupper
@@ -686,14 +686,15 @@ class Nonsense(commands.Cog):
     name: Name for tupper
     avatar: Avatar for tupper (MUST BE A LINK)
     '''
-    if name not in db["tupper"][str(inter.author.id)]:
-      db["tupper"][str(inter.author.id)].update({str(name): str(avatar)})
-      e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
-      e.set_image(url = avatar)
-      await inter.send(embed = e, ephemeral = True)
-    else:
-      e = discord.Embed(title = "Error", description = f"Tupper named: `{name}` already exists!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with shelve.open("db", writeback =  True):
+      if name not in db["tupper"][str(inter.author.id)] or db["tupper"][str(inter.author.id)] is None:
+        db["tupper"][str(inter.author.id)][str(name)] = str(avatar)
+        e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
+        e.set_image(url = avatar)
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = f"Tupper named: `{name}` already exists!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   #use tupper
   @tupper.sub_command()

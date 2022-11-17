@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 import shelve
 
-botbuild = "8.2.4" # major.sub.minor/fix
+botbuild = "8.2.5" # major.sub.minor/fix
 pyver = "3.10.7"
 dnver = "2.5.1"
 
@@ -188,13 +188,13 @@ class Utility(commands.Cog):
     if bmname is None:
       bmname = str(msgid.id)
     with shelve.open("db", writeback = True) as db:
-      if bmname in db["bookmarks"][str(inter.author.id)]:
+      if bmname in db["bookmarks"][str(inter.author.id)] and not db["bookmarks"][str(inter.author.id)][bmname] is None:
         e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
 
       msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-      db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+      db["bookmarks"][str(inter.author.id)][bmname] = {"items": {"content": msg.content, "jumpurl": msg.jump_url}}
       e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
