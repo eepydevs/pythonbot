@@ -1,12 +1,14 @@
 import asyncio
 import disnake as discord
 import random
+import sys
 import os
 import datetime, time
 import shelve
 from disnake.ext import commands
 from dotenv import load_dotenv
 load_dotenv()
+pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 
 bot = commands.InteractionBot(intents=discord.Intents.all()) #, test_guilds = [908099219401883670, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 900579811544670218, 902248677891010641, 968171159776559174, 902970942173626378, 995060155848851537, 843562496543817778, 1004796648641273856, 1030182066052145283]
 
@@ -53,7 +55,7 @@ async def on_ready():
   await bot.change_presence(status = discord.Status.online, activity = discord.Game("Restarted"))
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("/ | Made in Python 3.10.7!"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | Made in Python {pyver}!"))
   """while True:
     print(f"{int(time.time())}")
     if len(db["reminders"]) == 1:

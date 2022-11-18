@@ -2,6 +2,7 @@
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
+import sys
 import re
 import os
 import utils

@@ -3,15 +3,16 @@ import disnake as discord
 from disnake.ext import commands
 import random
 import psutil
+import sys
 import os
 import requests
 import asyncio
 import datetime, time
 import shelve
 
-botbuild = "8.2.6" # major.sub.minor/fix
-pyver = "3.10.7"
-dnver = "2.5.1"
+botbuild = "8.2.7" # major.sub.minor/fix
+pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
+dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
