@@ -9,7 +9,7 @@ import asyncio
 import datetime, time
 import shelve
 
-botbuild = "8.2.5" # major.sub.minor/fix
+botbuild = "8.2.6" # major.sub.minor/fix
 pyver = "3.10.7"
 dnver = "2.5.1"
 

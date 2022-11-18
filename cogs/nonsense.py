@@ -107,6 +107,8 @@ def shuffle(x):
 
 async def suggest_tupper(inter, input):
   with shelve.open("db", writeback = True) as db:
+    if not str(inter.author.id) in db["tupper"]:
+      db["tupper"][str(inter.author.id)] = {}
     return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
 
 async def suggest_rblxuser(inter, input):
@@ -121,6 +123,8 @@ async def suggest_rblxuser(inter, input):
 
 async def suggest_command(inter, input):
   with shelve.open("db", writeback = True) as db:
+    if str(inter.author.id) not in db["customcmd"]:
+      db["customcmd"][str(inter.author.id)] = {}
     return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
 def runbf(str):
@@ -623,7 +627,7 @@ class Nonsense(commands.Cog):
     ----------
     emoji: Emoji here
     '''
-    await inter.response.send_message(emoji.url)
+    await inter.response.send(emoji.url)
 
   #someone command
   @commands.slash_command(name = "someone", description = "Ping random person (Just like @someone back in 2018)")
@@ -666,7 +670,7 @@ class Nonsense(commands.Cog):
     '''
     await inter.response.defer()
     json = rq.get(f"http://api.qrserver.com/v1/read-qr-code/?fileurl={qrcode.replace(' ', '%20').replace('/', '%2F').replace(':', '%3A').replace('=', '%3D').replace('?', '%3F')}").json()
-    await inter.edit_original_message(content = f"Contents: {json[0]['symbol'][0]['data']}")
+    await inter.send(content = f"Contents: {json[0]['symbol'][0]['data']}")
 
   #tupper group
   @commands.slash_command()
@@ -686,15 +690,16 @@ class Nonsense(commands.Cog):
     name: Name for tupper
     avatar: Avatar for tupper (MUST BE A LINK)
     '''
-    with shelve.open("db", writeback =  True):
+    with shelve.open("db", writeback =  True) as db:
+      await inter.response.defer(ephemeral = True)
       if name not in db["tupper"][str(inter.author.id)] or db["tupper"][str(inter.author.id)] is None:
         db["tupper"][str(inter.author.id)][str(name)] = str(avatar)
         e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
         e.set_image(url = avatar)
-        await inter.send(embed = e, ephemeral = True)
+        await inter.send(embed = e)
       else:
         e = discord.Embed(title = "Error", description = f"Tupper named: `{name}` already exists!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+        await inter.send(embed = e)
 
   #use tupper
   @tupper.sub_command()
@@ -708,9 +713,10 @@ class Nonsense(commands.Cog):
     content: Text here
     '''
     with shelve.open("db", writeback = True) as db:
+      await inter.response.defer(ephemeral = True)
       if tupper in db["tupper"][str(inter.author.id)] and db["tupper"][str(inter.author.id)][tupper]:
         e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+        await inter.send(embed = e)
         channel_webhooks = await inter.channel.webhooks()
         webhook_count = 0
 
@@ -725,7 +731,7 @@ class Nonsense(commands.Cog):
         await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none())
       else:
         e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+        await inter.send(embed = e)
 
   #delete tupper
   @tupper.sub_command()
@@ -738,13 +744,14 @@ class Nonsense(commands.Cog):
     tupper: Tupper you want to delete
     '''
     with shelve.open("db", writeback = True) as db:
+      await inter.response.defer(ephemeral = True)
       if tupper in db["tupper"][str(inter.author.id)] and db["tupper"][str(inter.author.id)][tupper]:
-        db["tupper"][str(inter.author.id)][tupper] = None
+        db["tupper"][str(inter.author.id)][tupper] = {}
         e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+        await inter.send(embed = e)
       else:
         e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+        await inter.send(embed = e)
 
   #edit tupper
   @tupper.sub_command()
@@ -760,8 +767,8 @@ class Nonsense(commands.Cog):
     '''
     with shelve.open("db", writeback = True) as db:
       if tupper in db["tupper"][str(inter.author.id)]:
-        db["tupper"][str(inter.author.id)][tupper] = None
-        db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
+        db["tupper"][str(inter.author.id)][tupper] = {}
+        db["tupper"][str(inter.author.id)][new_name] = str(avatar)
         e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
         e.set_image(url = avatar)
         await inter.send(embed = e, ephemeral = True)
