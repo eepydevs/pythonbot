@@ -15,7 +15,6 @@ bot = commands.InteractionBot(intents=discord.Intents.all()) #, test_guilds = [9
 with shelve.open("db", writeback = True) as db:
   if "afk" not in db:
     db["afk"] = {}
-  #db["reminders"] = {"439788095483936768": {"rtext": "hello world", "rid": 439788095483936768, "time": 1645436505}}
 
 #on message event thing
 # @bot.event
