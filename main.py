@@ -15,20 +15,21 @@ bot = commands.InteractionBot(intents=discord.Intents.all()) #, test_guilds = [9
 with shelve.open("db", writeback = True) as db:
   if "afk" not in db:
     db["afk"] = {}
+  #db["reminders"] = {"439788095483936768": {"rtext": "hello world", "rid": 439788095483936768, "time": 1645436505}}
 
 #on message event thing
-@bot.event
-async def on_message(message):
-  with shelve.open("db", writeback = True) as db:
-    if str(message.author.id) in db["afk"] and db["afk"][str(message.author.id)]:
-      db["afk"][str(message.author.id)] = None
-      await message.channel.send(f"Welcome back, {message.author.mention}", delete_after = 5)
-      return
-    for member in message.mentions:
-      if str(message.author.id) in db["afk"] and db["afk"][str(message.author.id)]:
-        e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]['reason']}\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
-        await message.channel.send(embed = e)
-      return
+# @bot.event
+# async def on_message(message):
+#   with shelve.open("db", writeback = True) as db:
+#     if str(message.author.id) in db["afk"] and db["afk"][str(message.author.id)]:
+#       db["afk"][str(message.author.id)] = None
+#       await message.channel.send(f"Welcome back, {message.author.mention}", delete_after = 5)
+#       return
+#     for member in message.mentions:
+#       if str(message.author.id) in db["afk"] and db["afk"][str(message.author.id)]:
+#         e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]['reason']}\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
+#         await message.channel.send(embed = e)
+#       return
 
 @bot.event
 async def on_message_delete(message):
@@ -56,20 +57,20 @@ async def on_ready():
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
   await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | Made in Python {pyver}!"))
-  """while True:
-    print(f"{int(time.time())}")
-    if len(db["reminders"]) == 1:
-      check = 1
-    else:
-      check = 0
-    for i in range(len(db["reminders"]) - check):
-      if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[i]]["time"]:
-        ruser = db["reminders"][list(db["reminders"].keys())[i]]["rid"]
-        rtext = db["reminders"][list(db["reminders"].keys())[i]]["rtext"]
-        e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
-        await bot.get_user(ruser).send(embed = e)
-        del db["reminders"][list(db["reminders"].keys())[i]]
-    await asyncio.sleep(10)"""
+  # while True:
+  #   print(f"{int(time.time())}")
+  #   if len(db["reminders"]) == 1:
+  #     check = 1
+  #   else:
+  #     check = 0
+  #   for i in range(len(db["reminders"]) - check):
+  #     if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[i]]["time"]:
+  #       ruser = db["reminders"][list(db["reminders"].keys())[i]]["rid"]
+  #       rtext = db["reminders"][list(db["reminders"].keys())[i]]["rtext"]
+  #       e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
+  #       await bot.get_user(ruser).send(embed = e)
+  #       del db["reminders"][list(db["reminders"].keys())[i]]
+  #   await asyncio.sleep(10)
 
 #load cogs
 for filename in os.listdir('./cogs'):   

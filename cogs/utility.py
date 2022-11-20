@@ -257,49 +257,49 @@ class Utility(commands.Cog):
         e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
-  """#remind command
-  @commands.slash_command(name = "remind", description = "reminder")
-  async def slashremind(inter, ctime = "1h", *, text):
-    '''
-    Make a reminder for yourself
-    Parameters
-    ----------
-    ctime: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1h
-    text: Your reminder here
-    '''
-    if ctime[:-1].isnumeric():
-      if ctime[len(ctime) - 1] == "m":
-        rtime = int(time.time()) + 60 * int(ctime[:-1])
-      elif ctime[len(ctime) - 1] == "d":
-        rtime = int(time.time()) + 86400 * int(ctime[:-1])
-      elif ctime[len(ctime) - 1] == "s":
-        rtime = int(time.time()) + int(ctime[:-1])
-      elif ctime[len(ctime) - 1] == "h":
-        rtime = int(time.time()) + 3600 * int(ctime[:-1])
-    else:
-      raise ValueError("Invalid argument: time")
-    ruser = inter.author.id
-    rtext = text
-    db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
-    e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
-    if str(inter.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
-    await inter.send(embed = e)"""
+  #remind command
+  # @commands.slash_command(name = "remind", description = "reminder")
+  # async def slashremind(inter, ctime = "1h", *, text):
+  #   '''
+  #   Make a reminder for yourself
+  #   Parameters
+  #   ----------
+  #   ctime: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1h
+  #   text: Your reminder here
+  #   '''
+  #   if ctime[:-1].isnumeric():
+  #     if ctime[len(ctime) - 1] == "m":
+  #       rtime = int(time.time()) + 60 * int(ctime[:-1])
+  #     elif ctime[len(ctime) - 1] == "d":
+  #       rtime = int(time.time()) + 86400 * int(ctime[:-1])
+  #     elif ctime[len(ctime) - 1] == "s":
+  #       rtime = int(time.time()) + int(ctime[:-1])
+  #     elif ctime[len(ctime) - 1] == "h":
+  #       rtime = int(time.time()) + 3600 * int(ctime[:-1])
+  #   else:
+  #     raise ValueError("Invalid argument: time")
+  #   ruser = inter.author.id
+  #   rtext = text
+  #   db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
+  #   e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
+  #   if str(inter.author.id) in db["debug"]:
+  #     e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
+  #   await inter.send(embed = e)
 
   #afk command
-  @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
-  async def slashafk(inter, reason = "None"):
-      '''
-      Set your afk and reason for it
+  # @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
+  # async def slashafk(inter, reason = "None"):
+  #     '''
+  #     Set your afk and reason for it
   
-      Parameters
-      ----------
-      reason: Reason for afk
-      '''
-      with shelve.open("db", writeback = True) as db:
-        db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
-      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
+  #     Parameters
+  #     ----------
+  #     reason: Reason for afk
+  #     '''
+  #     with shelve.open("db", writeback = True) as db:
+  #       db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+  #     e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e)
 
   #bot group
   @commands.slash_command()
