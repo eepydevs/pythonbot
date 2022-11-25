@@ -5,11 +5,12 @@ import requests
 import random
 import asyncio
 import os
-import shelve
+from utils import RdictManager
 
 responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly..", "Concentrate and ask again.", "Cannot predict now.", "Ask again later."]
 random.shuffle(responselist)
-with shelve.open("db", writeback = True) as db:
+
+with RdictManager(str("./database")) as db:
   if "queue" not in db:
     db["queue"] = None
 
@@ -116,7 +117,7 @@ class Fun(commands.Cog):
     '''
     random.shuffle(responselist)
     e = discord.Embed(title = f"{inter.author.name}: {text}", description = f"🎱: {random.choice(responselist)}", color = random.randint(0, 16777215))
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{responselist}")
     await inter.response.send_message(embed = e)
@@ -192,7 +193,7 @@ class Fun(commands.Cog):
         answer = round(firstNum / secondNum)
       
       e = discord.Embed(title = "Math question", description = f"{question} = ?", color = random.randint(0, 16777215))
-      with shelve.open("db", writeback = True) as db:
+      with RdictManager(str("./database")) as db:
         if str(inter.author.id) in db["debug"]:
           e.add_field(name = "Debug", value = f"Variables value:\n{answer}")
       await inter.send(embed = e)
@@ -230,7 +231,7 @@ class Fun(commands.Cog):
     e = discord.Embed(title = "Guess the number!", color = random.randint(0, 16777215))
     e.add_field(name = "Settings", value = f"Infinity tries: {infinity}\nMax tries: {tries_amt}", inline = False)
     e.add_field(name = "Info", value = "Type `stop`/`close`/`leave`/`quit`/`exit` to stop playing", inline = False)
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
     await inter.send(embed = e)
@@ -249,7 +250,7 @@ class Fun(commands.Cog):
             break
           elif int(message.content) < botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try higher", color = random.randint(0, 1677215))
-            with shelve.open("db", writeback = True) as db:
+            with RdictManager(str("./database")) as db:
               if str(inter.author.id) in db["debug"]:
                 e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
             e.set_footer(text = f"{tries} Tries")
@@ -257,7 +258,7 @@ class Fun(commands.Cog):
             tries += 1
           elif int(message.content) > botnum:
             e = discord.Embed(title = "Incorrect", description = f"Try lower", color = random.randint(0, 1677215))
-            with shelve.open("db", writeback = True) as db:
+            with RdictManager(str("./database")) as db:
               if str(inter.author.id) in db["debug"]:
                 e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
             e.set_footer(text = f"{tries} Tries")
@@ -271,7 +272,7 @@ class Fun(commands.Cog):
           await inter.send(embed = e)
         except ValueError:
           e = discord.Embed(title = "Input error: Try again", color = random.randint(0, 16777215))
-          with shelve.open("db", writeback = True) as db:
+          with RdictManager(str("./database")) as db:
             if str(inter.author.id) in db["debug"]:
               e.add_field(name = "Debug", value = f"Variables value:\n{infinity}, {tries_amt}, {botnum}, {tries}")
           await inter.send(embed = e)

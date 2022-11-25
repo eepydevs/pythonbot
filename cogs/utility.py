@@ -8,7 +8,7 @@ import os
 import requests
 import asyncio
 import datetime, time
-import shelve
+from utils import RdictManager
 
 botbuild = "8.2.7" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
@@ -17,7 +17,7 @@ dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
-with shelve.open("db", writeback = True) as db:
+with RdictManager(str("./database")) as db:
   if "notes" not in db:
     db["notes"] = {}
 
@@ -41,7 +41,7 @@ def sbs(members):
   return rval
 
 async def suggest_note(inter, input):
-  with shelve.open("db", writeback = True) as db:
+  with RdictManager(str("./database")) as db:
     return [note for note in list(db['notes'][str(inter.author.id)].keys()) if input.lower() in note.lower()][0:24]
 
 async def suggest_user(inter, input):
@@ -51,11 +51,11 @@ async def suggest_member(inter, input):
   return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
 async def suggest_bookmark(inter, input):
-  with shelve.open("db", writeback = True) as db:
+  with RdictManager(str("./database")) as db:
     return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
 
 async def suggest_sbookmark(inter, input):
-  with shelve.open("db", writeback = True) as db:
+  with RdictManager(str("./database")) as db:
     return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
   
 class rbbuttons(discord.ui.View):
@@ -86,7 +86,7 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -100,7 +100,7 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -119,7 +119,7 @@ class Utility(commands.Cog):
   @commands.user_command(name="User Info")  
   async def userinfo(self, inter, member: discord.Member):
     role_list = []
-
+    await inter.response.defer(ephemeral = True)
     for role in member.roles:
       if role.name != "@everyone":
         role_list.append(role.mention)
@@ -146,7 +146,7 @@ class Utility(commands.Cog):
     e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
     e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
     e.set_footer(text = f"ID: {member.id}")
-    await inter.send(embed = e, ephemeral = True)
+    await inter.edit_original_response(embed = e)
 
   #context menu message info command
   @commands.message_command(name="Message Info") 
@@ -156,25 +156,31 @@ class Utility(commands.Cog):
 
   @commands.message_command(name="Add bookmark") 
   async def addbm(self, inter, msgid: discord.Message):
-    with shelve.open("db", writeback = True) as db:
+    await inter.response.defer(ephemeral = True)
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["bookmarks"]:
-        db["bookmarks"][str(inter.author.id)] = {}
-
+        upd = db["bookmarks"]
+        upd[str(inter.author.id)] = {}
+        db["bookmarks"] = upd
       if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
 
       msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-      db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+      upd = db["bookmarks"]
+      upd[str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+      db["bookmarks"] = upd
       e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+      await inter.edit_original_response(embed = e)
 
   @commands.slash_command()
   async def bookmarks(self, inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["bookmarks"]:
-        db["bookmarks"][str(inter.author.id)] = {}
+        upd = db["bookmarks"]
+        upd[str(inter.author.id)] = {}
+        db["bookmarks"] = upd
     
   @bookmarks.sub_command()
   async def add(self, inter, *, bmname = None, msgid: discord.Message):
@@ -188,14 +194,17 @@ class Utility(commands.Cog):
     '''
     if bmname is None:
       bmname = str(msgid.id)
-    with shelve.open("db", writeback = True) as db:
-      if bmname in db["bookmarks"][str(inter.author.id)] and not db["bookmarks"][str(inter.author.id)][bmname] is None:
+    with RdictManager(str("./database")) as db:
+      if bmname in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
 
       msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
       db["bookmarks"][str(inter.author.id)][bmname] = {"items": {"content": msg.content, "jumpurl": msg.jump_url}}
+      upd = db["bookmarks"]
+      upd[str(inter.author.id)][bmname] = {"items": {"content": msg.content, "jumpurl": msg.jump_url}}
+      db["bookmarks"] = upd
       e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
@@ -208,13 +217,15 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if bmname not in db["bookmarks"][str(inter.author.id)] and db["bookmarks"][str(inter.author.id)][bmname]:
         e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
-        
-      db["bookmarks"][str(inter.author.id)][bmname] = None
+      
+      upd = db["bookmarks"]
+      del upd[str(inter.author.id)][bmname]
+      db["bookmarks"] = upd
       e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
@@ -227,7 +238,7 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if bmname not in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -244,10 +255,12 @@ class Utility(commands.Cog):
     ----------
     text: Tell your bug here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in reportblacklist:
         with open("buglist.txt", "a") as report:
-          db['bot']['bugcounter'] += 1
+          upd = db["bot"]
+          upd["bugcounter"] += 1
+          db["bot"] = upd
           report.write("\n")
           report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
           report.close()
@@ -296,8 +309,10 @@ class Utility(commands.Cog):
   #     ----------
   #     reason: Reason for afk
   #     '''
-  #     with shelve.open("db", writeback = True) as db:
-  #       db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+  #     with RdictManager(str("./database")) as db:
+  #       upd = db["afk"]
+  #       upd[str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+  #       db["afk"] = upd
   #     e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
   #     await inter.send(embed = e)
 
@@ -323,7 +338,7 @@ class Utility(commands.Cog):
   @bot.sub_command(name = "ping", description = "Shows bot's ping")
   async def slashping(self, inter):
     e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.send(embed = e)
@@ -491,13 +506,15 @@ class Utility(commands.Cog):
   #group smh
   @commands.slash_command(description = "Make notes with the bot")
   async def note(self, inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["notes"]:
-        db["notes"][str(inter.author.id)] = {}
+        upd = db["notes"]
+        upd[str(inter.author.id)]= {}
+        db["notes"] = upd
   
   @note.sub_command(description = "Shows list of notes you have")
   async def list(self, inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
         notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(list(db["notes"][str(inter.author.id)].keys()), start = 1))
         e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
@@ -515,7 +532,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["notes"]:
         if name not in db["notes"][str(inter.author.id)]:
           if text != None:
@@ -535,14 +552,18 @@ class Utility(commands.Cog):
           await inter.send(embed = e, ephemeral = True)
       else:
         if text != None:
-          db["notes"][str(inter.author.id)] = {}
+          upd = db["notes"]
+          upd[str(inter.author.id)] = {}
+          db["notes"] = upd
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = text
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
         else:
-          db["notes"][str(inter.author.id)] = {}
+          upd = db["notes"]
+          upd[str(inter.author.id)] = {}
+          db["notes"] = upd
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = "New note"
           db["notes"][str(inter.author.id)] = updatenotes
@@ -558,7 +579,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here, // to newline
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       try:
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] = text.replace("//", "\n")
@@ -578,7 +599,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       try:
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] += f" {text}"
@@ -598,7 +619,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       try:
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] += f"\n{text}"
@@ -617,7 +638,7 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if name in db["notes"][str(inter.author.id)]:
         e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -633,7 +654,7 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["notes"]:
         if name != None:
           if name in db["notes"][str(inter.author.id)]:
@@ -660,10 +681,11 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["notes"]:
         if name in db["notes"][str(inter.author.id)]:
-          text = db['notes'][str(inter.author.id)].get(name)
+          upd = db["notes"]
+          text = upd[str(inter.author.id)].get(name)
           rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
           e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
@@ -684,7 +706,7 @@ class Utility(commands.Cog):
     ----------
     code: Code here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       exec(code)
       print(f"{code} is executed")
       e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))

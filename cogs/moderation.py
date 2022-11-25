@@ -4,12 +4,12 @@ from disnake.ext import commands
 import asyncio
 from enum import Enum
 import random
-import shelve
+from utils import RdictManager
 
 purgequotes = ["Stop spamming!", "Spamming is bad.", "Purge the chat! Haha!", "Purge after these silly young spammers...", "Is it just me, or is spamming more likely now than notime else?"]
 modquotes = ["I hope they learned their lesson.", "Make them cry!", "Haha!", "Gotcha!", "They should've readed the rules.", "Why they didn't readed the rules...", "That's lesson for you to read rules!", "'no reason ban' they say... Right at your eyes broke rule number 1337!", "Oops!"]
 
-with shelve.open("db", writeback = True) as db:
+with RdictManager(str("./database")) as db:
   if "warns" not in db:
     db["warns"] = {}
 
@@ -196,12 +196,16 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the warn, will be shown in /warns member: @mention
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if not inter.author.top_role < member.top_role:
         if str(inter.guild.id) not in db["warns"]:
-          db["warns"][str(inter.guild.id)] = {}
+          upd = db["warns"]
+          upd[str(inter.guild.id)] = {}
+          db["warns"] = upd
         if str(member.id) not in db["warns"][str(inter.guild.id)]:
-          db["warns"][str(inter.guild.id)][str(member.id)] = []
+          upd = db["warns"][str(inter.guild.id)]
+          upd[str(member.id)] = []
+          db["warns"] = upd
           updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
           updatelist.append(reason)
           db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
@@ -228,10 +232,12 @@ class Moderation(commands.Cog):
     ----------
     member: Mention member
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if not inter.author.top_role < member.top_role:
         if str(inter.guild.id) not in db["warns"]:
-          db["warns"][str(inter.guild.id)] = {}
+          upd = db["warns"]
+          upd[str(inter.guild.id)] = {}
+          db["warns"] = upd
         if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
           list = db["warns"][str(inter.guild.id)][str(member.id)]
           text = ""
@@ -260,7 +266,7 @@ class Moderation(commands.Cog):
     index: index of the warn, shown in /warns member: @mention
     '''
     if not inter.author.top_role < member.top_role:
-      with shelve.open("db", writeback = True) as db:
+      with RdictManager(str("./database")) as db:
         if str(inter.guild.id) not in db["warns"]:
           db["warns"][str(inter.guild.id)] = {}
         if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
@@ -296,12 +302,14 @@ class Moderation(commands.Cog):
     setting: Available settings: gpd, nqn
     switch: basically anything
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if switch != "info":
         if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
           if setting == "gpd":
             if str(inter.guild.id) in db["serversetting"]["gpd"] and db["serversetting"]["gpd"][str(inter.guild.id)]:
-              db["serversetting"]["gpd"][str(inter.guild.id)] = None
+              upd = db["serversetting"]["gpd"]
+              del upd[str(inter.guild.id)]
+              db["serversetting"]["gpd"] = upd
               e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
             else:
@@ -310,7 +318,9 @@ class Moderation(commands.Cog):
               await inter.send(embed = e)
           if setting == "nqn":
             if str(inter.guild.id) in db["serversetting"]["nqn"] and db["serversetting"]["nqn"][str(inter.guild.id)]:
-              db["serversetting"]["nqn"][str(inter.guild.id)] = None
+              upd = db["serversetting"]["nqn"]
+              del upd[str(inter.guild.id)]
+              db["serversetting"]["nqn"] = upd
               e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
             else:

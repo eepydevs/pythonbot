@@ -4,7 +4,7 @@ from disnake.ext import commands
 from enum import Enum
 import random
 import asyncio
-import shelve
+from utils import RdictManager
 
 item_info = {
 	"Computer": "Usable: hack Command/False\nType: Item\nInfo: You can hack people's data on this",
@@ -15,7 +15,7 @@ item_info = {
 	"Lottery": "Usable: True\nType: Item\nInfo: Gives random amount of cash... Sometimes huge amount of cash"
 }
 
-with shelve.open("db", writeback = True) as db:
+with RdictManager(str("./database")) as db:
   if "balance" not in db:
     db["balance"] = {}
 
@@ -41,15 +41,15 @@ def iteminfo(name):
   return "No info"
 
 async def suggest_buyitem(inter, input):
-  with shelve.open("db", writeback = True) as db:
+  with RdictManager(str("./database")) as db:
     return [item for item in list(db['shop'].keys()) if input.lower() in item.lower()][0:24]
 
 async def suggest_item(inter, input):
- with shelve.open("db", writeback = True) as db:
+ with RdictManager(str("./database")) as db:
    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] else ["You have nothing!"]
 
 async def suggest_usableitem(inter, input):
- with shelve.open("db", writeback = True) as db:
+ with RdictManager(str("./database")) as db:
    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
   
 def lottery():
@@ -93,7 +93,7 @@ class lbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -107,7 +107,7 @@ class lbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -138,10 +138,10 @@ class menusearch(discord.ui.Select):
         return True
     
   async def callback(self, inter: discord.MessageInteraction):
-    if str(inter.author.id) in db["balance"]:
-      chance = random.randint(0, 100)
-      if chance > 25:
-        with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
+      if str(inter.author.id) in db["balance"]:
+        chance = random.randint(0, 100)
+        if chance > 25:
           rng = random.randint(100, 500)
           db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
@@ -149,23 +149,23 @@ class menusearch(discord.ui.Select):
             e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
           await inter.response.edit_message(embed = e, view = None)
           return
+        else:
+          with RdictManager(str("./database")) as db:
+            e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+            if str(inter.author.id) in db["debug"]:
+              e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}")
+            await inter.response.edit_message(embed = e, view = None)
+            return
       else:
-        with shelve.open("db", writeback = True) as db:
-          e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+        with RdictManager(str("./database")) as db:
+          db["balance"][str(inter.author.id)] = 0
+          rng = random.randint(100, 500)
+          db["balance"][str(inter.author.id)] += rng
+          e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
           if str(inter.author.id) in db["debug"]:
-            e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}")
+            e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
           await inter.response.edit_message(embed = e, view = None)
           return
-    else:
-      with shelve.open("db", writeback = True) as db:
-        db["balance"][str(inter.author.id)] = 0
-        rng = random.randint(100, 500)
-        db["balance"][str(inter.author.id)] += rng
-        e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-        if str(inter.author.id) in db["debug"]:
-          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
-        await inter.response.edit_message(embed = e, view = None)
-        return
 
 class searchview(discord.ui.View):
   def __init__(self, inter: discord.Interaction):
@@ -198,14 +198,15 @@ class menupm(discord.ui.Select):
   async def callback(self, inter: discord.MessageInteraction):
     chance = random.randint(0, 100)
     if chance > 45:
-      rng = random.randint(250, 1000)
-      db["balance"][str(inter.author.id)] += rng
-      e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-      with shelve.open("db", writeback = True) as db:
-        if str(inter.author.id) in db["debug"]:
-          e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
-      await inter.response.edit_message(embed = e, view = None)
-      return
+      with RdictManager(str("./database")) as db:
+        rng = random.randint(250, 1000)
+        db["balance"][str(inter.author.id)] += rng
+        e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
+        with RdictManager(str("./database")) as db:
+          if str(inter.author.id) in db["debug"]:
+            e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
+        await inter.response.edit_message(embed = e, view = None)
+        return
     else:
       e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
       await inter.response.edit_message(embed = e, view = None)
@@ -223,7 +224,7 @@ class Economy(commands.Cog):
   #item group
   @commands.slash_command()
   async def item(self, inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["inventory"]:
         db["inventory"][str(inter.author.id)] = {}
       
@@ -238,7 +239,7 @@ class Economy(commands.Cog):
     itemname: Item name
     '''
     item = itemname.lower().capitalize()
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if item in db["inventory"][str(inter.author.id)]:
         if item == "Lottery":
           win = lottery()
@@ -274,7 +275,7 @@ class Economy(commands.Cog):
     itemname: Item name
     '''
     item = itemname.lower().capitalize()
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if item in db["inventory"][str(inter.author.id)]:
         e = discord.Embed(title = f"Item: {item}", description = f"{iteminfo(item)}", color = random.randint(0, 16777215))
         await inter.send(embed = e)
@@ -292,10 +293,12 @@ class Economy(commands.Cog):
     ----------
     member: Mention member
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if member is None:
         if not str(inter.author.id) in db["balance"]:
-          db["balance"][str(inter.author.id)] = 0
+          upd = db["balance"]
+          upd[str(inter.author.id)] = 0
+          db["balance"] = upd
           e = discord.Embed(title = f"{inter.author}'s Balance", description = f"Wallet: {db['balance'][str(inter.author.id)]} 💵", color = random.randint(0, 16777215))
           await inter.send(embed = e)
         else:
@@ -304,7 +307,9 @@ class Economy(commands.Cog):
           await inter.send(embed = e)
       else:
         if not str(member.id) in db["balance"]:
-          db["balance"][str(member.id)] = 0
+          upd = db["balance"]
+          upd[str(member.id)] = 0
+          db["balance"] = upd
           wallet = db["balance"][str(member.id)]
           e = discord.Embed(title = f"{member}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
           await inter.send(embed = e)
@@ -317,9 +322,11 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "beg", description = "Beg people to them give you nothing lol\nHas cooldown of 10 seconds")
   @commands.cooldown(rate = 1, per = 10, type = commands.BucketType.user)
   async def slashbeg(inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["balance"]:
-        db["balance"][str(inter.author.id)] = 0
+        upd = db["balance"]
+        upd[str(inter.author.id)] = 0
+        db["balance"] = upd
         if random.randint(0, 100) < 35:
           e = discord.Embed(title = "Fail", description = "You failed!", color = random.randint(0 , 16777215))
           if str(inter.author.id) in db["debug"]:
@@ -350,7 +357,7 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "work", description = "Work to get some cash. Has cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 60 * 30, type = commands.BucketType.user)
   async def slashwork(inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["balance"]:
         firstNum = random.randint(0, 1000)
         secondNum = random.randint(0, 1000)
@@ -410,7 +417,9 @@ class Economy(commands.Cog):
             e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}")
           await inter.send(embed = e)
       else:
-        db["balance"][str(inter.author.id)] = 0
+        upd = db["balance"]
+        upd[str(inter.author.id)] = 0
+        db["balance"] = upd
         rng = random.randint(250, 1000)
         db["balance"][str(inter.author.id)] += rng
         e = discord.Embed(title = "Success", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
@@ -430,7 +439,7 @@ class Economy(commands.Cog):
     member: Mention member
     payment: Amount of cash
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["balance"]:
         money = db["balance"][str(inter.author.id)]
         if member.id != inter.author.id:
@@ -446,7 +455,9 @@ class Economy(commands.Cog):
                       e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}, {db['balance'][str(member.id)]}")
                     await inter.send(embed = e)
                   else:
-                    db["balance"][str(member.id)] = 0
+                    upd = db["balance"]
+                    upd[str(member.id)] = 0
+                    db["balance"] = upd
                     db["balance"][str(inter.author.id)] -= payment
                     db["balance"][str(member.id)] += payment
                     e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
@@ -485,7 +496,7 @@ class Economy(commands.Cog):
     '''
     rng = random.randint(0, 12)
     dice = random.randint(0, 12)
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["balance"]:
         money = db["balance"][str(inter.author.id)]
         if payment <= money:
@@ -518,11 +529,13 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "daily", description = "Get 1000 cash per day")
   @commands.cooldown(rate = 1, per = 86400, type = commands.BucketType.user)
   async def slashdaily(inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["balance"]:
         db["balance"][str(inter.author.id)] += 1000
       else:
-        db["balance"][str(inter.author.id)] = 0
+        upd = db["balance"]
+        upd[str(inter.author.id)] = 0
+        db["balance"] = upd
         db["balance"][str(inter.author.id)] += 1000
       e = discord.Embed(title = "Daily", description = "You got 1000 💵 !", color = random.randint(0, 16777215))
       if str(inter.author.id) in db["debug"]:
@@ -533,19 +546,21 @@ class Economy(commands.Cog):
   @commands.slash_command(description = "See other rich people in leaderboard")
   @commands.guild_only()
   async def leaderboard(self, inter):
-    leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-    color = random.randint(0, 16667215)
-    e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
-    await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
+    with RdictManager(str("./database")) as db:
+      leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+      color = random.randint(0, 16667215)
+      e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
+      await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
   
   #global leaderboard command
   @commands.slash_command(description = "See other rich people in leaderboard")
   @commands.guild_only()
   async def globalleaderboard(self, inter):
-    leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-    color = random.randint(0, 16667215)
-    e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
-    await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
+    with RdictManager(str("./database")) as db:
+      leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+      color = random.randint(0, 16667215)
+      e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
+      await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
 
   #rob command
   @commands.slash_command(name = "rob", description = "Get jailed, Has cooldown of 30 seconds")
@@ -558,7 +573,7 @@ class Economy(commands.Cog):
       ----------
       member: Mention member
       '''
-      with shelve.open("db", writeback = True) as db:
+      with RdictManager(str("./database")) as db:
         if member.id != inter.author.id:
           if str(member.id) in db["balance"]:
             if db["balance"][str(member.id)] != 0 and db["balance"][str(member.id)] > 150:
@@ -587,7 +602,9 @@ class Economy(commands.Cog):
                     chance = random.randint(0, 100)
                     if chance < 50:
                       try:
-                        db["balance"][str(inter.author.id)] = 0
+                        upd = db["balance"]
+                        upd[str(inter.author.id)] = 0
+                        db["balance"] = upd
                         max = db["balance"][str(member.id)]
                         rng = random.randint(100, max)
                         db["balance"][str(member.id)] -= rng
@@ -598,7 +615,9 @@ class Economy(commands.Cog):
                         e = discord.Embed(title = "Error", description = "This person is too poor to be robbed!",  color = random.randint(0, 16777215))
                         await inter.send(embed = e)
                     else:
-                      db["balance"][str(inter.author.id)] = 0
+                      upd = db["balance"]
+                      upd[str(inter.author.id)] = 0
+                      db["balance"] = upd
                       rng = random.randint(250, 1000)
                       db["balance"][str(member.id)] += rng
                       db["balance"][str(inter.author.id)] -= rng
@@ -625,9 +644,11 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "passive", description = "For people who don't want to get robbed, Has cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 1800, type = commands.BucketType.user)
   async def slashpassive(inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["passive"] and db["passive"][str(inter.author.id)]:
-        db["passive"][str(inter.author.id)] = None
+        upd = db["passive"]
+        del upd[str(inter.author.id)]
+        db["passive"] = upd
         e = discord.Embed(title = "Success", description = "Youre now a normal person", color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:
@@ -645,9 +666,11 @@ class Economy(commands.Cog):
   #shop group
   @commands.slash_command()
   async def shop(self, inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["inventory"]:
-        db["inventory"][str(inter.author.id)] = {}
+        upd = db["inventory"]
+        upd[str(inter.author.id)] = {}
+        db["inventory"] = upd
       
   #items sub command
   @shop.sub_command()
@@ -655,9 +678,10 @@ class Economy(commands.Cog):
     '''
     See prices of items here
     '''
-    shop = '\n'.join(f'`{i+1}.` {item}: {price if "Discount card" not in db["inventory"][str(inter.author.id)] else int(price * 0.75)}' for i, (price,item) in enumerate(sorted(((price,item) for item,price in db['shop'].items()),reverse=True)))
-    e = discord.Embed(title = "Shop", description = shop, color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    with RdictManager(str("./database")) as db:
+      shop = '\n'.join(f'`{i+1}.` {item}: {price if "Discount card" not in db["inventory"][str(inter.author.id)] else int(price * 0.75)}' for i, (price,item) in enumerate(sorted(((price,item) for item,price in db['shop'].items()),reverse=True)))
+      e = discord.Embed(title = "Shop", description = shop, color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #buy sub command
   @shop.sub_command()
@@ -672,40 +696,46 @@ class Economy(commands.Cog):
       '''
       modtext = item_name.lower()
       itemname = modtext.capitalize()
-      with shelve.open("db", writeback = True) as db:
+      with RdictManager(str("./database")) as db:
         if quantity > 0:
           if itemname in db["shop"]:
             if str(inter.author.id) in db["balance"]:
               if db["shop"].get(itemname) * quantity < db["balance"][str(inter.author.id)] or int(db["shop"].get(itemname) * 0.75) * quantity < db["balance"][str(inter.author.id)]:
                 if str(inter.author.id) in db["inventory"]:
                   if itemname not in db["inventory"][str(inter.author.id)]:
+                    upd = db["balance"]
                     if "Discount card" in db["inventory"][str(inter.author.id)]:
-                      db["balance"][str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75) * quantity
+                      upd[str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75) * quantity
                     else:
-                      db["balance"][str(inter.author.id)] -= db["shop"].get(itemname) * quantity
-                    updateinv = db["inventory"][str(inter.author.id)]
-                    updateinv[itemname] = quantity
-                    db["inventory"][str(inter.author.id)] = updateinv
+                      upd[str(inter.author.id)] -= db["shop"].get(itemname) * quantity
+                    db["balance"] = upd
+                    updateinv = db["inventory"]
+                    updateinv[str(inter.author.id)][itemname] = quantity
+                    db["inventory"] = updateinv
                     e = discord.Embed(title = "Shop", description = f"You got {quantity} {itemname}'s!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
                   else:
+                    upd = db["balance"]
                     if "Discount card" in db["inventory"][str(inter.author.id)]:
-                      db["balance"][str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75) * quantity
+                      upd[str(inter.author.id)] -= int(db["shop"].get(itemname) * 0.75) * quantity
                     else:
-                      db["balance"][str(inter.author.id)] -= db["shop"].get(itemname) * quantity
-                    updateinv = db["inventory"][str(inter.author.id)]
-                    updateinv[itemname] += quantity
-                    db["inventory"][str(inter.author.id)] = updateinv
-                    itemammount = db["inventory"][str(inter.author.id)].get(itemname)
+                      upd[str(inter.author.id)] -= db["shop"].get(itemname) * quantity
+                    db["balance"] = upd
+                    updateinv = db["inventory"]
+                    updateinv[str(inter.author.id)][itemname] += quantity
+                    db["inventory"] = updateinv
+                    itemammount =[str(inter.author.id)].get(itemname)
                     e = discord.Embed(title = "Shop", description = f"You got {quantity} {itemname}'s!", color = random.randint(0, 16777215))
                     e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
                     await inter.send(embed = e)
                 else:
-                  db["inventory"][str(inter.author.id)] = {}
-                  db["balance"][str(inter.author.id)] -= db["shop"].get(itemname) * quantity
-                  updateinv = db["inventory"][str(inter.author.id)]
+                  updateinv = db["inventory"]
+                  updateinv[str(inter.author.id)] = {}
+                  upd = db["balance"]
+                  upd[str(inter.author.id)] -= db["shop"].get(itemname) * quantity
+                  db["balance"] = upd
                   updateinv[itemname] = quantity
-                  db["inventory"][str(inter.author.id)] = updateinv
+                  db["inventory"] = updateinv
                   e = discord.Embed(title = "Shop", description = f"You got {itemname}!", color = random.randint(0, 16777215))
                   await inter.send(embed = e)
               else:
@@ -728,7 +758,7 @@ class Economy(commands.Cog):
     ----------
     itemname: Item name here
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if quantity > 0:
         if quantity <= db["inventory"][str(inter.author.id)].get(itemname):
           if itemname != None:
@@ -740,26 +770,31 @@ class Economy(commands.Cog):
                   if itemname not in db["inventory"][str(inter.author.id)]:
                     e = discord.Embed(title = "Shop", description = "You can't sell nothing!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
+                    return
                   else:
                     if db["inventory"][str(inter.author.id)].get(itemname) >= 2:
-                      db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2) * quantity
-                      updateinv = db["inventory"][str(inter.author.id)]
-                      if quantity == db["inventory"][str(inter.author.id)].get(itemname):
-                        updateinv.pop(itemname)
+                      upd = db["balance"]
+                      upd[str(inter.author.id)] += int(db["shop"].get(itemname) // 2) * quantity
+                      db["balance"] = upd
+                      updateinv = db["inventory"]
+                      if quantity == updateinv[str(inter.author.id)].get(itemname):
+                        updateinv[str(inter.author.id)].pop(itemname)
                         itemammount = 0
                       else:
-                        updateinv[itemname] -= quantity
-                        itemammount = db["inventory"][str(inter.author.id)].get(itemname)
-                      db["inventory"][str(inter.author.id)] = updateinv
+                        updateinv[str(inter.author.id)][itemname] -= quantity
+                        itemammount = updateinv[str(inter.author.id)].get(itemname)
+                      db["inventory"] = updateinv
                       e = discord.Embed(title = "Shop", description = f"You sold {quantity} {itemname}'s!", color = random.randint(0, 16777215))
                       e.set_footer(text = f"Now you have {itemammount} {itemname}'s")
                       await inter.send(embed = e)
                     else:
-                      db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2)
-                      updateinv = db["inventory"][str(inter.author.id)]
-                      updateinv.pop(itemname)
-                      db["inventory"][str(inter.author.id)] = updateinv
-                      itemammount = db["inventory"][str(inter.author.id)].get(itemname)
+                      upd = db["balance"]
+                      upd[str(inter.author.id)] += int(db["shop"].get(itemname) // 2)
+                      db["balance"] = upd
+                      updateinv = db["inventory"]
+                      updateinv[str(inter.author.id)].pop(itemname)
+                      db["inventory"] = updateinv
+                      itemammount = updateinv[str(inter.author.id)].get(itemname)
                       e = discord.Embed(title = "Shop", description = f"You sold {itemname}!", color = random.randint(0, 16777215))
                       await inter.send(embed = e)
                 else:
@@ -787,7 +822,7 @@ class Economy(commands.Cog):
     ----------
     member: Mentioned member
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if member is None:
         if str(inter.author.id) in db["inventory"] and db["inventory"][str(inter.author.id)] != {}:
           inventory = "\n".join(f"{index}. `{name}`: {amount}" for index, (name, amount) in enumerate(db["inventory"][str(inter.author.id)].items(), start = 1))
@@ -809,7 +844,7 @@ class Economy(commands.Cog):
   @commands.slash_command(description = "Hacks random people. Requirement: 1 Computer. Has cooldown of 1 hour")
   @commands.cooldown(rate = 1, per = 3600, type = commands.BucketType.user)
   async def hack(inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["balance"]:
         if str(inter.author.id) in db["inventory"]:
           if "Computer" in db["inventory"][str(inter.author.id)]:
@@ -831,7 +866,9 @@ class Economy(commands.Cog):
             e = discord.Embed(title = "Error", description = "Buy a computer!", color = random.randint(0, 16777215))
             await inter.send(embed = e, ephemeral = True)
         else:
-          db["inventory"][str(inter.author.id)] = {}
+          upd = db["inventory"]
+          upd[str(inter.author.id)] = {}
+          db["inventory"] = upd
           e = discord.Embed(title = "Error", description = "Buy a computer!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
       else:
@@ -842,7 +879,7 @@ class Economy(commands.Cog):
   @commands.slash_command(description = "Post memes and get money from it, Requirement: a Laptop")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
   async def postmeme(self, inter):
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["balance"]:
         if str(inter.author.id) in db["inventory"]:
           if "Laptop" in db["inventory"][str(inter.author.id)]:
@@ -853,7 +890,9 @@ class Economy(commands.Cog):
             await inter.send(embed = e)
             inter.command.reset_cooldown(inter)
         else:
-          db["inventory"][str(inter.author.id)] = {}
+          upd = db["inventory"]
+          upd[str(inter.author.id)] = {}
+          db["inventory"] = upd
           e = discord.Embed(title = "Error", description = "Buy a laptop!", color = random.randint(0, 16777215))
           await inter.send(embed = e)
           inter.command.reset_cooldown(inter)
@@ -874,7 +913,7 @@ class Economy(commands.Cog):
     text: Text to send
     imagelink: Image to send (link)
     '''
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["inventory"]:
         if "Smartphone" in db["inventory"][str(inter.author.id)]:
           if str(member.id) in db["inventory"]:
@@ -922,7 +961,7 @@ class Economy(commands.Cog):
     money = 0
     inventory = "Nothing here"
     passive = "False"
-    with shelve.open("db", writeback = True) as db:
+    with RdictManager(str("./database")) as db:
       if member == None:
         if str(inter.author.id) in db["balance"]:
           money = db["balance"][str(inter.author.id)]

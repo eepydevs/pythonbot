@@ -1,9 +1,20 @@
 from typing import Union
 import datetime
 import disnake as discord
+from rocksdict import Rdict
 from disnake.ext import commands
-from replit import db
 import os
+
+class RdictManager():
+  def __init__(self, path: str):
+    self._path = path
+        
+  def __enter__(self):
+    self._rdict = Rdict(self._path)
+    return self._rdict
+    
+  def __exit__(self, exc_type,exc_value, exc_traceback):
+    self._rdict.close()
 
 def Embed(
     msg: Union[commands.Context, discord.Interaction, discord.Message],
@@ -35,7 +46,7 @@ def Embed(
         'icon_url': 'https://cdn.discordapp.com/attachments/914750432520331304/933032744349474836/carbot.png'} if isinstance(msg, (commands.Context, discord.Interaction)) else {},
         'type': type,
         'timestamp': timestamp,
-        'color': color if color else colour if colour else db['color']
+        'color': color if color else colour if colour else None
       }
     )
 
