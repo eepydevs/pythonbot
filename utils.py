@@ -6,15 +6,19 @@ from disnake.ext import commands
 import os
 
 class RdictManager():
-  def __init__(self, path: str):
-    self._path = path
+    def __init__(self, path: str):
+        self._path = path
         
-  def __enter__(self):
-    self._rdict = Rdict(self._path)
-    return self._rdict
+    def __enter__(self):
+        self._rdict = Rdict(self._path)
+        if "main" not in self._rdict:
+            self._rdict["main"] = {}
+        self._var = self._rdict["main"]
+        return self._var
     
-  def __exit__(self, exc_type,exc_value, exc_traceback):
-    self._rdict.close()
+    def __exit__(self, exc_type,exc_value, exc_traceback):
+        self._rdict["main"] = self._var
+        self._rdict.close()
 
 def Embed(
     msg: Union[commands.Context, discord.Interaction, discord.Message],

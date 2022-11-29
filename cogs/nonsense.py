@@ -110,10 +110,6 @@ def shuffle(x):
 
 async def suggest_tupper(inter, input):
   with RdictManager(str("./database")) as db:
-    if not str(inter.author.id) in db["tupper"]:
-      upd = db["tupper"]
-      upd[str(inter.author.id)] = {}
-      db["tupper"] = upd
     return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
 
 async def suggest_rblxuser(inter, input):
@@ -128,10 +124,6 @@ async def suggest_rblxuser(inter, input):
 
 async def suggest_command(inter, input):
   with RdictManager(str("./database")) as db:
-    if str(inter.author.id) not in db["customcmd"]:
-      upd = db["customcmd"]
-      upd[str(inter.author.id)] = {}
-      db["customcmd"] = upd
     return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
 def runbf(str):
@@ -243,7 +235,7 @@ class Nonsense(commands.Cog):
               rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
             await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
             await asyncio.sleep(0.2)
-    
+      
     except:
       pass
 
@@ -379,18 +371,11 @@ class Nonsense(commands.Cog):
       return
     with RdictManager(str("./database")) as db:
       if str(inter.channel.id) not in db["linkchannels"]:
-        upd = db["linkchannels"]
-        upd[str(inter.channel.id)] = []
-        db["linkchannels"] = upd
+        db["linkchannels"][str(inter.channel.id)] = []
       if id not in db["linkchannels"]:
-        upd = db["linkchannels"]
-        upd[id] = []
-        db["linkchannels"] = upd
+        db["linkchannels"][id] = []
+
       if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
-        upd = db["linkchannels"]
-        upd[id].append(str(inter.channel.id))
-        upd[str(inter.channel.id)].append(id)
-        db["linkchannels"] = upd
         db["linkchannels"][id].append(str(inter.channel.id))
         db["linkchannels"][str(inter.channel.id)].append(id)
         e = discord.Embed(title = "Success", description = f"Linked `{id}` and this channel", color = random.randint(0, 16777215))
@@ -419,27 +404,18 @@ class Nonsense(commands.Cog):
       id1 = db["linkchannels"][id]
       if str(inter.channel.id) in id1:
         if len(id1) == 1:
-          upd = db["linkchannels"]
-          del upd[str(inter.channel.id)]
-          db["linkchannels"] = upd
+          del db["linkchannels"][str(inter.channel.id)]
         else:
-          db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)] = None
+          del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
         e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
       if id in id2:
         if len(id2) == 1:
-          upd = db["linkchannels"]
-          del upd[id]
-          db["linkchannels"] = upd
+          del db["linkchannels"][id]
         else:
-          db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))] = None
-          
-          upd = db["linkchannels"]
-          del upd[id][upd[id].index(str(inter.channel.id))]
-          db["linkchannels"] = upd
-          
+          del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
         e.add_field(name = f"{inter.channel.id} > {id}", value = "_ _", inline = False)
       await inter.send(embed = e, ephemeral = True)
-    
+      
   @commands.slash_command(name = "urban")
   async def slashurban(inter, query):
     '''
@@ -676,7 +652,7 @@ class Nonsense(commands.Cog):
     ----------
     emoji: Emoji here
     '''
-    await inter.response.send(emoji.url)
+    await inter.response.send_message(emoji.url)
 
   #someone command
   @commands.slash_command(name = "someone", description = "Ping random person (Just like @someone back in 2018)")
@@ -719,16 +695,14 @@ class Nonsense(commands.Cog):
     '''
     await inter.response.defer()
     json = rq.get(f"http://api.qrserver.com/v1/read-qr-code/?fileurl={qrcode.replace(' ', '%20').replace('/', '%2F').replace(':', '%3A').replace('=', '%3D').replace('?', '%3F')}").json()
-    await inter.send(content = f"Contents: {json[0]['symbol'][0]['data']}")
+    await inter.edit_original_message(content = f"Contents: {json[0]['symbol'][0]['data']}")
 
   #tupper group
   @commands.slash_command()
   async def tupper(self, inter):
     with RdictManager(str("./database")) as db:
-      if not str(inter.author.id) in db["tupper"]:
-        upd = db["tupper"]
-        upd[str(inter.author.id)] = {}
-        db["tupper"] = upd
+      if str(inter.author.id) not in db["tupper"]:
+        db["tupper"][str(inter.author.id)] = {}
 
   #create tupper
   @tupper.sub_command()
@@ -744,9 +718,7 @@ class Nonsense(commands.Cog):
     with RdictManager(str("./database")) as db:
       await inter.response.defer(ephemeral = True)
       if name not in db["tupper"][str(inter.author.id)]:
-        upd = db["tupper"][str(inter.author.id)]
-        upd[str(name)] = str(avatar)
-        db["tupper"][str(inter.author.id)] = upd
+        db["tupper"][str(inter.author.id)].update({str(name): str(avatar)})
         e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
         e.set_image(url = avatar)
         await inter.send(embed = e)
@@ -767,7 +739,7 @@ class Nonsense(commands.Cog):
     '''
     with RdictManager(str("./database")) as db:
       await inter.response.defer(ephemeral = True)
-      if tupper in db["tupper"][str(inter.author.id)] and db["tupper"][str(inter.author.id)][tupper]:
+      if tupper in db["tupper"][str(inter.author.id)]:
         e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
         await inter.send(embed = e)
         channel_webhooks = await inter.channel.webhooks()
@@ -799,9 +771,7 @@ class Nonsense(commands.Cog):
     with RdictManager(str("./database")) as db:
       await inter.response.defer(ephemeral = True)
       if tupper in db["tupper"][str(inter.author.id)]:
-        upd = db["tupper"][str(inter.author.id)]
-        del upd[tupper]
-        db["tupper"][str(inter.author.id)] = upd
+        del db["tupper"][str(inter.author.id)][tupper]
         e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:
@@ -822,10 +792,8 @@ class Nonsense(commands.Cog):
     '''
     with RdictManager(str("./database")) as db:
       if tupper in db["tupper"][str(inter.author.id)]:
-        upd = db["tupper"][str(inter.author.id)]
-        del upd[tupper]
-        upd[new_name] = str(avatar)
-        db["tupper"][str(inter.author.id)] = upd
+        del db["tupper"][str(inter.author.id)][tupper]
+        db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
         e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
         e.set_image(url = avatar)
         await inter.send(embed = e, ephemeral = True)
@@ -854,9 +822,7 @@ class Nonsense(commands.Cog):
   async def cc(self, inter):
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["customcmd"]:
-        upd = db["customcmd"]
-        upd[str(inter.author.id)] = {}
-        db["customcmd"] = upd
+        db["customcmd"][str(inter.author.id)] = {}
                         
   @cc.sub_command()
   async def info(inter):
@@ -891,9 +857,7 @@ class Nonsense(commands.Cog):
     '''
     with RdictManager(str("./database")) as db:
       if cmd_name not in db["customcmd"][str(inter.author.id)]:
-        upd = db["customcmd"]
-        upd[str(inter.author.id)].update({cmd_name: expr})
-        db["customcmd"] = upd
+        db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
         e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
       else:
@@ -909,12 +873,11 @@ class Nonsense(commands.Cog):
     ----------
     cmd_name: Command name
     '''
-    with RdictManager(str("./database")) as db:
-      if cmd_name in db["customcmd"][str(inter.author.id)]:
-        await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
-      else:
-        e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    if cmd_name in db["customcmd"][str(inter.author.id)]:
+      await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
+    else:
+      e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @cc.sub_command()
   async def delete(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
@@ -927,9 +890,7 @@ class Nonsense(commands.Cog):
     '''
     with RdictManager(str("./database")) as db:
       if cmd_name in db["customcmd"][str(inter.author.id)]:
-        upd = db["customcmd"]
-        upd[str(inter.author.id)].pop(cmd_name)
-        db["customcmd"] = upd
+        db["customcmd"][str(inter.author.id)].pop(cmd_name)
         e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
       else:

@@ -22,18 +22,18 @@ class Debug(commands.Cog):
     self.bot = bot
 
   #when slash error
-  # @commands.Cog.listener()
-  # async def on_slash_command_error(self, inter, error):
-  #   if isinstance(error, commands.CommandNotFound):
-  #     return
-  #   if not isinstance(error, commands.CommandOnCooldown):
-  #     if not "Command raised an exception:" in str(error):
-  #       e = discord.Embed(title = "Error", description = f"```{str(error)}```", color = random.randint(0, 16777215))
-  #     else:
-  #       e = discord.Embed(title = "Error", description = f"```{str(error)[29:]}```", color = random.randint(0, 16777215))
-  #   else:
-  #     e = discord.Embed(title = "Error", description = f"{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
-  #   await inter.send(embed = e, ephemeral = True)
+  @commands.Cog.listener()
+  async def on_slash_command_error(self, inter, error):
+    if isinstance(error, commands.CommandNotFound):
+      return
+    if not isinstance(error, commands.CommandOnCooldown):
+      if not "Command raised an exception:" in str(error):
+        e = discord.Embed(title = "Error", description = f"```{str(error)}```", color = random.randint(0, 16777215))
+      else:
+        e = discord.Embed(title = "Error", description = f"```{str(error)[29:]}```", color = random.randint(0, 16777215))
+    else:
+      e = discord.Embed(title = "Error", description = f"{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
     
   #when normal error 
   @commands.Cog.listener()
@@ -71,9 +71,7 @@ class Debug(commands.Cog):
       return
     if str(inter.author.id) in db["debug"] and not toggler:
       with RdictManager(str("./database")) as db:
-        upd = db["debug"]
-        del upd["debug"][str(inter.author.id)]
-        db["debug"] = upd
+        del db["debug"][str(inter.author.id)]
       e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 

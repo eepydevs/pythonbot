@@ -199,13 +199,9 @@ class Moderation(commands.Cog):
     with RdictManager(str("./database")) as db:
       if not inter.author.top_role < member.top_role:
         if str(inter.guild.id) not in db["warns"]:
-          upd = db["warns"]
-          upd[str(inter.guild.id)] = {}
-          db["warns"] = upd
+          db["warns"][str(inter.guild.id)] = {}
         if str(member.id) not in db["warns"][str(inter.guild.id)]:
-          upd = db["warns"][str(inter.guild.id)]
-          upd[str(member.id)] = []
-          db["warns"] = upd
+          db["warns"][str(inter.guild.id)][str(member.id)] = []
           updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
           updatelist.append(reason)
           db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
@@ -235,9 +231,7 @@ class Moderation(commands.Cog):
     with RdictManager(str("./database")) as db:
       if not inter.author.top_role < member.top_role:
         if str(inter.guild.id) not in db["warns"]:
-          upd = db["warns"]
-          upd[str(inter.guild.id)] = {}
-          db["warns"] = upd
+          db["warns"][str(inter.guild.id)] = {}
         if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
           list = db["warns"][str(inter.guild.id)][str(member.id)]
           text = ""
@@ -307,9 +301,7 @@ class Moderation(commands.Cog):
         if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
           if setting == "gpd":
             if str(inter.guild.id) in db["serversetting"]["gpd"] and db["serversetting"]["gpd"][str(inter.guild.id)]:
-              upd = db["serversetting"]["gpd"]
-              del upd[str(inter.guild.id)]
-              db["serversetting"]["gpd"] = upd
+              db["serversetting"]["gpd"][str(inter.guild.id)] = None
               e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
             else:
@@ -318,9 +310,7 @@ class Moderation(commands.Cog):
               await inter.send(embed = e)
           if setting == "nqn":
             if str(inter.guild.id) in db["serversetting"]["nqn"] and db["serversetting"]["nqn"][str(inter.guild.id)]:
-              upd = db["serversetting"]["nqn"]
-              del upd[str(inter.guild.id)]
-              db["serversetting"]["nqn"] = upd
+              db["serversetting"]["nqn"][str(inter.guild.id)] = None
               e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
               await inter.send(embed = e)
             else:

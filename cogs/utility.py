@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "8.2.7" # major.sub.minor/fix
+botbuild = "8.4.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -159,18 +159,15 @@ class Utility(commands.Cog):
     await inter.response.defer(ephemeral = True)
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["bookmarks"]:
-        upd = db["bookmarks"]
-        upd[str(inter.author.id)] = {}
-        db["bookmarks"] = upd
+        db["bookmarks"][str(inter.author.id)] = {}
+
       if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
 
       msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-      upd = db["bookmarks"]
-      upd[str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
-      db["bookmarks"] = upd
+      db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
       e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
       await inter.edit_original_response(embed = e)
 
@@ -178,9 +175,7 @@ class Utility(commands.Cog):
   async def bookmarks(self, inter):
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["bookmarks"]:
-        upd = db["bookmarks"]
-        upd[str(inter.author.id)] = {}
-        db["bookmarks"] = upd
+        db["bookmarks"][str(inter.author.id)] = {}
     
   @bookmarks.sub_command()
   async def add(self, inter, *, bmname = None, msgid: discord.Message):
@@ -201,10 +196,7 @@ class Utility(commands.Cog):
         return
 
       msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-      db["bookmarks"][str(inter.author.id)][bmname] = {"items": {"content": msg.content, "jumpurl": msg.jump_url}}
-      upd = db["bookmarks"]
-      upd[str(inter.author.id)][bmname] = {"items": {"content": msg.content, "jumpurl": msg.jump_url}}
-      db["bookmarks"] = upd
+      db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
       e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
@@ -258,9 +250,8 @@ class Utility(commands.Cog):
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in reportblacklist:
         with open("buglist.txt", "a") as report:
-          upd = db["bot"]
-          upd["bugcounter"] += 1
-          db["bot"] = upd
+          db['bot']['bugcounter'] += 1
+
           report.write("\n")
           report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
           report.close()
@@ -508,15 +499,13 @@ class Utility(commands.Cog):
   async def note(self, inter):
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) not in db["notes"]:
-        upd = db["notes"]
-        upd[str(inter.author.id)]= {}
-        db["notes"] = upd
+        db["notes"][str(inter.author.id)] = {}
   
   @note.sub_command(description = "Shows list of notes you have")
   async def list(self, inter):
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
-        notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(list(db["notes"][str(inter.author.id)].keys()), start = 1))
+        notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
         e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
       else:
@@ -552,18 +541,14 @@ class Utility(commands.Cog):
           await inter.send(embed = e, ephemeral = True)
       else:
         if text != None:
-          upd = db["notes"]
-          upd[str(inter.author.id)] = {}
-          db["notes"] = upd
+          db["notes"][str(inter.author.id)] = {}
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = text
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
         else:
-          upd = db["notes"]
-          upd[str(inter.author.id)] = {}
-          db["notes"] = upd
+          db["notes"][str(inter.author.id)] = {}
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = "New note"
           db["notes"][str(inter.author.id)] = updatenotes
@@ -684,8 +669,7 @@ class Utility(commands.Cog):
     with RdictManager(str("./database")) as db:
       if str(inter.author.id) in db["notes"]:
         if name in db["notes"][str(inter.author.id)]:
-          upd = db["notes"]
-          text = upd[str(inter.author.id)].get(name)
+          text = db['notes'][str(inter.author.id)].get(name)
           rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
           e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)

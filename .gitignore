@@ -4,3 +4,6 @@ database/
 poetry.lock
 .breakpoints
 .env
+db.bak
+db.dir
+db.dat
