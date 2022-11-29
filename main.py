@@ -21,9 +21,7 @@ with RdictManager(str("./database")) as db:
 # async def on_message(message):
 #   with RdictManager(str("./database")) as db:
 #     if str(message.author.id) in db["afk"]:
-#       upd = db["afk"]
-#       del upd[str(message.author.id)]
-#       db["afk"] = upd
+#       del db["afk"][str(message.author.id)]
 #       await message.channel.send(f"Welcome back, {message.author.mention}", delete_after = 5)
 #       return
 #     for member in message.mentions:

@@ -210,7 +210,7 @@ class Utility(commands.Cog):
     bmname: Name of bookmark
     '''
     with RdictManager(str("./database")) as db:
-      if bmname not in db["bookmarks"][str(inter.author.id)] and db["bookmarks"][str(inter.author.id)][bmname]:
+      if bmname not in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
         return
@@ -301,9 +301,7 @@ class Utility(commands.Cog):
   #     reason: Reason for afk
   #     '''
   #     with RdictManager(str("./database")) as db:
-  #       upd = db["afk"]
-  #       upd[str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
-  #       db["afk"] = upd
+  #       db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
   #     e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
   #     await inter.send(embed = e)
 

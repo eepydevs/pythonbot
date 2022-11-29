@@ -873,11 +873,12 @@ class Nonsense(commands.Cog):
     ----------
     cmd_name: Command name
     '''
-    if cmd_name in db["customcmd"][str(inter.author.id)]:
-      await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
-    else:
-      e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    with RdictManager(str("./database")) as db:
+      if cmd_name in db["customcmd"][str(inter.author.id)]:
+        await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
+      else:
+        e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
 
   @cc.sub_command()
   async def delete(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):

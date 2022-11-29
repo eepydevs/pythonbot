@@ -138,10 +138,10 @@ class menusearch(discord.ui.Select):
         return True
     
   async def callback(self, inter: discord.MessageInteraction):
-    if str(inter.author.id) in db["balance"]:
-      chance = random.randint(0, 100)
-      if chance > 25:
-        with RdictManager(str("./database")) as db:
+    with RdictManager(str("./database")) as db:
+      if str(inter.author.id) in db["balance"]:
+        chance = random.randint(0, 100)
+        if chance > 25:
           rng = random.randint(100, 500)
           db["balance"][str(inter.author.id)] += rng
           e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
@@ -149,15 +149,13 @@ class menusearch(discord.ui.Select):
             e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
           await inter.response.edit_message(embed = e, view = None)
           return
-      else:
-        with RdictManager(str("./database")) as db:
+        else:
           e = discord.Embed(title = f"{inter.author.name} searched: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
           if str(inter.author.id) in db["debug"]:
             e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}")
           await inter.response.edit_message(embed = e, view = None)
           return
-    else:
-      with RdictManager(str("./database")) as db:
+      else:
         db["balance"][str(inter.author.id)] = 0
         rng = random.randint(100, 500)
         db["balance"][str(inter.author.id)] += rng
@@ -197,19 +195,19 @@ class menupm(discord.ui.Select):
     
   async def callback(self, inter: discord.MessageInteraction):
     chance = random.randint(0, 100)
-    if chance > 45:
-      rng = random.randint(250, 1000)
-      db["balance"][str(inter.author.id)] += rng
-      e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
-      with RdictManager(str("./database")) as db:
+    with RdictManager(str("./database")) as db:
+      if chance > 45:
+        rng = random.randint(250, 1000)
+        db["balance"][str(inter.author.id)] += rng
+        e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You got {rng} 💵 !", color = random.randint(0, 16777215))
         if str(inter.author.id) in db["debug"]:
           e.add_field(name = "Debug", value = f"Variables value:\n{rng}, {db['balance'][str(inter.author.id)]}, {self.values[0]}")
-      await inter.response.edit_message(embed = e, view = None)
-      return
-    else:
-      e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
-      await inter.response.edit_message(embed = e, view = None)
-      return
+        await inter.response.edit_message(embed = e, view = None)
+        return
+      else:
+        e = discord.Embed(title = f"{inter.author.name} posted: {self.values[0]}", description = f"You failed...", color = random.randint(0, 16777215))
+        await inter.response.edit_message(embed = e, view = None)
+        return
 
 class pmview(discord.ui.View):
   def __init__(self, inter: discord.Interaction):
@@ -742,6 +740,7 @@ class Economy(commands.Cog):
                   if itemname not in db["inventory"][str(inter.author.id)]:
                     e = discord.Embed(title = "Shop", description = "You can't sell nothing!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
+                    return
                   else:
                     if db["inventory"][str(inter.author.id)].get(itemname) >= 2:
                       db["balance"][str(inter.author.id)] += int(db["shop"].get(itemname) // 2) * quantity
