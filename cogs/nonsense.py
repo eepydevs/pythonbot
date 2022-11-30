@@ -11,6 +11,7 @@ import random
 import asyncio
 import requests
 import math
+from webcolors import hex_to_rgb
 import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
@@ -36,6 +37,9 @@ with RdictManager(str("./database")) as db:
 
   if "bookmarks" not in db:
     db["bookmarks"] = {}
+    
+def esc_md(text: str):
+  return text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
   
 class Required1(str, Enum):
   You = "True"
@@ -110,6 +114,8 @@ def shuffle(x):
 
 async def suggest_tupper(inter, input):
   with RdictManager(str("./database")) as db:
+    if str(inter.author.id) not in db["tupper"]:
+      db["tupper"][str(inter.author.id)] = {}
     return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
 
 async def suggest_rblxuser(inter, input):
@@ -124,6 +130,8 @@ async def suggest_rblxuser(inter, input):
 
 async def suggest_command(inter, input):
   with RdictManager(str("./database")) as db:
+    if str(inter.author.id) not in db["notes  "]:
+      db["customcmd"][str(inter.author.id)] = {}
     return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
 def runbf(str):
@@ -263,6 +271,23 @@ class Nonsense(commands.Cog):
     e.set_thumbnail(url = str(info.beatmapset().covers.list_2x)) 
     e.set_footer(text = f"ID: {info.beatmapset_id} > {beatmapid}")
     await inter.send(embed = e)
+    
+  
+  @osu.sub_command()
+  async def user(self, inter, user: str):
+    """
+    Search for user info in osu!
+    
+    Parameters
+    ----------
+    user: User name or id
+    """
+    info = osuapi.user(user = user)
+    rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
+    e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[BOT]`" if info.is_bot else "") + (" `[❤️]`" if info.is_supporter else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "")  + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + "\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`", color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16667215))
+    e.add_field(name = "Statistics:", value = f"PP (Perforamnce Points): `{round(info.statistics.pp)}`" + "\n" +  f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`")
+    e.set_thumbnail(url = str(info.avatar_url))
+    await inter.send(embed = e, ephemeral = True)
      
 
   #roblox group

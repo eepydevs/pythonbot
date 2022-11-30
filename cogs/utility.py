@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "8.4.0" # major.sub.minor/fix
+botbuild = "8.5.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -42,6 +42,8 @@ def sbs(members):
 
 async def suggest_note(inter, input):
   with RdictManager(str("./database")) as db:
+    if str(inter.author.id) not in db["notes"]:
+      db["notes"][str(inter.author.id)] = {}
     return [note for note in list(db['notes'][str(inter.author.id)].keys()) if input.lower() in note.lower()][0:24]
 
 async def suggest_user(inter, input):
@@ -52,10 +54,14 @@ async def suggest_member(inter, input):
 
 async def suggest_bookmark(inter, input):
   with RdictManager(str("./database")) as db:
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
     return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
 
 async def suggest_sbookmark(inter, input):
   with RdictManager(str("./database")) as db:
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
     return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
   
 class rbbuttons(discord.ui.View):

@@ -390,19 +390,6 @@ class Text(commands.Cog):
     modtext = uwuize(text)
     await inter.send(modtext)
 
-  #domify command
-  @commands.slash_command(name = "domify", description = "Domify your inputted text!")
-  async def dot(inter, *, text):
-    '''
-    Domify your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = text.lower() + "."
-    await inter.send(modtext)
-
   #ifyify command
   @commands.slash_command(name = "ifyify", description = "Ifyify your inputted text!")
   async def ify(inter, *, text):
