@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "8.5.0" # major.sub.minor/fix
+botbuild = "8.6.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -297,19 +297,22 @@ class Utility(commands.Cog):
   #   await inter.send(embed = e)
 
   #afk command
-  # @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
-  # async def slashafk(inter, reason = "None"):
-  #     '''
-  #     Set your afk and reason for it
+  @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
+  async def slashafk(inter, reason = "None"):
+      '''
+      Set your afk and reason for it
   
-  #     Parameters
-  #     ----------
-  #     reason: Reason for afk
-  #     '''
-  #     with RdictManager(str("./database")) as db:
-  #       db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
-  #     e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
-  #     await inter.send(embed = e)
+      Parameters
+      ----------
+      reason: Reason for afk
+      '''
+      with RdictManager(str("./database")) as db:
+        db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+        if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role:
+          db["afk"][str(inter.author.id)].update({"bname": (str(inter.author.nick) if inter.author.nick else str(inter.author.name)), "serverid": inter.guild.id})
+          await inter.author.edit(nick = f"[AFK] {str(inter.author.nick) if inter.author.nick else str(inter.author.name)}")
+      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #bot group
   @commands.slash_command()
@@ -323,7 +326,7 @@ class Utility(commands.Cog):
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [Number1#4325](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{psutil.getloadavg()[1]}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Total: `4096MB`\n> Usage: `{psutil.virtual_memory()[2]}%` (virtual)\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False) #
+    e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False) 
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)\n[Python Bot plans Trello board](https://trello.com/b/G33MTATB/python-bot-plans)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
@@ -409,7 +412,7 @@ class Utility(commands.Cog):
     e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
     view = discord.ui.View()
     style = discord.ButtonStyle.gray
-    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239702432855&scope=bot%20applications.commands")
+    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
     style1 = discord.ButtonStyle.gray
     item1 = discord.ui.Button(style = style1, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
     view.add_item(item = item)

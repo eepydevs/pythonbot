@@ -9,14 +9,14 @@ class RdictManager():
     def __init__(self, path: str):
         self._path = path
         
-    def __enter__(self):
+    def __enter__(self) -> dict:
         self._rdict = Rdict(self._path)
         if "main" not in self._rdict:
             self._rdict["main"] = {}
         self._var = self._rdict["main"]
         return self._var
     
-    def __exit__(self, exc_type,exc_value, exc_traceback):
+    def __exit__(self, exc_type, exc_value, exc_traceback):
         self._rdict["main"] = self._var
         self._rdict.close()
 

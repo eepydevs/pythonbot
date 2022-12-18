@@ -248,6 +248,49 @@ class Nonsense(commands.Cog):
       pass
 
   @commands.slash_command()
+  async def tetrio(self, inter):
+    pass
+  
+  @tetrio.sub_command()
+  async def stats(self, inter):
+    """
+    See global stats of TETR.IO    
+    """
+    await inter.response.defer()
+    url = "https://ch.tetr.io/api/general/stats"
+    response = requests.request("GET", url)
+    rjson = response.json()["data"]
+    e = discord.Embed(url = "https://ch.tetr.io/", title = "TETR.IO Server stats", color = random.randint(0, 16667215))
+    e.add_field(name = f"Total players: {rjson['usercount']}", value = f"> Of which registered: `{rjson['usercount'] - rjson['anoncount']}`" + "\n" + f"> Of which anonymous: `{rjson['anoncount']}`" + "\n" + f"> Of which ranked: `{rjson['rankedcount']}`" + "\n" + f"Users registered a second\*: `{round(rjson['usercount_delta'])}` (rounded)" + "\n" + "\n" + f"Replays stored: `{rjson['replaycount']}`" + "\n" + f"Games played: `{rjson['gamesplayed']}`" + "\n" + f"> Of which finished: `{rjson['gamesfinished']}`" + "\n" + f"Games played a second\*: `{round(rjson['gamesplayed_delta'])}` (rounded)"+ "\n" + "\n" + f"Time played\*\*: `{round(rjson['gametime'] / 60 / 60)}` hours" + "\n" + f"--------------- or `{round(rjson['gametime'] / 60 / 60 / 24)}` days" + "\n" + f"--------------- or `{round(rjson['gametime'] / 60 / 60 / 24 / 365)}` years" + "\n" + "\n" + f"Pieces placed: `{rjson['piecesplaced']}`" + "\n" + f"Keypresses: `{rjson['inputs']}`", inline = False)
+    e.set_footer(text = "* Through the last minute, ** Rounded")
+    await inter.edit_original_message(embed = e)
+    
+  @tetrio.sub_command()
+  async def user(self, inter, user: str):
+    """
+    Search for user info in TETR.IO
+   
+    Parameters
+    ----------  
+    user: User name or id 
+    """
+    await inter.response.defer()
+    url = f"https://ch.tetr.io/api/users/{user}"
+    response = requests.request("GET", url)
+    if "data" in response.json():
+      rjson = response.json()["data"]["user"]
+      league = rjson["league"]
+      e = discord.Embed(url = f"https://ch.tetr.io/u/{user}", title = f"{esc_md(rjson['username'])} `[{rjson['role'].upper()}]`" + (f" `[✅]`" if rjson['verified'] else "") + (f" `[{'⭐' * rjson['supporter_tier']}]`" if rjson['supporter_tier'] else ""), description = (f"Country: :flag_{rjson['country'].lower()}:" if rjson['country'] != "XM" else "Country: The Moon"), color = random.randint(0, 16667215))
+      e.add_field(name = "Joined:", value = f"<t:{str(time.mktime(time.strptime(rjson['ts'].replace('T', ' ')[:rjson['ts'].find('.')], '%Y-%m-%d %H:%M:%S')))[:-2]}:R>" if "ts" in rjson else "Here since the beginning")
+      e.add_field(name = "Statistics:", value = f"Experience: {rjson['xp']}\nPlay time: {round(rjson['gametime'] / 60 / 60)} hours\nOnline games: {rjson['gamesplayed']}\n> Of which wins: {rjson['gameswon']}", inline = False)
+      e.add_field(name = "Tetra League:", value = f"Rank: **{league['rank'].upper()}**" + "\n" + ((f"Top rank: **{league['bestrank'].upper()}**" + "\n") if "bestrank" in league else "") + f"Record: {league['gameswon']}/{league['gamesplayed']} ({'%.2f'%(league['gameswon'] / league['gamesplayed'] * 100)}%)" + "\n" + ((f"Rating: {'%.2f'%(league['rating'])}" + "\n") if "rating" in league else "") + ((f"Glicko: {'%.2f'%(league['glicko'])}±{'%.2f'%(league['rd'])}" + "\n") if "glicko" in league else "") + ((f"APM: {league['apm']}" + "\n") if "apm" in league else "") + ((f"PPS: {league['pps']}" + "\n") if "pps" in league else "") + ((f"VS: {league['vs']}" + "\n") if "vs" in league else ""), inline = True)
+      e.set_footer(text = f"ID: {rjson['_id']}")
+    else:
+      rjson = response.json()
+      e = discord.Embed(title = "Error", description = f"```{rjson['error']}```", color = random.randint(0, 16667215))
+    await inter.send(embed = e)
+
+  @commands.slash_command()
   async def osu(self, inter):
     pass
 
@@ -284,10 +327,16 @@ class Nonsense(commands.Cog):
     """
     info = osuapi.user(user = user)
     rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
-    e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[BOT]`" if info.is_bot else "") + (" `[❤️]`" if info.is_supporter else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "")  + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + "\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`", color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16667215))
-    e.add_field(name = "Statistics:", value = f"PP (Perforamnce Points): `{round(info.statistics.pp)}`" + "\n" +  f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`")
+    e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16667215))
+    e.add_field(name = "Joined:", value = f"<t:{int(info.join_date.timestamp())}:R>", inline = True)
+    e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
+    if not info.is_bot:
+      e.add_field(name = "Statistics:", value = f"Performance Points: `{round(info.statistics.pp)}`" + "\n" +  f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`", inline = False)
+    if info.cover.url:
+      e.set_image(url = str(info.cover.url))
     e.set_thumbnail(url = str(info.avatar_url))
-    await inter.send(embed = e, ephemeral = True)
+    e.set_footer(text = f"ID: {info.id}")
+    await inter.send(embed = e)
      
 
   #roblox group
@@ -563,7 +612,7 @@ class Nonsense(commands.Cog):
     send_way: Available ways: Normal, Await
     code: Code here
     '''
-    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension", "leave"]
+    blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension", "leave", "token", "http"]
     try:
       if inter.author.id == inter.bot.owner.id:
         if send_way == "Normal":
