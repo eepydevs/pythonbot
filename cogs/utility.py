@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "8.6.0" # major.sub.minor/fix
+botbuild = "8.6.1" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 

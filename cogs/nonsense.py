@@ -272,18 +272,20 @@ class Nonsense(commands.Cog):
    
     Parameters
     ----------  
-    user: User name or id 
+    user: User Name or MongoID 
     """
+    user = user.lower()
     await inter.response.defer()
     url = f"https://ch.tetr.io/api/users/{user}"
     response = requests.request("GET", url)
     if "data" in response.json():
       rjson = response.json()["data"]["user"]
       league = rjson["league"]
-      e = discord.Embed(url = f"https://ch.tetr.io/u/{user}", title = f"{esc_md(rjson['username'])} `[{rjson['role'].upper()}]`" + (f" `[✅]`" if rjson['verified'] else "") + (f" `[{'⭐' * rjson['supporter_tier']}]`" if rjson['supporter_tier'] else ""), description = (f"Country: :flag_{rjson['country'].lower()}:" if rjson['country'] != "XM" else "Country: The Moon"), color = random.randint(0, 16667215))
+      e = discord.Embed(url = f"https://ch.tetr.io/u/{user}", title = f"{esc_md(rjson['username'])} `[{rjson['role'].upper()}]`" + (f" `[✅]`" if rjson['verified'] else "") + (f" `[{'⭐' * rjson['supporter_tier']}]`" if rjson['supporter_tier'] else ""), description = ((f"Country: :flag_{rjson['country'].lower()}:" if rjson['country'] != "XM" else "Country: The Moon") if rjson["country"] else ""), color = random.randint(0, 16667215))
       e.add_field(name = "Joined:", value = f"<t:{str(time.mktime(time.strptime(rjson['ts'].replace('T', ' ')[:rjson['ts'].find('.')], '%Y-%m-%d %H:%M:%S')))[:-2]}:R>" if "ts" in rjson else "Here since the beginning")
-      e.add_field(name = "Statistics:", value = f"Experience: {rjson['xp']}\nPlay time: {round(rjson['gametime'] / 60 / 60)} hours\nOnline games: {rjson['gamesplayed']}\n> Of which wins: {rjson['gameswon']}", inline = False)
-      e.add_field(name = "Tetra League:", value = f"Rank: **{league['rank'].upper()}**" + "\n" + ((f"Top rank: **{league['bestrank'].upper()}**" + "\n") if "bestrank" in league else "") + f"Record: {league['gameswon']}/{league['gamesplayed']} ({'%.2f'%(league['gameswon'] / league['gamesplayed'] * 100)}%)" + "\n" + ((f"Rating: {'%.2f'%(league['rating'])}" + "\n") if "rating" in league else "") + ((f"Glicko: {'%.2f'%(league['glicko'])}±{'%.2f'%(league['rd'])}" + "\n") if "glicko" in league else "") + ((f"APM: {league['apm']}" + "\n") if "apm" in league else "") + ((f"PPS: {league['pps']}" + "\n") if "pps" in league else "") + ((f"VS: {league['vs']}" + "\n") if "vs" in league else ""), inline = True)
+      e.add_field(name = "Statistics:", value = f"Experience: `{rjson['xp']}`\nPlay time: `{round(rjson['gametime'] / 60 / 60) if rjson['gametime'] else 0}` hours\nOnline games: `{rjson['gamesplayed']}`\n> Of which wins: `{rjson['gameswon']}`", inline = False)
+      if league['gamesplayed']:
+        e.add_field(name = "Tetra League:", value = f"Rank: **`{league['rank'].upper()}`**" + "\n" + ((f"Top rank: **`{league['bestrank'].upper()}`**" + "\n") if "bestrank" in league else "") + f"Record: **`{league['gameswon']}`**/`{league['gamesplayed']}` (`{'%.2f'%(league['gameswon'] / league['gamesplayed'] * 100) if league['gameswon'] and league['gamesplayed'] else 0}%`)" + "\n" + ((f"Rating: `{'%.2f'%(league['rating'])}`" + "\n") if "rating" in league else "") + ((f"Glicko: **`{'%.2f'%(league['glicko'])}`**±`{'%.2f'%(league['rd'])}`" + "\n") if "glicko" in league else "") + ((f"APM: `{league['apm']}`" + "\n") if "apm" in league else "") + ((f"PPS: `{league['pps']}`" + "\n") if "pps" in league else "") + ((f"VS: `{league['vs']}`" + "\n") if "vs" in league else ""), inline = True)
       e.set_footer(text = f"ID: {rjson['_id']}")
     else:
       rjson = response.json()
@@ -315,7 +317,6 @@ class Nonsense(commands.Cog):
     e.set_footer(text = f"ID: {info.beatmapset_id} > {beatmapid}")
     await inter.send(embed = e)
     
-  
   @osu.sub_command()
   async def user(self, inter, user: str):
     """
@@ -325,20 +326,46 @@ class Nonsense(commands.Cog):
     ----------
     user: User name or id
     """
-    info = osuapi.user(user = user)
-    rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
-    e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16667215))
-    e.add_field(name = "Joined:", value = f"<t:{int(info.join_date.timestamp())}:R>", inline = True)
-    e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
-    if not info.is_bot:
-      e.add_field(name = "Statistics:", value = f"Performance Points: `{round(info.statistics.pp)}`" + "\n" +  f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`", inline = False)
-    if info.cover.url:
-      e.set_image(url = str(info.cover.url))
-    e.set_thumbnail(url = str(info.avatar_url))
-    e.set_footer(text = f"ID: {info.id}")
-    await inter.send(embed = e)
-     
-
+    try:
+      info = osuapi.user(user = user)
+      rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
+      e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16667215))
+      e.add_field(name = "Joined:", value = f"<t:{int(info.join_date.timestamp())}:R>", inline = True)
+      e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
+      if not info.is_bot:
+        e.add_field(name = "Statistics:", value = f"Performance Points: `{round(info.statistics.pp)}`" + "\n" +  f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`", inline = False)
+      if info.cover.url:
+        e.set_image(url = str(info.cover.url))
+      e.set_thumbnail(url = str(info.avatar_url))
+      e.set_footer(text = f"ID: {info.id}")
+      await inter.send(embed = e)
+    except ValueError:
+      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16667215))
+      await inter.send(embed = e, ephemeral = True)
+      
+  @osu.sub_command()
+  async def rs(self, inter, user: str):
+    """
+    See information about most recent score of mentioned user
+    
+    Parameters
+    ----------
+    user: User name or id
+    """
+    try:
+      if osuapi.user_scores(osuapi.user(user = user).id, "recent"):
+        await inter.response.defer()
+        info = osuapi.user_scores(osuapi.user(user = user).id, "recent")[0]
+        e = discord.Embed(title = f"{info.beatmap.beatmapset().artist} - {info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods)) if str(info.mods) != 'NM' else ''} [{info.beatmap.difficulty_rating}⭐]", description = f"> **`{info.rank.name}`** - **`{'%.2f'%(info.pp) if info.pp else 0}PP`** - **`{'%.2f'%(info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]\n\n<t:{int(time.mktime(info.created_at.timetuple())) + 10800}:R> on osu! Bancho", color = random.randint(0, 16667215))
+        e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x)) 
+        await inter.send(f"**Recent {info.mode.name.lower()}! score for {esc_md(osuapi.user(user = user).username)}:**", embed = e) # 'match', 'override_class', 'override_types', 'passed', 'rank_country', 'rank_global'
+      else:
+        e = discord.Embed(title = "Error", description = "This user does not have recent scores...", color = random.randint(0, 16667215))
+        await inter.send(embed = e, ephemeral = True)
+    except ValueError:
+      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16667215))
+      await inter.send(embed = e, ephemeral = True)
+      
   #roblox group
   @commands.slash_command()
   async def roblox(self, inter):
