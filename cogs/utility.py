@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "8.7.0" # major.sub.minor/fix
+botbuild = "8.7.1" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -23,15 +23,6 @@ with RdictManager(str("./database")) as db:
 
   if "reminders" not in db:
     db["reminders"] = {}
-
-  if "bot" not in db:
-    db["bot"] = {}
-
-  if "bugcounter" not in db["bot"]:
-    db["bot"]["bugcounter"] = 0
-
-  if "atr_log" not in db["bot"]:
-    db["bot"]["atr_log"] = 0
 
 def sbs(members):
   rval = {"offline": 0, "online": 0, "idle": 0, "dnd": 0}
@@ -243,29 +234,6 @@ class Utility(commands.Cog):
         return
       e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
       await inter.send(embed = e, ephemeral = True)
-      
-  #report bug command
-  @commands.slash_command(name = "bugreport", description = "report bug")
-  async def slashreport(inter, text):
-    '''
-    Report a bug to bot owner
-    Parameters
-    ----------
-    text: Tell your bug here
-    '''
-    with RdictManager(str("./database")) as db:
-      if str(inter.author.id) not in reportblacklist:
-        with open("buglist.txt", "a") as report:
-          db['bot']['bugcounter'] += 1
-
-          report.write("\n")
-          report.write(f"Bug #{db['bot']['bugcounter']}: {text} from {inter.author}")
-          report.close()
-        e = discord.Embed(title = "Success", description = f"Appended `Bug #{db['bot']['bugcounter']}: {text} from {inter.author}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = "Youre blacklisted", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
 
   #remind command
   # @commands.slash_command()

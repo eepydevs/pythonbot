@@ -6,7 +6,7 @@
 
 ## Commands
 
-Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `screenshot`, `bugreport`, `afk`, `suggest`, `invite`, `whois`, `emoji`, `poll`, `quote`
+Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `screenshot`, `afk`, `suggest`, `invite`, `whois`, `emoji`, `poll`, `quote`
 
 Text: `encode(braille, binary, morse)`, `decode(braille, binary, morse)`, `lowify`, `highify`, `spacify`, `titlize`, `swapize`, `capify`, `flipify`, `reversify`, `strokify`, `fuwwify`, `ifyify`, `izeize`, `brickify`, `shoutify`, `spoilerize`, `sortify`, `qmaify`, `remixuerify`, `indicatorify`, `ifyinglyedy`
 
