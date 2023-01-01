@@ -16,7 +16,7 @@ Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `
 
 Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `serverinfo`, `roleinfo`, `hasrole`
 
-Moderation: `kick`, `ban`, `unban`, `purge`, `pin`, `warn`, `warns`, `removewarns`, `switchsetting`, `createchannel`
+Moderation: `kick`, `ban`, `unban`, `purge`, `pin`, `warn`, `warns`, `removewarn`, `switchsetting`, `createchannel`
 
 Fun: `meme`, `say`, `choice`, `8ball`, `coinflip`, `random`, `dice`, `math`, `guessthenumber`, `rps`, `repleach`
 
@@ -28,7 +28,7 @@ Manage nicknames: `afk` (changing nickname)
 
 Manage webhooks: `copy-person`, `tupper`
 
-Kick members: `kick`, `warn`, `warns`, `removewarns`
+Kick members: `kick`, `warn`, `warns`, `removewarn`
 
 Ban members: `ban`, `unban`
 
