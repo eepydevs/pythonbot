@@ -5,7 +5,14 @@ from rocksdict import Rdict
 from disnake.ext import commands
 import os
 
-class RdictManager():
+class Singleton(type):
+  _instances = {}
+  def __call__(cls, *args, **kwargs):
+    if cls not in cls._instances:
+      cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+    return cls._instances[cls]
+    
+class RdictManager(metaclass = Singleton):
     def __init__(self, path: str):
         self._path = path
         
@@ -19,6 +26,23 @@ class RdictManager():
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self._rdict["main"] = self._var
         self._rdict.close()
+        
+    def sync(self, cvar: dict = None) -> dict:
+        self._c = Rdict(self._path)
+        if "main" not in self._c:
+            self._c["main"] = {}
+        if cvar:
+            self._c["main"] = cvar
+        self._v = self._c["main"]
+        self._c.close()
+        return self._v
+        
+        # with RdictManager(self._path) as self._c:
+        #     if cvar:
+        #         self._c = cvar
+        #     return self._c
+        
+        
 
 def Embed(
     msg: Union[commands.Context, discord.Interaction, discord.Message],

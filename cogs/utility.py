@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "8.6.1" # major.sub.minor/fix
+botbuild = "8.7.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -268,33 +268,47 @@ class Utility(commands.Cog):
         await inter.send(embed = e)
 
   #remind command
-  # @commands.slash_command(name = "remind", description = "reminder")
-  # async def slashremind(inter, ctime = "1h", *, text):
+  # @commands.slash_command()
+  # async def remind(self, inter):
+  #   pass
+
+  # @remind.sub_command()
+  # async def add(self, inter, days: int = 0, hours: int = 1, minutes: int = 0, *, text):
   #   '''
   #   Make a reminder for yourself
+    
   #   Parameters
   #   ----------
-  #   ctime: Xh = X hours, Xd = X days, Xs = X seconds, Xm = X minutes | Default: 1h
+  #   days: Amount of days to wait | Default: 0
+  #   hours: Amount of hours to wait | Default: 1
+  #   minutes: Amount of minutes to wait | Default: 0
   #   text: Your reminder here
   #   '''
-  #   if ctime[:-1].isnumeric():
-  #     if ctime[len(ctime) - 1] == "m":
-  #       rtime = int(time.time()) + 60 * int(ctime[:-1])
-  #     elif ctime[len(ctime) - 1] == "d":
-  #       rtime = int(time.time()) + 86400 * int(ctime[:-1])
-  #     elif ctime[len(ctime) - 1] == "s":
-  #       rtime = int(time.time()) + int(ctime[:-1])
-  #     elif ctime[len(ctime) - 1] == "h":
-  #       rtime = int(time.time()) + 3600 * int(ctime[:-1])
-  #   else:
-  #     raise ValueError("Invalid argument: time")
+  #   rtime = int(time.time()) + 86400 * days + 3600 * hours + 60 * minutes
   #   ruser = inter.author.id
   #   rtext = text
-  #   db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
-  #   e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
-  #   if str(inter.author.id) in db["debug"]:
-  #     e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
-  #   await inter.send(embed = e)
+  #   with RdictManager(str("./database")) as db:
+  #     db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
+  #     e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
+  #     if str(inter.author.id) in db["debug"]:
+  #       e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
+  #     await inter.send(embed = e)
+    
+  
+  # @remind.sub_command()
+  # async def remove(self, inter):
+  #   '''
+  #   Remove the reminder you made
+  #   '''
+  #   with RdictManager(str("./database")) as db:
+  #     e = discord.Embed(title = "Error", description = f"Reminder deleted", color = random.randint(0, 16777215))
+  #     if str(inter.author.id) in db["reminders"]:
+  #       del db["reminders"][str(inter.author.id)]
+  #       e = discord.Embed(title = "Success", description = f"Reminder deleted", color = random.randint(0, 16777215))
+  #       await inter.send(embed = e)
+  #       return
+  #     e = discord.Embed(title = "Error", description = f"Reminder is not found", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e, ephemeral = True)
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
@@ -413,10 +427,11 @@ class Utility(commands.Cog):
     view = discord.ui.View()
     style = discord.ButtonStyle.gray
     item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
-    style1 = discord.ButtonStyle.gray
-    item1 = discord.ui.Button(style = style1, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
+    item1 = discord.ui.Button(style = style, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
+    item2 = discord.ui.Button(style = style, label = "Invite to Guilded support server", url = "https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat")
     view.add_item(item = item)
     view.add_item(item = item1)
+    view.add_item(item = item2)
     await inter.send(embed = e, view = view)
     
   #member info command

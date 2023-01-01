@@ -18,10 +18,22 @@ import datetime, time
 import requests as rq
 from utils import RdictManager
 from dotenv import load_dotenv
+from pp_calc import calc as pp
 load_dotenv()
 
 osuapi = osu.OssapiV2(18955, os.getenv("osu"), "http://localhost:727/")
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
+
+ranks = {
+  'D': '<:D_:1054751662394318888>',
+  'C': '<:C_:1054751660431392768>',
+  'B': '<:B_:1054751658879483934>',
+  'A': '<:A_:1054751657138847834>',
+  'S': '<:S_:1054751655452745738>',
+  'SH': '<:SH:1054751653758255104>',
+  'XH': '<:XH:1054751664436944897>',
+  'X': '<:X_:1054751667687522336>',
+}
 
 crblx = rblx.Client(os.getenv('rblxs'))
 
@@ -40,6 +52,8 @@ with RdictManager(str("./database")) as db:
     
 def esc_md(text: str):
   return text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
+  
+calc_acc = lambda c300 = 0, c100 = 0, c50 = 0, miss = 0: round((300 * c300 + 100 * c100 + 50 * c50) / 300 / (c300 + c100 + c50 + miss) * 100, 2)
   
 class Required1(str, Enum):
   You = "True"
@@ -344,27 +358,89 @@ class Nonsense(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
       
   @osu.sub_command()
-  async def rs(self, inter, user: str):
+  async def rs(self, inter, user: str, index: int = 1):
     """
     See information about most recent score of mentioned user
     
     Parameters
     ----------
     user: User name or id
+    index: Index of score (default: 1)
     """
     try:
-      if osuapi.user_scores(osuapi.user(user = user).id, "recent"):
+      if req := osuapi.user_scores(osuapi.user(user = user).id, "recent"):
         await inter.response.defer()
-        info = osuapi.user_scores(osuapi.user(user = user).id, "recent")[0]
-        e = discord.Embed(title = f"{info.beatmap.beatmapset().artist} - {info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods)) if str(info.mods) != 'NM' else ''} [{info.beatmap.difficulty_rating}⭐]", description = f"> **`{info.rank.name}`** - **`{'%.2f'%(info.pp) if info.pp else 0}PP`** - **`{'%.2f'%(info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]\n\n<t:{int(time.mktime(info.created_at.timetuple())) + 10800}:R> on osu! Bancho", color = random.randint(0, 16667215))
-        e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x)) 
-        await inter.send(f"**Recent {info.mode.name.lower()}! score for {esc_md(osuapi.user(user = user).username)}:**", embed = e) # 'match', 'override_class', 'override_types', 'passed', 'rank_country', 'rank_global'
+        if index < 1:
+          index = 1
+        elif index > len(req):
+          index = len(req)
+        info = req[index - 1]
+        ppifranked = 0
+        ppaccifranked = 0
+        if info.pp and info.mode.value == "osu":
+          if not info.perfect and info.mode.value == 'osu':
+            accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
+            #ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
+            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        elif not info.pp and info.mode.value == "osu":
+          acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
+          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f'%(info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f'%(accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f'%(info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + 10800}:R> on osu! Bancho", color = random.randint(0, 16667215))
+        e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
+        e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
+        await inter.send(f"**Recent {info.mode.name.lower()}! score for [{esc_md(osuapi.user(user = user).username)}](https://osu.ppy.sh/users/{osuapi.user(user = user).id}):**", embed = e)
       else:
-        e = discord.Embed(title = "Error", description = "This user does not have recent scores...", color = random.randint(0, 16667215))
+        e = discord.Embed(title = "Error", description = "This user does not have any recent scores...", color = random.randint(0, 16667215))
         await inter.send(embed = e, ephemeral = True)
     except ValueError:
       e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16667215))
       await inter.send(embed = e, ephemeral = True)
+      
+  @osu.sub_command()
+  async def ppacc(self, inter, id: str, acc: float = 100.00, mods: str = "NM"):
+    '''
+    Calculate osu! PP using accuracy
+    
+    Parameters
+    ----------
+    id: Beatmap ID
+    acc: Accuracy
+    mods: Mods string (example: HDDT) 
+    '''
+    if acc > 100.00: acc = 100.00
+    elif acc < 0.00: acc = 0.00
+    try:
+      info = osuapi.beatmap(beatmap_id = id)
+      ppacc = pp.pp(l = f'https://osu.ppy.sh/osu/{id}', acc = acc, mod_s = (str(mods)) if str(mods) != 'NM' else '')
+      e = discord.Embed(url = f"https://osu.ppy.sh/osu/{id}",title = f"PP calculation for: {info.beatmapset().title} [{info.version}] {('+' + str(mods).upper() + ' ') if str(mods).upper() != 'NM' else ''}[{info.difficulty_rating}⭐]", description = f"**`{ppacc}PP`** - `{acc}%`", color = random.randint(0, 16667215))
+      await inter.send(embed = e)
+    except ValueError:
+      e = discord.Embed(title = "Error", description = "Beatmap not found", color = random.randint(0, 16667215))
+      await inter.send(embed = e, ephemeral = True)
+      
+  @osu.sub_command()
+  async def acc(self, inter, c300: int = 0, c100: int = 0, c50: int = 0, misses: int = 0):
+    '''
+    Calculate osu! accuracy using hitcircle scores
+    
+    Parameters
+    ----------
+    c300: Amount of 300's
+    c100: Amount of 100's
+    c50: Amount of 50's
+    misses: Amount of misses
+    ''' 
+    if any([c300, c100, c50, misses]):
+      result = calc_acc(c300, c100, c50, misses)
+      e = discord.Embed(title = "Accuracy calculation", description = f"**`{result}%`** - [{c300}/{c100}/{c50}/{misses}]", color = random.randint(0, 16667215))
+      await inter.send(embed = e)
+    else:
+      result = 100.00
+      e = discord.Embed(title = "Accuracy calculation", description = f"**`{result}%`**", color = random.randint(0, 16667215))
+      await inter.send(embed = e)
       
   #roblox group
   @commands.slash_command()
@@ -384,7 +460,7 @@ class Nonsense(commands.Cog):
     try: 
       user = await crblx.get_user_by_username(username, expand = True)
       avatar = await crblx.thumbnails.get_user_avatar_thumbnails(users = [user], type = AvatarThumbnailType.headshot, size = (420, 420))
-    except rblx.UserNotFound:
+    except rblx.UserNotFound: 
       e = discord.Embed(title = "Error", description = "Invalid username", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       return
@@ -829,6 +905,7 @@ class Nonsense(commands.Cog):
 
   #use tupper
   @tupper.sub_command()
+  @commands.bot_has_permissions(manage_webhooks = True)
   async def say(self, inter, *, tupper: str = commands.Param(autocomplete = suggest_tupper), content):
     '''
     Use tupper to say something!
@@ -930,7 +1007,10 @@ class Nonsense(commands.Cog):
     '''
     Expression info here
     '''
-    e = discord.Embed(title = "Expression info", description = "{author} = " + inter.author.name + "\n{author.mention} = " + f"<@{inter.author.id}>" + "\n{server} = " + inter.guild.name + "\n{server.id} = " + str(inter.guild.id) + "\n{channel} = " + inter.channel.name + "\n{channel.id} = " + str(inter.channel.id), color = random.randint(0, 16777215))
+    table = {"{author}": inter.author.name, "{author.mention}": f"<@{inter.author.id}>",
+           "{server}": inter.guild.name, "{server.id}": str(inter.guild.id),
+           "{channel}": inter.channel.name, "{channel.id}": str(inter.channel.id)}
+    e = discord.Embed(title = "Expression info", description = '\n'.join((key + ': ' + value) for key, value in zip(table.keys(), table.values())), color = random.randint(0, 16777215))
     await inter.send(embed = e, ephemeral = True)
 
   @cc.sub_command()

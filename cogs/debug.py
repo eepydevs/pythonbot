@@ -55,6 +55,7 @@ class Debug(commands.Cog):
     pass
 
   @debug.sub_command()
+  @commands.is_owner()
   async def toggle(self, inter, toggler: Required1 = Required1.true):
     '''
     debug,,
