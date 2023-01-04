@@ -5,7 +5,9 @@ import requests
 import random
 import asyncio
 import os
-from utils import RdictManager
+from utils import RdictManager, PopcatAPI
+
+popcat = PopcatAPI()
 
 responselist = ["Yes.", "It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Signs point to yes.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good...", "Very doubtful.", "Maybe...", "No.", "Possibly..", "Concentrate and ask again.", "Cannot predict now.", "Ask again later."]
 random.shuffle(responselist)
@@ -67,17 +69,11 @@ class Fun(commands.Cog):
   
   @commands.slash_command(name = "getmeme", description = "Get a meme lol")
   async def slashmeme(inter):
-    r = requests.get("https://meme-api.herokuapp.com/gimme")
-    rjson = r.json()
-    while True:
-      if str(rjson['nsfw']).title() == "True":
-        r = requests.get("https://meme-api.herokuapp.com/gimme")
-        rjson = r.json()
-      else:
-        break
-    e = discord.Embed(title = f"{rjson['title']}", description = f"Link: {rjson['postLink']}\nMeme by: {rjson['author']}", color = random.randint(0, 16777215))
-    e.set_image(url = f"{rjson['url']}")
-    e.set_footer(text = f"👍: {rjson['ups']}")
+    await inter.response.defer()
+    r = popcat.meme()
+    e = discord.Embed(url = r['url'], title = f"{r['title']}", color = random.randint(0, 16777215))
+    e.set_image(url = f"{r['image']}")
+    e.set_footer(text = f"👍: {r['upvotes']} | 🗨️: {r['comments']}")
     await inter.send(embed = e)
     
   #say command slash

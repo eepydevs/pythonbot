@@ -16,10 +16,12 @@ import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
 import requests as rq
-from utils import RdictManager
+from utils import RdictManager, PopcatAPI
 from dotenv import load_dotenv
 from pp_calc import calc as pp
 load_dotenv()
+
+popcat = PopcatAPI()
 
 osuapi = osu.OssapiV2(18955, os.getenv("osu"), "http://localhost:727/")
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
@@ -990,7 +992,7 @@ class Nonsense(commands.Cog):
     '''
     if any([site.startswith("https://"), site.startswith("http://")]):
       e = discord.Embed(title = site, description = "If you don't see image then url doesn't work", color = random.randint(0, 16777215))
-      e.set_image(url = f"https://api.popcat.xyz/screenshot?url={site}")
+      e.set_image(popcat.screenshot(site))
       await inter.send(embed = e, ephemeral = True)
     else:
       e = discord.Embed(title = "Error", description = "Invalid URL", color = random.randint(0, 16777215))

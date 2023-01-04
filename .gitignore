@@ -7,3 +7,4 @@ poetry.lock
 db.bak
 db.dir
 db.dat
+pets/
