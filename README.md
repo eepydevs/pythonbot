@@ -12,9 +12,11 @@ Text: `encode(braille, binary, morse)`, `decode(braille, binary, morse)`, `lowif
 
 Economy: `shop(items, buy, sell)`, `item(use, info)`, `balance`, `beg`, `work`, `give`, `gamble`, `daily`, `leaderboard`, `globalleaderboard`, `rob`, `passive`, `search`, `inventory`, `hack`, `postmeme`, `mail`, `profile`
 
+Image: `image(jail, unforgivable, sadcat, cars, pooh, wanted, whowouldwin, gun, drake, ship, bidentweet, pikachu, colorify, drip, clown, advert, blur, invert, grayscale, joke_overhead, pet, caution, alert, facts_book)`
+
 Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`
 
-Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `serverinfo`, `roleinfo`, `hasrole`
+Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `serverinfo`, `roleinfo`, `hasrole`, `steam`, `github`
 
 Moderation: `kick`, `ban`, `unban`, `purge`, `pin`, `warn`, `warns`, `removewarn`, `switchsetting`, `createchannel`
 
@@ -33,3 +35,5 @@ Kick members: `kick`, `warn`, `warns`, `removewarn`
 Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
+
+## Last updated: 2023/01/07, 6:56 pm (UTC+03, MSK), v9.1.0

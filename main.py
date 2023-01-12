@@ -56,7 +56,6 @@ async def on_message_delete(message):
 async def on_connection():
   bot.launch_time = datetime.datetime(1970, 1, 1)
 
-
 #when bot is online event
 @bot.event
 async def on_ready():

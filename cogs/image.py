@@ -120,13 +120,13 @@ class Image(commands.Cog):
     member: Member here'''
     await inter.response.defer()
     e = discord.Embed(title = f"{member.name} is now armed", color = random.randint(0, 16667215))
-    e.set_image(popcat.gun(str(member.avatar)))
+    e.set_image(popcat.gun(str(member.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)
     
   @image.sub_command()
   async def drake(self, inter, top_text: str, bottom_text: str):
     '''
-    Who would win?
+    Drake with top and bottom text
     
     Paramaters
     ----------
@@ -134,7 +134,7 @@ class Image(commands.Cog):
     bottom_text: Bottom text
     '''
     await inter.response.defer()
-    e = discord.Embed(title = "Who would win?", color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16667215))
     e.set_image(popcat.drake(top_text, bottom_text))
     await inter.send(embed = e)
     
@@ -152,7 +152,7 @@ class Image(commands.Cog):
     if member1 is None: member1 = inter.author
     if member2 is None: member2 = random.choice(inter.guild.members)
     e = discord.Embed(title = "You two make a cute couple together!", color = random.randint(0, 16667215))
-    e.set_image(popcat.ship(str(member1.avatar), str(member2.avatar)))
+    e.set_image(popcat.ship(str(member1.avatar).replace("?size=1024", str()), str(member2.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)\
     
   @image.sub_command()
@@ -273,7 +273,7 @@ class Image(commands.Cog):
     member: Member here'''
     await inter.response.defer()
     e = discord.Embed(title = f"{member.name} got grayscaled", color = random.randint(0, 16667215))
-    e.set_image(popcat.grayscale(str(member.avatar)))
+    e.set_image(popcat.grayscale(str(member.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)
     
   @image.sub_command()
@@ -286,7 +286,7 @@ class Image(commands.Cog):
     member: Member here'''
     await inter.response.defer()
     e = discord.Embed(title = f"{member.name} got a joke over their head", color = random.randint(0, 16667215))
-    e.set_image(popcat.joke_overhead(str(member.avatar)))
+    e.set_image(popcat.joke_overhead(str(member.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)
     
   @image.sub_command()
@@ -298,9 +298,9 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    dl = Upload(popcat.pet(str(member.avatar)), f"pet{member.id}.gif", "./pets/")
+    dl = Upload(popcat.pet(str(member.avatar)), f"pet{member.id}.gif", "./image/")
     dl.download()
-    with open(f"./pets/pet{member.id}.gif", "rb") as file:
+    with open(f"./image/pet{member.id}.gif", "rb") as file:
       msg = await inter.bot.get_channel(1060317600057393317).send(file = discord.File(file))
       e = discord.Embed(title = f"{member.name} got petted", color = random.randint(0, 16667215))
       e.set_image(msg.attachments[0].url)

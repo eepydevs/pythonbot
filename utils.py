@@ -255,7 +255,10 @@ class PopcatAPI():
     Returns:
         dict: All the info
     """
-    return rq.get(f"{self.BASE_URL}github/{query}").json()
+    r = rq.get(f"{self.BASE_URL}github/{query}").json()
+    r["created_at"] = self.__convert_iso8601(r["created_at"])
+    r["updated_at"] = self.__convert_iso8601(r["updated_at"])
+    return r
   
   def weather(self, query: str) -> dict:
     """See your city's weather
@@ -744,18 +747,16 @@ class Upload():
     self.__chunk_size = _chunk_size
     self.__delete_after = _delete_after
   
-  def __enter__(self): 
-    try:
-      self._opnfile = open((self._path + self._filename), "wb")
-    except FileNotFoundError:
+  def __enter__(self):
+    if not os.path.exists(self._path): 
       self.createDirectory(self._path)
-      self._opnfile = open((self._path + self._filename), "wb")
-      r = rq.get(self._url, stream = True)
-      for chunk in r.iter_content(self.__chunk_size):
-        if not chunk:
-          break
-        self._opnfile.write(chunk)
-      return self._opnfile
+    self._opnfile = open((self._path + self._filename), "wb")
+    r = rq.get(self._url, stream = True)
+    for chunk in r.iter_content(self.__chunk_size):
+      if not chunk:
+        break
+      self._opnfile.write(chunk)
+    return self._opnfile
     
   def __exit__(self, exc_type, exc_value, exc_traceback):
     self._opnfile.close()
@@ -764,22 +765,23 @@ class Upload():
     os.remove(f"{self._path}{self._filename}")
     
   def createDirectory(self, directories: str):
+    c_path = "."
     for dirs in directories.split("/")[1:]:
-      if dirs :
-        os.mkdir(dirs)
+      if dirs:
+        c_path = c_path + f"/{dirs}"
+        if not os.path.exists(c_path):
+          os.mkdir(c_path)
     
   def download(self):
-    try:
-      with open((self._path + self._filename), "wb") as opnfile:
-        r = rq.get(self._url, stream = True)
-        for chunk in r.iter_content(self.__chunk_size):
-          if not chunk:
-            break
-          opnfile.write(chunk)
-        return opnfile
-    except FileNotFoundError:
+    if not os.path.exists(self._path):
       self.createDirectory(self._path)
-      self.download()
+    with open((self._path + self._filename), "wb") as opnfile:
+      r = rq.get(self._url, stream = True)
+      for chunk in r.iter_content(self.__chunk_size):
+        if not chunk:
+          break
+        opnfile.write(chunk)
+      return opnfile
   
   def delete(self):
     try:

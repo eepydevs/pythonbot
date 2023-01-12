@@ -262,6 +262,47 @@ class Nonsense(commands.Cog):
       
     except:
       pass
+    
+  @commands.slash_command()
+  async def github(inter, username: str):
+    '''
+    See someones Github profile
+    
+    Parameters
+    ----------
+    username: Github username
+    '''
+    await inter.response.defer()
+    r = popcat.github(username)
+    e = discord.Embed(url = r["url"], title = (username + f" [{r['account_type']}]"), description = f"Followers: `{r['followers']}`\nFollowing: `{r['following']}`" + (f'\nPublic repos: `{r["public_repos"]}`' if r['public_repos'] != '0' else '') + (f'\nPublic gists: `{r["public_gists"]}`' if r['public_gists'] != '0' else '') + "\n" + (f'\nLocation: `{r["location"]}`' if r['location'] != 'None' else '') + (f'\nCompany: `{r["company"]}`' if r['company'] != 'None' else '') + (f'\nBlog: `{r["blog"]}`' if r['blog'] != 'None' else '') + (f'\nEmail: `{r["email"]}`' if r['email'] != 'None' else '') + (f'\nTwitter: `{r["twitter"]}`' if r['twitter'] != 'Not set' else ''), color = random.randint(0, 16667215)) 
+    e.add_field(name = "Registered", value = f"<t:{r['created_at']}:R>")
+    e.add_field(name = "Last updated", value = f"<t:{r['updated_at']}:R>")
+    e.add_field(name = "Bio", value = r["bio"], inline = False)
+    e.set_thumbnail((r["avatar"]))
+    await inter.send(embed = e)
+    
+  @commands.slash_command()
+  async def steam(inter, game_name: str):
+    '''
+    See info about a Steam game
+    
+    Parameters
+    ----------
+    game_name: Game name here
+    '''
+    await inter.response.defer()
+    r = popcat.steam(game_name)
+    if not "error" in r:
+      e = discord.Embed(url = r["website"] if r["website"] != "None" else None, title = f"{r['name']} [{r['type'].title()}]", description = r["description"].replace("&quot;", '"'), color = random.randint(0, 16667215))
+      e.add_field(name = "Developed by", value = ", ".join(r["developers"]))
+      e.add_field(name = "Published by", value = ", ".join(r["publishers"]))
+      e.add_field(name = "Price", value = r["price"], inline = False)
+      e.set_image(r["banner"])
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16667215))
+      await inter.send(embed = e)
+      
 
   @commands.slash_command()
   async def tetrio(self, inter):
@@ -653,8 +694,6 @@ class Nonsense(commands.Cog):
         indexsh += 1
     await inter.send(embed = e, ephemeral = ephemeral)
     
-    
-  
   @commands.slash_command(name = "copy-person")
   @commands.bot_has_permissions(manage_webhooks = True)
   async def userecho(inter, member: discord.Member, *, content):
@@ -718,34 +757,35 @@ class Nonsense(commands.Cog):
     code: Code here
     '''
     blacklist = ["time.sleep", "sleep", "open", "exec", "license", "help", "exit", "quit", "os", "eval", "reset_cooldown", "run", "clear", "unload_extension", "load_extension", "leave", "token", "http"]
+    await inter.response.defer(ephemeral = ephemeral)
     try:
       if inter.author.id == inter.bot.owner.id:
         if send_way == "Normal":
           e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{eval(code)}\n```", color = random.randint(0, 16777215)) 
-          await inter.send(embed = e, ephemeral = ephemeral)
+          await inter.send(embed = e)
         elif send_way == "Await":
           e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
-          await inter.send(embed = e, ephemeral = ephemeral)
+          await inter.send(embed = e)
           await eval(code)
       else:
         if send_way == "Normal":
           if any(i in code for i in blacklist):
             e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = True)
+            await inter.send(embed = e)
           else:
             e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult:\n```\n{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})}\n```", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = ephemeral)
+            await inter.send(embed = e)
         else:
           if any(i in code for i in blacklist):
             e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = True)
+            await inter.send(embed = e)
           else:
             e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = ephemeral)
+            await inter.send(embed = e)
             await eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})
     except Exception as error:
       e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+      await inter.send(embed = e)
     
   #eval brainfudge command
   @commands.slash_command(name = "execbf", description = "Execute brainfudge code and see results")
