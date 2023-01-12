@@ -23,7 +23,7 @@ load_dotenv()
 
 popcat = PopcatAPI()
 
-osuapi = osu.OssapiV2(18955, os.getenv("osu"), "http://localhost:727/")
+osuapi = osu.OssapiV2(18955, os.environ["osu"], "http://localhost:727/")
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
 
 ranks = {
@@ -37,7 +37,7 @@ ranks = {
   'X': '<:X_:1054751667687522336>',
 }
 
-crblx = rblx.Client(os.getenv('rblxs'))
+crblx = rblx.Client(os.environ["rblxs"])
 
 with RdictManager(str("./database")) as db:
   if "tupper" not in db:
@@ -648,7 +648,7 @@ class Nonsense(commands.Cog):
       url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
       querystring = {"term": query}
       headers = {
-          'x-rapidapi-key': os.getenv('urbanAPI'),
+          'x-rapidapi-key': os.environ["urbanAPI"],
           'x-rapidapi-host': "mashape-community-urban-dictionary.p.rapidapi.com"
           }
       response = requests.request("GET", url, headers=headers, params=querystring)
