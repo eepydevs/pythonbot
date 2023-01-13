@@ -1,4 +1,3 @@
-print("test")
 import asyncio
 import disnake as discord
 import random
