@@ -17,6 +17,14 @@ bot = commands.InteractionBot(intents=discord.Intents.all()) #, test_guilds = [6
 with RdictManager(str("./database")) as db:
   if "afk" not in db:
     db["afk"] = {}
+  result = []
+  for k, v in db.items():  
+    try:
+      print(k, v)
+      result.append(f"'{k}': {v}")
+    except:
+      result.append(f"'{k}': {'{}'}")
+  print("{\n" + ",\n".join(f"{'{' + i + '}'}" for i in result) + "\n}")
 
 #on message event thing
 @bot.event
