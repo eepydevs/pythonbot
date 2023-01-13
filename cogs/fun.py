@@ -1,10 +1,8 @@
 #cog by Number1#4325
 import disnake as discord
 from disnake.ext import commands
-import requests
 import random
 import asyncio
-import os
 from utils import RdictManager, PopcatAPI
 
 popcat = PopcatAPI()

@@ -10,9 +10,9 @@ from dotenv import load_dotenv
 from pp_calc import calc as pp
 load_dotenv()
 
-pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
-
 bot = commands.InteractionBot(intents=discord.Intents.all()) #, test_guilds = [699994812517974057, 910131051320475648,  1008480558692712589, 1027278026154705046, 908099219401883670, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 900579811544670218, 902248677891010641, 968171159776559174, 902970942173626378, 995060155848851537, 843562496543817778, 1004796648641273856, 1030182066052145283, 809722018953166858, 1030182066052145283, 1005108434779250779]
+
+pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 
 with RdictManager(str("./database")) as db:
   if "afk" not in db:
@@ -20,7 +20,7 @@ with RdictManager(str("./database")) as db:
 
 #on message event thing
 @bot.event
-async def on_message(message):  
+async def on_message(message):
   if message.author.bot:
     return
   with RdictManager(str("./database")) as db:
@@ -84,8 +84,9 @@ async def on_ready():
   #   print(db["reminders"])
 
 #load cogs
-for filename in os.listdir('./cogs'):   
+for filename in os.listdir('./cogs'):
   if filename.endswith('.py') and filename not in []:
+    print(filename)
     bot.load_extension(f'cogs.{filename[:-3]}')
 
-bot.run(os.environ["TOKEN"])
+bot.run(os.environ["DISCORD_TOKEN"])

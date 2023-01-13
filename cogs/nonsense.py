@@ -2,14 +2,12 @@
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
-import sys
 import ossapi as osu
 import re
 import os
 import utils
 import random
 import asyncio
-import requests
 import math
 from webcolors import hex_to_rgb
 import roblox as rblx
@@ -23,7 +21,7 @@ load_dotenv()
 
 popcat = PopcatAPI()
 
-osuapi = osu.OssapiV2(18955, os.environ["osu"], "http://localhost:727/")
+osuapi = osu.OssapiV2(18955, os.environ["OSU"])
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
 
 ranks = {
@@ -37,7 +35,7 @@ ranks = {
   'X': '<:X_:1054751667687522336>',
 }
 
-crblx = rblx.Client(os.environ["rblxs"])
+crblx = rblx.Client(os.environ["RBLXS"])
 
 with RdictManager(str("./database")) as db:
   if "tupper" not in db:
@@ -315,7 +313,7 @@ class Nonsense(commands.Cog):
     """
     await inter.response.defer()
     url = "https://ch.tetr.io/api/general/stats"
-    response = requests.request("GET", url)
+    response = rq.request("GET", url)
     rjson = response.json()["data"]
     e = discord.Embed(url = "https://ch.tetr.io/", title = "TETR.IO Server stats", color = random.randint(0, 16667215))
     e.add_field(name = f"Total players: {rjson['usercount']}", value = f"> Of which registered: `{rjson['usercount'] - rjson['anoncount']}`" + "\n" + f"> Of which anonymous: `{rjson['anoncount']}`" + "\n" + f"> Of which ranked: `{rjson['rankedcount']}`" + "\n" + f"Users registered a second\*: `{round(rjson['usercount_delta'])}` (rounded)" + "\n" + "\n" + f"Replays stored: `{rjson['replaycount']}`" + "\n" + f"Games played: `{rjson['gamesplayed']}`" + "\n" + f"> Of which finished: `{rjson['gamesfinished']}`" + "\n" + f"Games played a second\*: `{round(rjson['gamesplayed_delta'])}` (rounded)"+ "\n" + "\n" + f"Time played\*\*: `{round(rjson['gametime'] / 60 / 60)}` hours" + "\n" + f"--------------- or `{round(rjson['gametime'] / 60 / 60 / 24)}` days" + "\n" + f"--------------- or `{round(rjson['gametime'] / 60 / 60 / 24 / 365)}` years" + "\n" + "\n" + f"Pieces placed: `{rjson['piecesplaced']}`" + "\n" + f"Keypresses: `{rjson['inputs']}`", inline = False)
@@ -334,7 +332,7 @@ class Nonsense(commands.Cog):
     user = user.lower()
     await inter.response.defer()
     url = f"https://ch.tetr.io/api/users/{user}"
-    response = requests.request("GET", url)
+    response = rq.request("GET", url)
     if "data" in response.json():
       rjson = response.json()["data"]["user"]
       league = rjson["league"]
@@ -648,10 +646,10 @@ class Nonsense(commands.Cog):
       url = "https://mashape-community-urban-dictionary.p.rapidapi.com/define"
       querystring = {"term": query}
       headers = {
-          'x-rapidapi-key': os.environ["urbanAPI"],
+          'x-rapidapi-key': os.environ["URBANAPI"],
           'x-rapidapi-host': "mashape-community-urban-dictionary.p.rapidapi.com"
           }
-      response = requests.request("GET", url, headers=headers, params=querystring)
+      response = rq.request("GET", url, headers=headers, params=querystring)
       rjson = response.json()
       e = discord.Embed(title = f"Urban Dictionary Meaning for: {query}", url = rjson['list'][0]['permalink'], color = random.randint(0, 16777215))
       e.add_field(name = "Definition:", value = rjson['list'][0]['definition'], inline = False)
