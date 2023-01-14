@@ -86,7 +86,6 @@ async def on_ready():
 #load cogs
 for filename in os.listdir('./cogs'):
   if filename.endswith('.py') and filename not in []:
-    print(filename)
     bot.load_extension(f'cogs.{filename[:-3]}')
 
 bot.run(os.environ["DISCORD_TOKEN"])

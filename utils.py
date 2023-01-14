@@ -4,6 +4,8 @@ import disnake as discord
 import requests as rq
 from rocksdict import Rdict
 from disnake.ext import commands
+import redis as rd
+import json
 import os
 
 class PopcatAPI():
@@ -664,17 +666,20 @@ class Singleton(type):
     
 class RdictManager(metaclass = Singleton):
     def __init__(self, path: str):
+        self._redis = rd.Redis(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"], charset = "utf-8", decode_responses = True)
         self._path = path
-        
+
     def __enter__(self) -> dict:
         self._rdict = Rdict(self._path)
         if "main" not in self._rdict:
-            self._rdict["main"] = {}
+            if not self._redis.hexists("main", "main"): self._rdict["main"] = {}
+            else: self._rdict["main"] = json.loads(self._redis.hget("main", "main"))
         self._var = self._rdict["main"]
         return self._var
     
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self._rdict["main"] = self._var
+        if self._rdict["main"] and json.loads(self._redis.hget("main", "main")) != self._rdict["main"]: self._redis.hset("main", "main", json.dumps(self._rdict["main"]))
         self._rdict.close()
         
     def sync(self, cvar: dict = None) -> dict:
