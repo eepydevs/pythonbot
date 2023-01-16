@@ -1,10 +1,10 @@
-import disnake as discord
 import os
 import datetime, time
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 from utils import RdictManager
-from disnake.ext import commands
+from dotenv import load_dotenv
+load_dotenv()
 
 def main():
   app = Flask(__name__)
@@ -38,7 +38,7 @@ def main():
   api.add_resource(Balance, "/api/balance")
   api.add_resource(Inventory, "/api/inventory")
   
-  app.run()
+  app.run("0.0.0.0", os.environ["PORT"])
 
 if __name__ == "__main__":
   main()

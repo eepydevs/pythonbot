@@ -4,6 +4,11 @@
 
 [![discord](https://img.shields.io/discord/910131051320475648?color=5865F2&label=Support%20server&logo=discord&logoColor=white)](https://discord.gg/jRK82RNx73) [![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat)
 
+## Economy API: [Balance](https://pb-api.up.railway.app/balance)/[Inventory](https://pb-api.up.railway.app/api/inventory)
+
+To search particular user use `userid` parameter \
+Example: <https://pb-api.up.railway.app/api/balance?userid=439788095483936768>
+
 ## Commands
 
 Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `screenshot`, `afk`, `suggest`, `invite`, `whois`, `emoji`, `poll`, `quote`
@@ -36,4 +41,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/01/07, 6:56 pm (UTC+03, MSK), v9.1.0
+## Last updated: 2023/01/16, 9:37 pm (UTC+03, MSK), v10.2.0
