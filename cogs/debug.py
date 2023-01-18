@@ -1,4 +1,4 @@
-#cog by Number1#4325
+#cog by maxy#2866
 import asyncio
 import disnake as discord
 import random

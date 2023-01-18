@@ -1,4 +1,4 @@
-#cog by Number1#4325
+#cog by maxy#2866
 import disnake as discord
 from disnake.ext import commands
 import random
@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RdictManager
 
-botbuild = "10.2.0" # major.sub.minor/fix
+botbuild = "10.2.1" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -306,7 +306,7 @@ class Utility(commands.Cog):
   async def slashbotinfo(self, inter):
     await inter.response.defer()
     
-    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [Number1#4325](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
+    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [maxy#2866](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
     e.add_field(name = "Specs", value = f"CPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False) 
     e.add_field(name = "Links", value = "[Python Bot github page](https://github.com/1randomguyspecial/pythonbot)\n[Disnake github page](https://github.com/DisnakeDev/disnake)\n[Python official page](https://www.python.org)\n[Python Bot plans Trello board](https://trello.com/b/G33MTATB/python-bot-plans)", inline = False)
