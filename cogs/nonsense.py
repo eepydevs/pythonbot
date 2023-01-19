@@ -14,7 +14,7 @@ import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
 import requests as rq
-from utils import RdictManager, PopcatAPI
+from utils import RedisManager, PopcatAPI
 from dotenv import load_dotenv
 from pp_calc import calc as pp
 load_dotenv()
@@ -37,7 +37,7 @@ ranks = {
 
 crblx = rblx.Client(os.environ["RBLXS"])
 
-with RdictManager(str("./database")) as db:
+with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "tupper" not in db:
     db["tupper"] = {}
 
@@ -127,7 +127,7 @@ def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_tupper(inter, input):
-  with RdictManager(str("./database")) as db:
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     if str(inter.author.id) not in db["tupper"]:
       db["tupper"][str(inter.author.id)] = {}
     return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
@@ -143,7 +143,7 @@ async def suggest_rblxuser(inter, input):
     return ["Users not found"]
 
 async def suggest_command(inter, input):
-  with RdictManager(str("./database")) as db:
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     if str(inter.author.id) not in db["notes  "]:
       db["customcmd"][str(inter.author.id)] = {}
     return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
@@ -224,7 +224,7 @@ class Nonsense(commands.Cog):
     if msg.author.bot or msg.author.discriminator == 0000:
       return
     try:
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         if str(msg.guild.id) in db["serversetting"]["nqn"]:
           reg = ':[a-zA-Z]+:'
           other = re.split(reg, msg.content)
@@ -587,7 +587,7 @@ class Nonsense(commands.Cog):
       e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       return
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.channel.id) not in db["linkchannels"]:
         db["linkchannels"][str(inter.channel.id)] = []
       if id not in db["linkchannels"]:
@@ -612,7 +612,7 @@ class Nonsense(commands.Cog):
     ----------
     id: Channel ID
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
         e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -917,7 +917,7 @@ class Nonsense(commands.Cog):
   #tupper group
   @commands.slash_command()
   async def tupper(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["tupper"]:
         db["tupper"][str(inter.author.id)] = {}
 
@@ -932,7 +932,7 @@ class Nonsense(commands.Cog):
     name: Name for tupper
     avatar: Avatar for tupper (MUST BE A LINK)
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       await inter.response.defer(ephemeral = True)
       if name not in db["tupper"][str(inter.author.id)]:
         db["tupper"][str(inter.author.id)].update({str(name): str(avatar)})
@@ -955,7 +955,7 @@ class Nonsense(commands.Cog):
     tupper: Tupper you want to use
     content: Text here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       await inter.response.defer(ephemeral = True)
       if tupper in db["tupper"][str(inter.author.id)]:
         e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
@@ -986,7 +986,7 @@ class Nonsense(commands.Cog):
     ----------
     tupper: Tupper you want to delete
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       await inter.response.defer(ephemeral = True)
       if tupper in db["tupper"][str(inter.author.id)]:
         del db["tupper"][str(inter.author.id)][tupper]
@@ -1008,7 +1008,7 @@ class Nonsense(commands.Cog):
     new_name: New name for tupper
     avatar: New avatar for tupper (MUST BE A LINK)
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if tupper in db["tupper"][str(inter.author.id)]:
         del db["tupper"][str(inter.author.id)][tupper]
         db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
@@ -1038,7 +1038,7 @@ class Nonsense(commands.Cog):
 
   @commands.slash_command()
   async def cc(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["customcmd"]:
         db["customcmd"][str(inter.author.id)] = {}
                         
@@ -1076,7 +1076,7 @@ class Nonsense(commands.Cog):
     cmd_name: Command name
     expr: Expressions here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if cmd_name not in db["customcmd"][str(inter.author.id)]:
         db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
         e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
@@ -1094,7 +1094,7 @@ class Nonsense(commands.Cog):
     ----------
     cmd_name: Command name
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if cmd_name in db["customcmd"][str(inter.author.id)]:
         await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
       else:
@@ -1110,7 +1110,7 @@ class Nonsense(commands.Cog):
     ----------
     cmd_name: Command name
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if cmd_name in db["customcmd"][str(inter.author.id)]:
         db["customcmd"][str(inter.author.id)].pop(cmd_name)
         e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))

@@ -4,7 +4,8 @@ from disnake.ext import commands
 from enum import Enum
 import random
 import asyncio
-from utils import RdictManager
+import os
+from utils import RedisManager
 
 item_info = {
 	"Computer": "Usable: hack Command/False\nType: Item\nInfo: You can hack people's data on this",
@@ -15,7 +16,7 @@ item_info = {
 	"Lottery": "Usable: True\nType: Item\nInfo: Gives random amount of cash... Sometimes huge amount of cash"
 }
 
-with RdictManager(str("./database")) as db:
+with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "balance" not in db:
     db["balance"] = {}
 
@@ -41,15 +42,15 @@ def iteminfo(name):
   return "No info"
 
 async def suggest_buyitem(inter, input):
-  with RdictManager(str("./database")) as db:
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     return [item for item in list(db['shop'].keys()) if input.lower() in item.lower()][0:24]
 
 async def suggest_item(inter, input):
- with RdictManager(str("./database")) as db:
+ with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower()][0:24] else ["You have nothing!"]
 
 async def suggest_usableitem(inter, input):
- with RdictManager(str("./database")) as db:
+ with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
   
 def lottery():
@@ -93,7 +94,7 @@ class lbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -107,7 +108,7 @@ class lbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -138,7 +139,7 @@ class menusearch(discord.ui.Select):
         return True
     
   async def callback(self, inter: discord.MessageInteraction):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         chance = random.randint(0, 100)
         if chance > 25:
@@ -195,7 +196,7 @@ class menupm(discord.ui.Select):
     
   async def callback(self, inter: discord.MessageInteraction):
     chance = random.randint(0, 100)
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if chance > 45:
         rng = random.randint(250, 1000)
         db["balance"][str(inter.author.id)] += rng
@@ -221,7 +222,7 @@ class Economy(commands.Cog):
   #item group
   @commands.slash_command()
   async def item(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["inventory"]:
         db["inventory"][str(inter.author.id)] = {}
       
@@ -236,7 +237,7 @@ class Economy(commands.Cog):
     itemname: Item name
     '''
     item = itemname.lower().capitalize()
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if item in db["inventory"][str(inter.author.id)]:
         if item == "Lottery":
           win = lottery()
@@ -272,7 +273,7 @@ class Economy(commands.Cog):
     itemname: Item name
     '''
     item = itemname.lower().capitalize()
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if item in db["inventory"][str(inter.author.id)]:
         e = discord.Embed(title = f"Item: {item}", description = f"{iteminfo(item)}", color = random.randint(0, 16777215))
         await inter.send(embed = e)
@@ -290,7 +291,7 @@ class Economy(commands.Cog):
     ----------
     member: Mention member
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if member is None:
         if not str(inter.author.id) in db["balance"]:
           upd = db["balance"]
@@ -317,7 +318,7 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "beg", description = "Beg people to them give you nothing lol\nHas cooldown of 10 seconds")
   @commands.cooldown(rate = 1, per = 10, type = commands.BucketType.user)
   async def slashbeg(inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["balance"]:
         db["balance"][str(inter.author.id)] = 0
         if random.randint(0, 100) < 35:
@@ -350,7 +351,7 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "work", description = "Work to get some cash. Has cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 60 * 30, type = commands.BucketType.user)
   async def slashwork(inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         firstNum = random.randint(0, 1000)
         secondNum = random.randint(0, 1000)
@@ -430,7 +431,7 @@ class Economy(commands.Cog):
     member: Mention member
     payment: Amount of cash
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         money = db["balance"][str(inter.author.id)]
         if member.id != inter.author.id:
@@ -485,7 +486,7 @@ class Economy(commands.Cog):
     '''
     rng = random.randint(0, 12)
     dice = random.randint(0, 12)
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         money = db["balance"][str(inter.author.id)]
         if payment <= money:
@@ -518,7 +519,7 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "daily", description = "Get 1000 cash per day")
   @commands.cooldown(rate = 1, per = 86400, type = commands.BucketType.user)
   async def slashdaily(inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         db["balance"][str(inter.author.id)] += 1000
       else:
@@ -558,7 +559,7 @@ class Economy(commands.Cog):
       ----------
       member: Mention member
       '''
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         if member.id != inter.author.id:
           if str(member.id) in db["balance"]:
             if db["balance"][str(member.id)] != 0 and db["balance"][str(member.id)] > 150:
@@ -625,7 +626,7 @@ class Economy(commands.Cog):
   @commands.slash_command(name = "passive", description = "For people who don't want to get robbed, Has cooldown of 30 minutes")
   @commands.cooldown(rate = 1, per = 1800, type = commands.BucketType.user)
   async def slashpassive(inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["passive"] and db["passive"][str(inter.author.id)]:
         db["passive"][str(inter.author.id)] = None
         e = discord.Embed(title = "Success", description = "Youre now a normal person", color = random.randint(0, 16777215))
@@ -645,7 +646,7 @@ class Economy(commands.Cog):
   #shop group
   @commands.slash_command()
   async def shop(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["inventory"]:
         db["inventory"][str(inter.author.id)] = {}
       
@@ -672,7 +673,7 @@ class Economy(commands.Cog):
       '''
       modtext = item_name.lower()
       itemname = modtext.capitalize()
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         if quantity > 0:
           if itemname in db["shop"]:
             if str(inter.author.id) in db["balance"]:
@@ -728,7 +729,7 @@ class Economy(commands.Cog):
     ----------
     itemname: Item name here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if quantity > 0:
         if quantity <= db["inventory"][str(inter.author.id)].get(itemname):
           if itemname != None:
@@ -788,7 +789,7 @@ class Economy(commands.Cog):
     ----------
     member: Mentioned member
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if member is None:
         if str(inter.author.id) in db["inventory"] and db["inventory"][str(inter.author.id)] != {}:
           inventory = "\n".join(f"{index}. `{name}`: {amount}" for index, (name, amount) in enumerate(db["inventory"][str(inter.author.id)].items(), start = 1))
@@ -810,7 +811,7 @@ class Economy(commands.Cog):
   @commands.slash_command(description = "Hacks random people. Requirement: 1 Computer. Has cooldown of 1 hour")
   @commands.cooldown(rate = 1, per = 3600, type = commands.BucketType.user)
   async def hack(inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         if str(inter.author.id) in db["inventory"]:
           if "Computer" in db["inventory"][str(inter.author.id)]:
@@ -843,7 +844,7 @@ class Economy(commands.Cog):
   @commands.slash_command(description = "Post memes and get money from it, Requirement: a Laptop")
   @commands.cooldown(rate = 1, per = 30, type = commands.BucketType.user)
   async def postmeme(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["balance"]:
         if str(inter.author.id) in db["inventory"]:
           if "Laptop" in db["inventory"][str(inter.author.id)]:
@@ -875,7 +876,7 @@ class Economy(commands.Cog):
     text: Text to send
     imagelink: Image to send (link)
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["inventory"]:
         if "Smartphone" in db["inventory"][str(inter.author.id)]:
           if str(member.id) in db["inventory"]:
@@ -923,7 +924,7 @@ class Economy(commands.Cog):
     money = 0
     inventory = "Nothing here"
     passive = "False"
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if member == None:
         if str(inter.author.id) in db["balance"]:
           money = db["balance"][str(inter.author.id)]

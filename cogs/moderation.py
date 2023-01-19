@@ -4,12 +4,13 @@ from disnake.ext import commands
 import asyncio
 from enum import Enum
 import random
-from utils import RdictManager
+import os
+from utils import RedisManager
 
 purgequotes = ["Stop spamming!", "Spamming is bad.", "Purge the chat! Haha!", "Purge after these silly young spammers...", "Is it just me, or is spamming more likely now than notime else?"]
 modquotes = ["I hope they learned their lesson.", "Make them cry!", "Haha!", "Gotcha!", "They should've readed the rules.", "Why they didn't readed the rules...", "That's lesson for you to read rules!", "'no reason ban' they say... Right at your eyes broke rule number 1337!", "Oops!"]
 
-with RdictManager(str("./database")) as db:
+with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "warns" not in db:
     db["warns"] = {}
 
@@ -196,7 +197,7 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the warn, will be shown in /warns member: @mention
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if not inter.author.top_role < member.top_role:
         if str(inter.guild.id) not in db["warns"]:
           db["warns"][str(inter.guild.id)] = {}
@@ -228,7 +229,7 @@ class Moderation(commands.Cog):
     ----------
     member: Mention member
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if not inter.author.top_role < member.top_role:
         if str(inter.guild.id) not in db["warns"]:
           db["warns"][str(inter.guild.id)] = {}
@@ -260,7 +261,7 @@ class Moderation(commands.Cog):
     index: index of the warn, shown in /warns member: @mention
     '''
     if not inter.author.top_role < member.top_role:
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         if str(inter.guild.id) not in db["warns"]:
           db["warns"][str(inter.guild.id)] = {}
         if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
@@ -296,7 +297,7 @@ class Moderation(commands.Cog):
     setting: Available settings: gpd, nqn
     switch: basically anything
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if switch != "info":
         if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
           if setting == "gpd":

@@ -4,18 +4,18 @@ import random
 import sys
 import os
 import datetime, time
-from utils import RdictManager, PopcatAPI, Upload
+from utils import RedisManager, PopcatAPI, Upload
 from disnake.ext import commands
 from dotenv import load_dotenv
 from pp_calc import calc as pp
 import subprocess
 load_dotenv()
 
-bot = commands.InteractionBot(intents=discord.Intents.all()) #, test_guilds = [699994812517974057, 910131051320475648,  1008480558692712589, 1027278026154705046, 908099219401883670, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 900579811544670218, 902248677891010641, 968171159776559174, 902970942173626378, 995060155848851537, 843562496543817778, 1004796648641273856, 1030182066052145283, 809722018953166858, 1030182066052145283, 1005108434779250779]
+bot = commands.InteractionBot(intents=discord.Intents.all(), test_guilds = [1037736545211400313, 910131051320475648, 1008480558692712589, 1027278026154705046, 908099219401883670, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 900579811544670218, 902248677891010641, 968171159776559174, 902970942173626378, 995060155848851537, 843562496543817778, 1004796648641273856, 1030182066052145283, 809722018953166858, 1030182066052145283, 1005108434779250779]) #, test_guilds = [1037736545211400313, 910131051320475648, 1008480558692712589, 1027278026154705046, 908099219401883670, 823959191894491206, 866689038731313193, 916407122474979398, 926443840632676412, 858300189358293037, 900579811544670218, 902248677891010641, 968171159776559174, 902970942173626378, 995060155848851537, 843562496543817778, 1004796648641273856, 1030182066052145283, 809722018953166858, 1030182066052145283, 1005108434779250779]
 
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 
-with RdictManager(str("./database")) as db:
+with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "afk" not in db:
     db["afk"] = {}
 
@@ -25,7 +25,7 @@ async def on_message(message):
   if message.author.bot:
     return
   try:
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(message.author.id) in db["afk"]:
         if "serverid" in db["afk"][str(message.author.id)] and db["afk"][str(message.author.id)]["serverid"] != message.guild.id:
           if bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.guild_permissions.manage_nicknames and bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.top_role > message.author.top_role:
@@ -46,7 +46,7 @@ async def on_message(message):
 @bot.event
 async def on_message_delete(message):
   try:
-    with RdictManager(str("./database")) as db:  
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:  
       if str(message.guild.id) in db["serversetting"]["gpd"]:
         if message.mentions:
           if not message.author.bot:
@@ -68,7 +68,7 @@ async def on_ready():
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
   await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | Made in Python {pyver}!"))
-  # db = RdictManager(str("./database")).sync()
+  # db = RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]).sync()
   # print(db["reminders"])
   # while True:
   #   print(f"{int(time.time())}")
@@ -84,7 +84,7 @@ async def on_ready():
   #       await bot.get_user(ruser).send(embed = e)
   #       del db["reminders"][list(db["reminders"].keys())[i]]
   #   await asyncio.sleep(10)
-  #   db = RdictManager(str("./database")).sync(db)
+  #   db = RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]).sync(db)
   #   print(db["reminders"])
 
 #load cogs

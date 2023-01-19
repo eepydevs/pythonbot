@@ -3,7 +3,7 @@ import asyncio
 import disnake as discord
 import random
 from disnake.ext import commands
-from utils import RdictManager, PopcatAPI, Upload
+from utils import RedisManager, PopcatAPI, Upload
 
 popcat = PopcatAPI()
 

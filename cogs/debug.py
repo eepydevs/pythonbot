@@ -7,9 +7,9 @@ from main import bot
 from enum import Enum
 import datetime, time
 from disnake.ext import commands
-from utils import RdictManager
+from utils import RedisManager
 
-with RdictManager(str("./database")) as db:
+with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "debug" not in db:
     db["debug"] = {}
 
@@ -51,13 +51,13 @@ class Debug(commands.Cog):
     text: None
     '''
     if str(inter.author.id) not in db["debug"] and toggler:
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         db["debug"][str(inter.author.id)] = "True"
       e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       return
     if str(inter.author.id) in db["debug"] and not toggler:
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         del db["debug"][str(inter.author.id)]
       e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)

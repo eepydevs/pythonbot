@@ -8,21 +8,28 @@ import os
 import requests
 import asyncio
 import datetime, time
-from utils import RdictManager
+from utils import RedisManager
 
-botbuild = "10.2.1" # major.sub.minor/fix
+botbuild = "10.3.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
 reportblacklist = []
 pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
 
-with RdictManager(str("./database")) as db:
+with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "notes" not in db:
     db["notes"] = {}
 
   if "reminders" not in db:
     db["reminders"] = {}
+
+def dividers(array: list, divider: str = " | "):
+  ft = []
+  for i in array:
+    if i:
+      ft.append(i)
+  return divider.join(ft) if divider else ""
 
 def sbs(members):
   rval = {"offline": 0, "online": 0, "idle": 0, "dnd": 0}
@@ -32,7 +39,7 @@ def sbs(members):
   return rval
 
 async def suggest_note(inter, input):
-  with RdictManager(str("./database")) as db:
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     if str(inter.author.id) not in db["notes"]:
       db["notes"][str(inter.author.id)] = {}
     return [note for note in list(db['notes'][str(inter.author.id)].keys()) if input.lower() in note.lower()][0:24]
@@ -44,13 +51,13 @@ async def suggest_member(inter, input):
   return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
 async def suggest_bookmark(inter, input):
-  with RdictManager(str("./database")) as db:
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     if str(inter.author.id) not in db["bookmarks"]:
       db["bookmarks"][str(inter.author.id)] = {}
     return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
 
 async def suggest_sbookmark(inter, input):
-  with RdictManager(str("./database")) as db:
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     if str(inter.author.id) not in db["bookmarks"]:
       db["bookmarks"][str(inter.author.id)] = {}
     return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
@@ -83,7 +90,7 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -97,7 +104,7 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(interaction.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
@@ -154,7 +161,7 @@ class Utility(commands.Cog):
   @commands.message_command(name="Add bookmark") 
   async def addbm(self, inter, msgid: discord.Message):
     await inter.response.defer(ephemeral = True)
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["bookmarks"]:
         db["bookmarks"][str(inter.author.id)] = {}
 
@@ -170,7 +177,7 @@ class Utility(commands.Cog):
 
   @commands.slash_command()
   async def bookmarks(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["bookmarks"]:
         db["bookmarks"][str(inter.author.id)] = {}
     
@@ -186,7 +193,7 @@ class Utility(commands.Cog):
     '''
     if bmname is None:
       bmname = str(msgid.id)
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if bmname in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -206,7 +213,7 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if bmname not in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -227,7 +234,7 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if bmname not in db["bookmarks"][str(inter.author.id)]:
         e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -255,7 +262,7 @@ class Utility(commands.Cog):
   #   rtime = int(time.time()) + 86400 * days + 3600 * hours + 60 * minutes
   #   ruser = inter.author.id
   #   rtext = text
-  #   with RdictManager(str("./database")) as db:
+  #   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   #     db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
   #     e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
   #     if str(inter.author.id) in db["debug"]:
@@ -268,7 +275,7 @@ class Utility(commands.Cog):
   #   '''
   #   Remove the reminder you made
   #   '''
-  #   with RdictManager(str("./database")) as db:
+  #   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   #     e = discord.Embed(title = "Error", description = f"Reminder deleted", color = random.randint(0, 16777215))
   #     if str(inter.author.id) in db["reminders"]:
   #       del db["reminders"][str(inter.author.id)]
@@ -288,7 +295,7 @@ class Utility(commands.Cog):
       ----------
       reason: Reason for afk
       '''
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
         if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role:
           db["afk"][str(inter.author.id)].update({"bname": (str(inter.author.nick) if inter.author.nick else str(inter.author.name)), "serverid": inter.guild.id})
@@ -318,7 +325,7 @@ class Utility(commands.Cog):
   @bot.sub_command(name = "ping", description = "Shows bot's ping")
   async def slashping(self, inter):
     e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["debug"]:
         e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
     await inter.send(embed = e)
@@ -422,7 +429,7 @@ class Utility(commands.Cog):
           
     role_list.reverse()
     b = ", ".join(role_list)
-    e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Member info: {member} ({dividers(['🖥️' if str(member.desktop_status) != 'offline' else None, '🌐' if str(member.web_status) != 'offline' else None, '📱' if str(member.mobile_status) != 'offline' else None])}{': 🟢' if member.status == discord.Status.online else ''}{': 🟡' if member.status == discord.Status.idle else ''}{': 🔴' if member.status == discord.Status.dnd else ''}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
     if member.avatar != None:
       e.set_thumbnail(url = str(member.avatar))
     e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
@@ -439,7 +446,6 @@ class Utility(commands.Cog):
       e.add_field(name = "Administrator?", value = "True", inline = False)
     else:
       e.add_field(name = "Administrator?", value = "False", inline = False)
-    e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
     e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
     e.set_footer(text = f"ID: {member.id}")
     await inter.send(embed = e)
@@ -487,13 +493,13 @@ class Utility(commands.Cog):
   #group smh
   @commands.slash_command(description = "Make notes with the bot")
   async def note(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) not in db["notes"]:
         db["notes"][str(inter.author.id)] = {}
   
   @note.sub_command(description = "Shows list of notes you have")
   async def list(self, inter):
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
         notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
         e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
@@ -511,7 +517,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["notes"]:
         if name not in db["notes"][str(inter.author.id)]:
           if text != None:
@@ -554,7 +560,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here, // to newline
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       try:
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] = text.replace("//", "\n")
@@ -574,7 +580,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       try:
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] += f" {text}"
@@ -594,7 +600,7 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       try:
         updatenotes = db["notes"][str(inter.author.id)]
         updatenotes[name] += f"\n{text}"
@@ -613,7 +619,7 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if name in db["notes"][str(inter.author.id)]:
         e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
@@ -629,7 +635,7 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["notes"]:
         if name != None:
           if name in db["notes"][str(inter.author.id)]:
@@ -656,7 +662,7 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if str(inter.author.id) in db["notes"]:
         if name in db["notes"][str(inter.author.id)]:
           text = db['notes'][str(inter.author.id)].get(name)
@@ -680,7 +686,7 @@ class Utility(commands.Cog):
     ----------
     code: Code here
     '''
-    with RdictManager(str("./database")) as db:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       exec(code)
       print(f"{code} is executed")
       e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
