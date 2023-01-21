@@ -68,24 +68,20 @@ async def on_ready():
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
   await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | Made in Python {pyver}!"))
-  # db = RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]).sync()
-  # print(db["reminders"])
-  # while True:
-  #   print(f"{int(time.time())}")
-  #   if len(db["reminders"]) < 1:
-  #     check = 1
-  #   else:
-  #     check = 0
-  #   for i in range(len(db["reminders"]) - check):
-  #     if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[i]]["time"]:
-  #       ruser = db["reminders"][list(db["reminders"].keys())[i]]["rid"]
-  #       rtext = db["reminders"][list(db["reminders"].keys())[i]]["rtext"]
-  #       e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
-  #       await bot.get_user(ruser).send(embed = e)
-  #       del db["reminders"][list(db["reminders"].keys())[i]]
-  #   await asyncio.sleep(10)
-  #   db = RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]).sync(db)
-  #   print(db["reminders"])
+  while True:
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      if len(db["reminders"]) < 1:
+        check = 1
+      else:
+        check = 0
+      for i in range(len(db["reminders"]) - check):
+        if int(time.time()) >= db["reminders"][list(db["reminders"].keys())[i]]["time"]:
+          ruser = db["reminders"][list(db["reminders"].keys())[i]]["rid"]
+          rtext = db["reminders"][list(db["reminders"].keys())[i]]["rtext"]
+          e = discord.Embed(title = "Reminder", description = f"{rtext}", color = random.randint(0, 16777215))
+          await bot.get_user(ruser).send(embed = e)
+          del db["reminders"][list(db["reminders"].keys())[i]]
+      await asyncio.sleep(10)
 
 #load cogs
 for filename in os.listdir('./cogs'):

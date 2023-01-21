@@ -8,6 +8,7 @@ import os
 import utils
 import random
 import asyncio
+import json
 import math
 from webcolors import hex_to_rgb
 import roblox as rblx
@@ -49,6 +50,9 @@ with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"]
 
   if "bookmarks" not in db:
     db["bookmarks"] = {}
+    
+  if "apifavs" not in db:
+    db["apifavs"] = {}
     
 def esc_md(text: str):
   return text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
@@ -125,6 +129,18 @@ class buttonthing(discord.ui.View):
   
 def shuffle(x):
   return random.sample(x, len(x))
+
+async def suggest_snip(inter, input):
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+    if str(inter.author.id) not in db["apifavs"]:
+      db["apifavs"][str(inter.author.id)] = {}
+    return [input] + [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:23] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else [input]
+  
+async def suggest_dsnip(inter, input):
+  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+    if str(inter.author.id) not in db["apifavs"]:
+      db["apifavs"][str(inter.author.id)] = {}
+    return [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else ["You have nothing! Go create a snippet!"]
 
 async def suggest_tupper(inter, input):
   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
@@ -240,29 +256,128 @@ class Nonsense(commands.Cog):
             await msg.delete()
             await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
           else:
-            webhook = (await utils.Webhook((await self.bot.get_context(msg))))
+            webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None))))
             await msg.delete()
             await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
             
         if "linkchannels" in db:
-          pass
-        if str(msg.channel.id) in list(db["linkchannels"].keys()):
-          for channel in db["linkchannels"][str(msg.channel.id)]:
-            webhook = (await utils.Webhook((await self.bot.get_context(msg)), self.bot.get_channel(int(channel))))
-            atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
-            rlatch = None
-            rmsg = ''
-            if not msg.reference is None:
-              rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-              rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-            await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-            await asyncio.sleep(0.2)
-      
+          with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+            if str(msg.channel.id) in list(db["linkchannels"].keys()):
+              for channel in db["linkchannels"][str(msg.channel.id)]:
+                webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
+                atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+                rlatch = None
+                rmsg = ''
+                if not msg.reference is None:
+                  rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+                  rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+                await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
     
   @commands.slash_command()
-  async def github(inter, username: str):
+  async def api(self, inter):
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      if str(inter.author.id) not in db["apifavs"]:
+        db["apifavs"][str(inter.author.id)] = {}
+  
+  @api.sub_command()
+  async def request(self, inter, baseurl: str = commands.Param(autocomplete = suggest_snip), options = None, params: str = None, ephemeral: Required1 = Required1.You):
+    '''
+    GET Request something from an API
+    
+    Parameters
+    ----------
+    ephemeral: Visibility of the embed | Default: You
+    baseurl: API Base URL to request | Example: https://api.popcat.xyz/
+    options: Options for API request | Example: github/peppy
+    params: Parameters to use in the request | Example: uid=123, score=456
+    '''
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      if options:
+        if baseurl in db["apifavs"][str(inter.author.id)]:
+          url = db["apifavs"][str(inter.author.id)][baseurl] + options
+        else:
+          url = baseurl + options
+      else:
+        url = baseurl
+      furl = None
+      await inter.response.defer(ephemeral = ephemeral)
+      if inter.author.id in whitelist_id:
+        e = discord.Embed(url = url, title = f"API: {url}", color = random.randint(0, 16667215))
+        param = {}
+        if not params is None:
+          for i in params.split(","):
+            param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
+        response = rq.get(url = url, params = param if param else None)
+        e.add_field(name = "Complete URL", value = f"```{response.url}```", inline = False)
+        try:
+          rjson = [json.dumps(response.json()), True]
+        except rq.JSONDecodeError:
+          e.set_image(url = response.url)
+          rjson = ["VVV (no picture means there is nothing as result or an error)", False]
+        except rq.ConnectionError:
+          rjson = ["Something went wrong...", False]
+        e.add_field(name = "Results", value = f"```json\n{rjson[0]}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
+      else:
+        e = discord.Embed(url = url, title = f"API: {url}", color = random.randint(0, 16667215))
+        param = {}
+        if not params is None:
+          for i in params.split(","):
+            param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
+        furl = f"{url}?" + "&".join(f"{k}={v}" for k, v in zip(param.keys(), param.values()))
+        e.add_field(name = "Complete URL", value = f"```{furl}```", inline = False)
+    view = discord.ui.View()
+    style = discord.ButtonStyle.gray
+    item = discord.ui.Button(style = style, label = "Requested API URL", url = furl if furl else response.url)
+    view.add_item(item)
+    await inter.send(embed = e, view = view)
+    
+  @api.sub_command()
+  async def snip(inter, snipname, url):
+    '''
+    Create a Custom Command for yourself
+
+    Parameters
+    ----------
+    snipname: Snippet name
+    url: API Base URL | Example: https://api.popcat.xyz/
+    '''
+    await inter.response.defer(ephemeral = True)
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      if snipname not in db["apifavs"][str(inter.author.id)]:
+        db["apifavs"][str(inter.author.id)].update({snipname: url})
+        e = discord.Embed(title = "Successful", description = f"Successfully added `{snipname}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "A snippet with this name already exists", color = random.randint(0, 16777215))
+        await inter.send(embed = e)    
+
+  @api.sub_command()
+  async def delete(inter, snipname: str = commands.Param(autocomplete = suggest_dsnip)):
+    '''
+    Delete an existing snippet
+
+    Parameters
+    ----------
+    snipname: Snippet to delete 
+    '''
+    await inter.response.defer(ephemeral = True)
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      if snipname in db["apifavs"][str(inter.author.id)]:
+        db["apifavs"][str(inter.author.id)].pop(snipname)
+        e = discord.Embed(title = "Successful", description = f"Successfully removed `{snipname}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "This snippet doesn't exist", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+
+  @commands.slash_command()
+  async def info(self, inter):
+    pass
+    
+  @info.sub_command()
+  async def github(self, inter, username: str):
     '''
     See someones Github profile
     
@@ -279,8 +394,8 @@ class Nonsense(commands.Cog):
     e.set_thumbnail((r["avatar"]))
     await inter.send(embed = e)
     
-  @commands.slash_command()
-  async def steam(inter, game_name: str):
+  @info.sub_command()
+  async def steam(self, inter, game_name: str):
     '''
     See info about a Steam game
     
@@ -551,7 +666,7 @@ class Nonsense(commands.Cog):
     '''
     
     try:
-      group = await crblx.get_group(int(groupid))
+      group = await crblx.get_channelgroup(int(groupid))
       icon = await crblx.thumbnails.get_group_icons(groups = [group], size = (420, 420))
       
     except rblx.GroupNotFound:
@@ -802,20 +917,6 @@ class Nonsense(commands.Cog):
     except:
       e = discord.Embed(title = "Error", description = f"Something went wrong. Try again...", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
-    
-  
-  #calculator command
-  @commands.slash_command(name = "calc", description = "Calculate anything you need! (basic math)")
-  async def slashcalculator(inter, equation):
-    '''
-    Calculate basic math
-
-    Parameters
-    ----------
-    equation: Example: 1 + 1
-    '''
-    e = discord.Embed(title = "Calculator", description = f"{equation} = {calc(equation)}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
   
   #embed command
   @commands.slash_command(name = "embed")

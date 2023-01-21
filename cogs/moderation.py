@@ -157,19 +157,12 @@ class Moderation(commands.Cog):
     ----------
     number: Number used for purging, min=0, max=100
     '''
-    if number > 0:
-      if number <= 100:
-        await inter.channel.purge(limit = number)
-        pquote = purgequotes[random.randint(0, len(purgequotes) - 1)]
-        e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))
-        await inter.send(embed = e, delete_after = 5)
-        #await asyncio.sleep(5)
-        #await m.delete()
-      else:
-        await inter.send("❌ Please insert a number under 100")
-    else:
-      await inter.send("❌ Please insert a number above 0")
-
+    if number >= 0: number = 1
+    if number <= 100: number = 100
+    await inter.channel.purge(limit = number)
+    pquote = purgequotes[random.choice(purgequotes)]
+    e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))
+    await inter.send(embed = e, delete_after = 5)
   #pin command
   @commands.slash_command()
   @commands.has_permissions(manage_channels = True)

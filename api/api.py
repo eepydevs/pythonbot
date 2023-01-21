@@ -2,7 +2,7 @@ import os
 import datetime, time
 from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
-from utils import RdictManager
+from utils import RedisManager
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -19,7 +19,7 @@ def main():
       query_parameters = request.args
       userid = query_parameters.get("userid")
       
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         if userid:
           return db["balance"][str(userid)] if str(userid) in db["balance"] else ({"message": "The user could not be found.", "status": 404}, 404)
         else:
@@ -29,7 +29,7 @@ def main():
     def get(self):
       query_parameters = request.args
       userid = query_parameters.get("userid")
-      with RdictManager(str("./database")) as db:
+      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
         if userid:
           return db["inventory"][str(userid)] if str(userid) in db["inventory"] else ({"message": "The user could not be found.", "status": 404}, 404)
         else:

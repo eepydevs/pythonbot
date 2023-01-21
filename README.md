@@ -1,31 +1,35 @@
 # Python bot, mostly funny bot with useful commands
 
+![total_files](https://img.shields.io/github/directory-file-count/1randomguyspecial/pythonbot?label=total%20files) ![total_lines](https://img.shields.io/tokei/lines/github/1randomguyspecial/pythonbot) ![repo_size](https://img.shields.io/github/repo-size/1randomguyspecial/pythonbot) \
+![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot)  ![last_commit](https://img.shields.io/github/last-commit/1randomguyspecial/pythonbot/main)
+
 ## Links
 
-[![discord](https://img.shields.io/discord/910131051320475648?color=5865F2&label=Support%20server&logo=discord&logoColor=white)](https://discord.gg/jRK82RNx73) [![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat)
+[![discord](https://img.shields.io/discord/910131051320475648?color=5865F2&label=Support%20server&logo=discord&logoColor=white)](https://discord.gg/jRK82RNx73) \
+[![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat)
 
-## Economy API: [Balance](https://pb-api.up.railway.app/balance)/[Inventory](https://pb-api.up.railway.app/api/inventory)
+### Economy API: [Balance](https://pb-api.up.railway.app/balance)/[Inventory](https://pb-api.up.railway.app/api/inventory)
 
 To search particular user use `userid` parameter \
 Example: <https://pb-api.up.railway.app/api/balance?userid=439788095483936768>
 
 ## Commands
 
-Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `screenshot`, `afk`, `suggest`, `invite`, `whois`, `emoji`, `poll`, `quote`
+Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `screenshot`, `afk`, `suggest`, `invite`, `whois`, `emoji`, `poll`, `quote`, `server(whois, suggest, info, roleinfo, hasrole)`
 
-Text: `encode(braille, binary, morse)`, `decode(braille, binary, morse)`, `lowify`, `highify`, `spacify`, `titlize`, `swapize`, `capify`, `flipify`, `reversify`, `strokify`, `fuwwify`, `ifyify`, `izeize`, `brickify`, `shoutify`, `spoilerize`, `sortify`, `qmaify`, `remixuerify`, `indicatorify`, `ifyinglyedy`
+Text: `encode(braille, binary, morse)`, `decode(braille, binary, morse)`,`flipify`, `reversify`, `strokify`, `fuwwify`, `ifyify`, `izeize`, `brickify`, `shoutify`, `spoilerize`, `indicatorify`, `ifyinglyedy`, `repleach`
 
 Economy: `shop(items, buy, sell)`, `item(use, info)`, `balance`, `beg`, `work`, `give`, `gamble`, `daily`, `leaderboard`, `globalleaderboard`, `rob`, `passive`, `search`, `inventory`, `hack`, `postmeme`, `mail`, `profile`
 
 Image: `image(jail, unforgivable, sadcat, cars, pooh, wanted, whowouldwin, gun, drake, ship, bidentweet, pikachu, colorify, drip, clown, advert, blur, invert, grayscale, joke_overhead, pet, caution, alert, facts_book)`
 
-Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`
+Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`, `api()`
 
-Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `serverinfo`, `roleinfo`, `hasrole`, `steam`, `github`
+Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `steam`, `github`
 
 Moderation: `kick`, `ban`, `unban`, `purge`, `pin`, `warn`, `warns`, `removewarn`, `switchsetting`, `createchannel`
 
-Fun: `meme`, `say`, `choice`, `8ball`, `coinflip`, `random`, `dice`, `math`, `guessthenumber`, `rps`, `repleach`
+Fun: `meme`, `say`, `choice`, `8ball`, `coinflip`, `random`, `dice`, `minigame(math, gtn, rps)`
 
 ### Required permissions
 
@@ -41,4 +45,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/01/16, 9:37 pm (UTC+03, MSK), v10.2.0
+## Last updated: 2023/01/21, 2:55 pm (UTC+03, MSK), v10.4.0

@@ -164,9 +164,13 @@ class Fun(commands.Cog):
     else: 
       await inter.response.send_message("Error: Invalid input")
 
+  @commands.slash_command()
+  async def minigame(self, inter):
+    pass
+
   #math command
-  @commands.slash_command(name = "math", description = "Math questions, wohooo very fun..")
-  async def slashmath(inter):
+  @minigame.sub_command(name = "math", description = "Math questions, wohooo very fun..")
+  async def slashmath(self, inter):
       firstNum = random.randint(0, 1000)
       secondNum = random.randint(0, 1000)
       chance = random.randint(0, 100)
@@ -208,8 +212,8 @@ class Fun(commands.Cog):
         await inter.send(embed = e)
 
   #guess the number command slash
-  @commands.slash_command(name = "guessthenumber", description = "The `max` arg is max count. The `tries_amt` arg is max tries. Note: 0 in `tries_amt` = inf tries")
-  async def slashguessthenumber(inter, max: int = 100, tries_amt: int = 0):
+  @minigame.sub_command(name = "gtn", description = "The `max` arg is max count. The `tries_amt` arg is max tries. Note: 0 in `tries_amt` = inf tries")
+  async def slashguessthenumber(self, inter, max: int = 100, tries_amt: int = 0):
     '''
     Guess the number minigame
 
@@ -277,7 +281,7 @@ class Fun(commands.Cog):
         break
 
   #rps command
-  @commands.slash_command(description = "Play rock paper scissors")
+  @minigame.sub_command(description = "Play rock paper scissors")
   async def rps(self, inter):
     e = discord.Embed(title = "RPS", description = "Choose a move below!", color = random.randint(0, 16777215))
     await inter.send(embed = e, view = rpsView(inter))
@@ -290,20 +294,6 @@ class Fun(commands.Cog):
     Scissors & Rock: Lose 2
     Scissors & Paper: Win 1
     """
-
-  #repleach command
-  @commands.slash_command()
-  async def repleach(inter, text: str, rwhat: str, rwith: str):
-    '''
-    Replace each RWHAT with RWITH (no regex here)
-    
-    Parameters
-    ----------
-    text: Text you want to use
-    rwhat: What to replace
-    rwith: Replace with what
-    '''
-    await inter.send(text.replace(rwhat, rwith))
     
 def setup(bot):
   bot.add_cog(Fun(bot))

@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RedisManager
 
-botbuild = "10.3.0" # major.sub.minor/fix
+botbuild = "10.4.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -243,47 +243,48 @@ class Utility(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   #remind command
-  # @commands.slash_command()
-  # async def remind(self, inter):
-  #   pass
+  @commands.slash_command()
+  async def remind(self, inter):
+    pass
 
-  # @remind.sub_command()
-  # async def add(self, inter, days: int = 0, hours: int = 1, minutes: int = 0, *, text):
-  #   '''
-  #   Make a reminder for yourself
+  @remind.sub_command()
+  async def add(self, inter, days: int = 0, hours: int = 0, minutes: int = 0, *, text):
+    '''
+    Make a reminder for yourself
     
-  #   Parameters
-  #   ----------
-  #   days: Amount of days to wait | Default: 0
-  #   hours: Amount of hours to wait | Default: 1
-  #   minutes: Amount of minutes to wait | Default: 0
-  #   text: Your reminder here
-  #   '''
-  #   rtime = int(time.time()) + 86400 * days + 3600 * hours + 60 * minutes
-  #   ruser = inter.author.id
-  #   rtext = text
-  #   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-  #     db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
-  #     e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
-  #     if str(inter.author.id) in db["debug"]:
-  #       e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
-  #     await inter.send(embed = e)
+    Parameters
+    ----------
+    days: Amount of days to wait | Default: 0
+    hours: Amount of hours to wait | Default: 1
+    minutes: Amount of minutes to wait | Default: 0
+    text: Your reminder here
+    '''
+    if not any([days, hours, minutes]): hours = 1
+    rtime = int(time.time()) + 86400 * days + 3600 * hours + 60 * minutes
+    ruser = inter.author.id
+    rtext = text
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
+      e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
+      if str(inter.author.id) in db["debug"]:
+        e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
+      await inter.send(embed = e)
     
   
-  # @remind.sub_command()
-  # async def remove(self, inter):
-  #   '''
-  #   Remove the reminder you made
-  #   '''
-  #   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-  #     e = discord.Embed(title = "Error", description = f"Reminder deleted", color = random.randint(0, 16777215))
-  #     if str(inter.author.id) in db["reminders"]:
-  #       del db["reminders"][str(inter.author.id)]
-  #       e = discord.Embed(title = "Success", description = f"Reminder deleted", color = random.randint(0, 16777215))
-  #       await inter.send(embed = e)
-  #       return
-  #     e = discord.Embed(title = "Error", description = f"Reminder is not found", color = random.randint(0, 16777215))
-  #     await inter.send(embed = e, ephemeral = True)
+  @remind.sub_command()
+  async def remove(self, inter):
+    '''
+    Remove the reminder you made
+    '''
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      e = discord.Embed(title = "Error", description = f"Reminder deleted", color = random.randint(0, 16777215))
+      if str(inter.author.id) in db["reminders"]:
+        del db["reminders"][str(inter.author.id)]
+        e = discord.Embed(title = "Success", description = f"Reminder deleted", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+        return
+      e = discord.Embed(title = "Error", description = f"Reminder is not found", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
@@ -335,10 +336,14 @@ class Utility(commands.Cog):
   async def credits(self, inter):
     e = discord.Embed(title = "Contributors/credits list", description = "[icemay#6281](https://replit.com/@neonyt1) - Scripter, Helper, Tester\n[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
     await inter.send(embed = e)
+    
+  @commands.slash_command()
+  async def server(self, inter):
+    pass
 
   #server info command
-  @commands.slash_command(name = "serverinfo", description = "Shows server's info")
-  async def serverinfo(inter):
+  @server.sub_command(name = "info", description = "Shows server's info")
+  async def serverinfo(self, inter):
     server_role_count = len(inter.guild.roles)
     list_of_bots = [bot.mention for bot in inter.guild.members if bot.bot]
     ms = sbs(inter.guild.members)
@@ -352,8 +357,8 @@ class Utility(commands.Cog):
     await inter.send(embed = e)
 
   #role info command
-  @commands.slash_command(name = "roleinfo", description = "Shows role's info")
-  async def roleinfo(inter, role: discord.Role):
+  @server.sub_command(name = "roleinfo", description = "Shows role's info")
+  async def roleinfo(self, inter, role: discord.Role):
     e = discord.Embed(title = f"Role info: {role.name}", description = f"{role.mention}\n\nRole position: {-role.position + len(inter.guild.roles)}\nRole creation date: <t:{str(time.mktime(role.created_at.timetuple()))[:-2]}:R>\nCan be mentioned by other users?: {role.mentionable}\nIs separated from other roles?: {role.hoist}\n{('Icon link: ' + role.icon.url) if role.icon != None else ''}", color = role.color)
     if len(role.members) != 0:
       rm = '\n'.join([f"{m}" for m in role.members[0:9]])
@@ -364,8 +369,8 @@ class Utility(commands.Cog):
     await inter.send(embed = e)
 
   #hasrole command
-  @commands.slash_command()
-  async def hasrole(inter, role: discord.Role):
+  @server.sub_command()
+  async def hasrole(self, inter, role: discord.Role):
     '''
     Shows how much people has the selected role
     
@@ -379,8 +384,8 @@ class Utility(commands.Cog):
     await inter.send(embed = e, view = rbbuttons(inter, color, board, role.name))
 
   #suggest command
-  @commands.slash_command(name = "suggest", description = "suggest")
-  async def slashsuggest(inter, text):
+  @server.sub_command(name = "suggest", description = "suggest")
+  async def slashsuggest(self, inter, text):
     '''
     Suggest an improvement for server
     Parameters
@@ -395,23 +400,9 @@ class Utility(commands.Cog):
     await msg.add_reaction("👎")
     await msg.add_reaction("❓")
 
-  #invite command
-  @commands.slash_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
-  async def slashinvite(inter):
-    e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
-    view = discord.ui.View()
-    style = discord.ButtonStyle.gray
-    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
-    item1 = discord.ui.Button(style = style, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
-    item2 = discord.ui.Button(style = style, label = "Invite to Guilded support server", url = "https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat")
-    view.add_item(item = item)
-    view.add_item(item = item1)
-    view.add_item(item = item2)
-    await inter.send(embed = e, view = view)
-    
   #member info command
-  @commands.slash_command(name = "whois", description = "Shows mentioned member's info")
-  async def slashmemberinfo(inter, member: discord.Member = None):
+  @server.sub_command(name = "whois", description = "Shows mentioned member's info")
+  async def slashmemberinfo(self, inter, member: discord.Member = None):
     '''
     Shows mentioned member's info
     Parameters
@@ -451,8 +442,8 @@ class Utility(commands.Cog):
     await inter.send(embed = e)
        
   #emoji command
-  @commands.slash_command(name = "emoji", description = "See emoji info")
-  async def emoji(inter, emoji: discord.Emoji):
+  @server.sub_command(name = "emoji", description = "See emoji info")
+  async def emoji(self, inter, emoji: discord.Emoji):
     '''
     See emoji info
     Parameters
@@ -463,18 +454,10 @@ class Utility(commands.Cog):
     e.set_image(url = emoji.url)
     e.set_footer(text = f"ID: {emoji.id}")
     await inter.send(embed = e)
-
-  """#servers command
-  @commands.slash_command(description = "See other servers' member counter")
-  async def servers(inter):
-    await inter.response.defer()
-    counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
-    e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)"""
-
+    
   #poll command
-  @commands.slash_command(name = "poll", description = "Example: /poll Hello name! Hello option 1!, Hello option 2!, Hello option 3!")
-  async def slashpoll(inter, name, options):
+  @server.sub_command(name = "poll", description = "Example: /poll Hello name! Hello option 1!, Hello option 2!, Hello option 3!")
+  async def slashpoll(self, inter, name, options):
     '''
     Make a poll
     Parameters
@@ -489,6 +472,28 @@ class Utility(commands.Cog):
     msg = await inter.original_message()
     for i in range(len(optionstuple)):
       await msg.add_reaction(pollemojis[i])
+
+  #invite command
+  @commands.slash_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
+  async def slashinvite(inter):
+    e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
+    view = discord.ui.View()
+    style = discord.ButtonStyle.gray
+    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
+    item1 = discord.ui.Button(style = style, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
+    item2 = discord.ui.Button(style = style, label = "Invite to Guilded support server", url = "https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat")
+    view.add_item(item = item)
+    view.add_item(item = item1)
+    view.add_item(item = item2)
+    await inter.send(embed = e, view = view)
+
+  """#servers command
+  @commands.slash_command(description = "See other servers' member counter")
+  async def servers(inter):
+    await inter.response.defer()
+    counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
+    e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
+    await inter.send(embed = e)"""
 
   #group smh
   @commands.slash_command(description = "Make notes with the bot")

@@ -258,84 +258,6 @@ class Text(commands.Cog):
     await inter.response.defer()
     await inter.send(morsifyen(text))
 
-  #lowcase command
-  @commands.slash_command(name = "lowify", description = "Low case your inputted text!")
-  async def slashlowcase(inter, *, text):
-    '''
-    Low case your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = text.lower()
-    await inter.send(modtext)
-
-  #highcase command
-  @commands.slash_command(name = "highify", description = "High case your inputted text!")
-  async def slashhighcase(inter, *, text):
-    '''
-    High case your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = text.upper()
-    await inter.send(modtext)
-
-  #spacecase command
-  @commands.slash_command(name = "spacify", description = "Space case your inputted text!")
-  async def slashspacecase(inter, *, text):
-    '''
-    Space case your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = " ".join(text)
-    await inter.send(modtext)
-  
-  #titlecase command
-  @commands.slash_command(name = "titlize", description = "Title case your inputted text!")
-  async def slashtitlecase(inter, *, text):
-    '''
-    Title case your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = text.title()
-    await inter.send(modtext)
-
-  #swapcase command
-  @commands.slash_command(name = "swapize", description = "Swap case your inputted text!")
-  async def slashswapcase(inter, *, text):
-    '''
-    Swap case your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = text.swapcase()
-    await inter.send(modtext)
-
-  #capitaizecase command
-  @commands.slash_command(name = "capify", description = "Capitalize your inputted text!")
-  async def slashcapitalizecase(inter, *, text):
-    '''
-    Capitalize your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    modtext = text.capitalize()
-    await inter.send(modtext)
-
   #flip command
   @commands.slash_command(name = "flipify", description = "Flip your inputted text!")
   async def slashflipcase(inter, *, text):
@@ -474,30 +396,7 @@ class Text(commands.Cog):
     '''
     modtext = sorted(text.split(" "), )
     await inter.send(" ".join(modtext))
-
-  @commands.slash_command(name = "qmaify")
-  async def qma(inter, *, text):
-    '''
-    Qmaify your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    await inter.send(f"- {text}")
-
-  @commands.slash_command(name = "remixuerify")
-  async def remixuer(inter, *, text):
-    '''
-    Remixuerify your inputted text!
-
-    Parameters
-    ----------
-    text: Text here
-    '''
-    catemoji = ["😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"]
-    random.shuffle(catemoji)
-    await inter.send(f"{random.choice(catemoji)} {text}")
+    
 
   @commands.slash_command(name = "indicatorify")
   async def indicatorify(inter, *, text):
@@ -522,6 +421,20 @@ class Text(commands.Cog):
     '''
     modtext = ifyed(text)
     await inter.send(modtext)
+    
+  #repleach command
+  @commands.slash_command()
+  async def repleach(inter, text: str, rwhat: str, rwith: str):
+    '''
+    Replace each RWHAT with RWITH (no regex here)
+    
+    Parameters
+    ----------
+    text: Text you want to use
+    rwhat: What to replace
+    rwith: Replace with what
+    '''
+    await inter.send(text.replace(rwhat, rwith))
     
 def setup(bot):
   bot.add_cog(Text(bot))
