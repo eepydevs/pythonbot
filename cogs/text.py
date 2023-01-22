@@ -177,11 +177,15 @@ class Text(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
 
-  @commands.slash_command(name = "decode", description = "Decode encoded text")
+  @commands.slash_command()
+  async def text(self, inter):
+    pass
+  
+  @text.sub_command_group(name = "decode", description = "Decode encoded text")
   async def decode(self, inter):
     pass
 
-  @decode.sub_command()
+  @decode.sub_command
   async def braille(self, inter, text):
     '''
     Braille decode your inputted text
@@ -218,7 +222,7 @@ class Text(commands.Cog):
     await inter.response.defer()
     await inter.send(morsifyde(text))
 
-  @commands.slash_command(name = "encode", description = "Encode text")
+  @text.sub_command_group(name = "encode", description = "Encode text")
   async def encode(self, inter):
     pass
 
@@ -259,7 +263,7 @@ class Text(commands.Cog):
     await inter.send(morsifyen(text))
 
   #flip command
-  @commands.slash_command(name = "flipify", description = "Flip your inputted text!")
+  @text.sub_command(name = "flipify", description = "Flip your inputted text!")
   async def slashflipcase(inter, *, text):
     '''
     Flip your inputted text!
@@ -274,7 +278,7 @@ class Text(commands.Cog):
     await inter.send(textstring)
   
   #reverse command
-  @commands.slash_command(name = "reversify", description = "Reverse your inputted text!")
+  @text.sub_command(name = "reversify", description = "Reverse your inputted text!")
   async def slashreversecase(inter, *, text):
     '''
     Reverse your inputted text!
@@ -287,7 +291,7 @@ class Text(commands.Cog):
     await inter.send(modtext)
 
   #mixcase command
-  @commands.slash_command(name = "strokify", description = "Mix your inputted text!")
+  @text.sub_command(name = "strokify", description = "Mix your inputted text!")
   async def slashmixcase(inter, *, text):
     '''
     Mix your inputted text!
@@ -300,7 +304,7 @@ class Text(commands.Cog):
     await inter.send(modtext)
   
   #uwuize command
-  @commands.slash_command(name = "fuwwify", description = "UwUize your inputted text!")
+  @text.sub_command(name = "fuwwify", description = "UwUize your inputted text!")
   async def uwuize(inter, *, text):
     '''
     UwUize your inputted text!
@@ -313,7 +317,7 @@ class Text(commands.Cog):
     await inter.send(modtext)
 
   #ifyify command
-  @commands.slash_command(name = "ifyify", description = "Ifyify your inputted text!")
+  @text.sub_command(name = "ifyify", description = "Ifyify your inputted text!")
   async def ify(inter, *, text):
     '''
     Ifyify your inputted text!
@@ -329,7 +333,7 @@ class Text(commands.Cog):
     await inter.send(" ".join(f"{item}" for item in result))
 
   #izeize command
-  @commands.slash_command(name = "izeize", description = "Izeize your inputted text!")
+  @text.sub_command(name = "izeize", description = "Izeize your inputted text!")
   async def ize(inter, *, text):
     '''
     Izeize your inputted text!
@@ -344,7 +348,7 @@ class Text(commands.Cog):
       result.append(item + "ize")
     await inter.send(" ".join(f"{item}" for item in result))
 
-  @commands.slash_command()
+  @text.sub_command()
   async def brickify(self, inter, text):
     '''
     Brickify your inputted text!
@@ -361,7 +365,7 @@ class Text(commands.Cog):
     text = f"{random.choice(['hmm', 'heh', 'lol', 'uhm', 'yeah'])} {text} {random.choice([':V', 'u<u', 'o<o', ':)', '🍞', '~'])}"
     await inter.send(text)
 
-  @commands.slash_command()
+  @text.sub_command()
   async def shoutify(self, inter, text):
     '''
     SHhOuttIfY yyOuR inPUtTedd TeXXt!!!
@@ -374,7 +378,7 @@ class Text(commands.Cog):
     text += random.choice(['!!!', '?!'])
     await inter.send(text)
 
-  @commands.slash_command()
+  @text.sub_command()
   async def spoilerize(self, inter, text):
     '''
     Spoiler your inputted text
@@ -385,7 +389,7 @@ class Text(commands.Cog):
     '''
     await inter.send(''.join(f'||{c}||' for c in text))
 
-  @commands.slash_command(name = "sortify", description = "Sort your inputted text!")
+  @text.sub_command(name = "sortify", description = "Sort your inputted text!")
   async def sort(inter, *, text):
     '''
     Sort your inputted text!
@@ -398,7 +402,7 @@ class Text(commands.Cog):
     await inter.send(" ".join(modtext))
     
 
-  @commands.slash_command(name = "indicatorify")
+  @text.sub_command(name = "indicatorify")
   async def indicatorify(inter, *, text):
     '''
     Indicatorify your inputted text!
@@ -410,7 +414,7 @@ class Text(commands.Cog):
     modtext = indicator(text)
     await inter.send(modtext)
 
-  @commands.slash_command(name = "ifyinglyedy")
+  @text.sub_command(name = "ifyinglyedy")
   async def ifyending(inter, *, text):
     '''
     Ifyinglyedy your inputted text!
@@ -423,7 +427,7 @@ class Text(commands.Cog):
     await inter.send(modtext)
     
   #repleach command
-  @commands.slash_command()
+  @text.sub_command()
   async def repleach(inter, text: str, rwhat: str, rwith: str):
     '''
     Replace each RWHAT with RWITH (no regex here)

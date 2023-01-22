@@ -17,13 +17,13 @@ Example: <https://pb-api.up.railway.app/api/balance?userid=439788095483936768>
 
 Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `screenshot`, `afk`, `suggest`, `invite`, `whois`, `emoji`, `poll`, `quote`, `server(whois, suggest, info, roleinfo, hasrole)`
 
-Text: `encode(braille, binary, morse)`, `decode(braille, binary, morse)`,`flipify`, `reversify`, `strokify`, `fuwwify`, `ifyify`, `izeize`, `brickify`, `shoutify`, `spoilerize`, `indicatorify`, `ifyinglyedy`, `repleach`
+Text: `text(encode(braille, binary, morse), decode(braille, binary, morse),flipify, reversify, strokify, fuwwify, ifyify, izeize, brickify, shoutify, spoilerize, indicatorify, ifyinglyedy, repleach)`
 
 Economy: `shop(items, buy, sell)`, `item(use, info)`, `balance`, `beg`, `work`, `give`, `gamble`, `daily`, `leaderboard`, `globalleaderboard`, `rob`, `passive`, `search`, `inventory`, `hack`, `postmeme`, `mail`, `profile`
 
 Image: `image(jail, unforgivable, sadcat, cars, pooh, wanted, whowouldwin, gun, drake, ship, bidentweet, pikachu, colorify, drip, clown, advert, blur, invert, grayscale, joke_overhead, pet, caution, alert, facts_book)`
 
-Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`, `api()`
+Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`, `api(request, snip, delete)`
 
 Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `steam`, `github`
 
@@ -45,4 +45,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/01/21, 2:55 pm (UTC+03, MSK), v10.4.0
+## Last updated: 2023/01/22, 10:31 pm (UTC+03, MSK), v10.5.0

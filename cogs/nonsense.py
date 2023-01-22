@@ -134,6 +134,8 @@ async def suggest_snip(inter, input):
   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
     if str(inter.author.id) not in db["apifavs"]:
       db["apifavs"][str(inter.author.id)] = {}
+    if not input:
+      input = "https://api.popcat.xyz"
     return [input] + [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:23] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else [input]
   
 async def suggest_dsnip(inter, input):
@@ -289,18 +291,22 @@ class Nonsense(commands.Cog):
     Parameters
     ----------
     ephemeral: Visibility of the embed | Default: You
-    baseurl: API Base URL to request | Example: https://api.popcat.xyz/
-    options: Options for API request | Example: github/peppy
+    baseurl: API Base URL to request | Example: https://api.popcat.xyz
+    options: Options for API request | Example: /github/peppy
     params: Parameters to use in the request | Example: uid=123, score=456
     '''
     with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if options:
-        if baseurl in db["apifavs"][str(inter.author.id)]:
-          url = db["apifavs"][str(inter.author.id)][baseurl] + options
+        if baseurl in db["apifavs"][str(inter.author.id)]: baseurl = db["apifavs"][str(inter.author.id)][baseurl]       
+        if baseurl.endswith("/") and options.startswith("/"): url = baseurl[:-1] + options
         else:
-          url = baseurl + options
+          if not any([baseurl.endswith("/"), options.startswith("/")]):
+            url = baseurl + "/" + options
+          else:
+            url = baseurl + options
       else:
         url = baseurl
+      if not url.startswith(("https://", "http://")): url = "https://" + url
       furl = None
       await inter.response.defer(ephemeral = ephemeral)
       if inter.author.id in whitelist_id:
