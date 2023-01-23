@@ -24,6 +24,7 @@ popcat = PopcatAPI()
 
 osuapi = osu.OssapiV2(18955, os.environ["OSU"])
 whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
+apirequests_id = whitelist_id.copy() + [712342308565024818, 699420041103540264, 767102460673916958, 462098932571308033]
 
 ranks = {
   'D': '<:D_:1054751662394318888>',
@@ -309,8 +310,8 @@ class Nonsense(commands.Cog):
       if not url.startswith(("https://", "http://")): url = "https://" + url
       furl = None
       await inter.response.defer(ephemeral = ephemeral)
-      if inter.author.id in whitelist_id:
-        e = discord.Embed(url = url, title = f"API: {url}", color = random.randint(0, 16667215))
+      if inter.author.id in apirequests_id:
+        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16667215))
         param = {}
         if not params is None:
           for i in params.split(","):
@@ -326,7 +327,7 @@ class Nonsense(commands.Cog):
           rjson = ["Something went wrong...", False]
         e.add_field(name = "Results", value = f"```json\n{rjson[0]}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
       else:
-        e = discord.Embed(url = url, title = f"API: {url}", color = random.randint(0, 16667215))
+        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16667215))
         param = {}
         if not params is None:
           for i in params.split(","):

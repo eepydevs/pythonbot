@@ -13,6 +13,10 @@ def main():
   @app.errorhandler(404)
   def page_not_found(e):
       return "<h1>404</h1><p>The resource could not be found.</p>", 404
+    
+  @app.route("/")
+  def home():
+    return "<center><h1>Home page</h1><center><p>The available endpoints:<br>/api/balance (userid=discord_id optional)<br>/api/inventory (userid=discord_id optional)</p>"
 
   class Balance(Resource):
     def get(self):
