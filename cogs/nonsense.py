@@ -673,7 +673,7 @@ class Nonsense(commands.Cog):
     '''
     
     try:
-      group = await crblx.get_channelgroup(int(groupid))
+      group = await crblx.get_group(int(groupid))
       icon = await crblx.thumbnails.get_group_icons(groups = [group], size = (420, 420))
       
     except rblx.GroupNotFound:
