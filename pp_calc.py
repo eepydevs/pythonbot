@@ -242,7 +242,8 @@ class bm:
 					raise()
 			except:
 				print("ERROR: Processing beatmap failed")
-				sys.exit(1)
+				raise()
+    
 		def apply_mods(self,mods):
 			# Ugly shouldput somewhere else
 			od0_ms = 79.5
@@ -711,19 +712,21 @@ class calc:
 
 
 	def pp(l: str, acc: float = 0, misses: int = 0, c100: int = 0, c50: int = 0, mod_s: str = '', combo: int = 0, sv: int = 1):
-		if mod_s != "":
-			mod_s = mod_s.upper()
-			mod_s = [mod_s[i:i+2] for i in range(0, len(mod_s), 2)]
-			for m in mod_s:
-				calc.set_mods(calc.mod, m)
-				calc.mod.update()
-		map = bm.Beatmap(requests.get(l).text.splitlines())
-		if combo == 0 or combo > map.max_combo:
-			combo = map.max_combo
-		map.apply_mods(calc.mod)
-		diff = diff_calc.main(map)
-		if acc == 0:
-			pp = pp_calc1.pp_calc(diff[0], diff[1], diff[3], misses, c100, c50, calc.mod, combo, sv)
-		else:
-			pp = pp_calc1.pp_calc_acc(diff[0], diff[1], diff[3], acc, calc.mod, combo, misses, sv)
-		return round(pp.pp, 2)
+		try:
+			if mod_s != "":
+				mod_s = mod_s.upper()
+				mod_s = [mod_s[i:i+2] for i in range(0, len(mod_s), 2)]
+				for m in mod_s:
+					calc.set_mods(calc.mod, m)
+					calc.mod.update()
+			map = bm.Beatmap(requests.get(l).text.splitlines())
+			if combo == 0 or combo > map.max_combo:
+				combo = map.max_combo
+			map.apply_mods(calc.mod)
+			diff = diff_calc.main(map)
+			if acc == 0:
+				pp = pp_calc1.pp_calc(diff[0], diff[1], diff[3], misses, c100, c50, calc.mod, combo, sv)
+			else:
+				pp = pp_calc1.pp_calc_acc(diff[0], diff[1], diff[3], acc, calc.mod, combo, misses, sv)
+			return round(pp.pp, 2)
+		except: return 0

@@ -573,6 +573,7 @@ class Nonsense(commands.Cog):
     acc: Accuracy
     mods: Mods string (example: HDDT) 
     '''
+    await inter.response.defer(ephemeral = True)
     if acc > 100.00: acc = 100.00
     elif acc < 0.00: acc = 0.00
     try:
@@ -582,7 +583,7 @@ class Nonsense(commands.Cog):
       await inter.send(embed = e)
     except ValueError:
       e = discord.Embed(title = "Error", description = "Beatmap not found", color = random.randint(0, 16667215))
-      await inter.send(embed = e, ephemeral = True)
+      await inter.send(embed = e)
       
   @osu.sub_command()
   async def acc(self, inter, c300: int = 0, c100: int = 0, c50: int = 0, misses: int = 0):
