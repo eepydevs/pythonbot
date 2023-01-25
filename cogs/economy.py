@@ -57,11 +57,10 @@ def lottery():
   while True:
     chance = random.randint(0, 100)
     if chance >= 25 and chance <= 50:
-      win = random.randint(100, 500)
+      win = random.randint(5, 50)
     elif chance >= 25:
-      win = random.randint(25, 150)
-    elif chance >= 95:
-      win = random.randint(1000, 5000)
+      win = random.randint(25, 125)
+
     else:
       continue
     break
@@ -656,6 +655,8 @@ class Economy(commands.Cog):
     '''
     See prices of items here
     '''
+    if str(inter.author.id) not in db["inventory"]:
+      db["inventory"][str(inter.author.id)] = {}
     shop = '\n'.join(f'`{i+1}.` {item}: {price if "Discount card" not in db["inventory"][str(inter.author.id)] else int(price * 0.75)}' for i, (price,item) in enumerate(sorted(((price,item) for item,price in db['shop'].items()),reverse=True)))
     e = discord.Embed(title = "Shop", description = shop, color = random.randint(0, 16777215))
     await inter.send(embed = e)

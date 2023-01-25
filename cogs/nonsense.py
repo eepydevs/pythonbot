@@ -311,12 +311,14 @@ class Nonsense(commands.Cog):
       furl = None
       await inter.response.defer(ephemeral = ephemeral)
       if inter.author.id in apirequests_id:
-        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16667215))
         param = {}
         if not params is None:
           for i in params.split(","):
             param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
+        ms = time.perf_counter()
         response = rq.get(url = url, params = param if param else None)
+        ms = round((time.perf_counter() - ms) * 1000)
+        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", description = f"Response: `{response.status_code}`, `{ms}ms`", color = random.randint(0, 16667215))
         e.add_field(name = "Complete URL", value = f"```{response.url}```", inline = False)
         try:
           rjson = [json.dumps(response.json()), True]
