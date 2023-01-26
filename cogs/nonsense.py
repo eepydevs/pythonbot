@@ -327,7 +327,7 @@ class Nonsense(commands.Cog):
           rjson = ["VVV (no picture means there is nothing as result or an error)", False]
         except rq.ConnectionError:
           rjson = ["Something went wrong...", False]
-        e.add_field(name = "Results", value = f"```json\n{rjson[0]}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
+        e.add_field(name = "Results", value = f"```json\n{rjson[0] if len(rjson[0]) < 1024 else 'Too long JSON response to display'}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
       else:
         e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16667215))
         param = {}
@@ -343,7 +343,7 @@ class Nonsense(commands.Cog):
     await inter.send(embed = e, view = view)
     
   @api.sub_command()
-  async def snip(inter, snipname, url):
+  async def snip(self, inter, snipname, url):
     '''
     Create a Custom Command for yourself
 
@@ -363,7 +363,7 @@ class Nonsense(commands.Cog):
         await inter.send(embed = e)    
 
   @api.sub_command()
-  async def delete(inter, snipname: str = commands.Param(autocomplete = suggest_dsnip)):
+  async def delete(self, inter, snipname: str = commands.Param(autocomplete = suggest_dsnip)):
     '''
     Delete an existing snippet
 

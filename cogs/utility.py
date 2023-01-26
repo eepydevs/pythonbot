@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RedisManager
 
-botbuild = "10.5.4" # major.sub.minor/fix
+botbuild = "10.5.5" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -76,10 +76,6 @@ class rbbuttons(discord.ui.View):
       await inter.send("Those buttons are not for you", ephemeral = True)
       return False
     return True
-
-  '''@discord.ui.button(label = "Primary", custom_id = "Primary", emoji = "1️⃣", style = discord.ButtonStyle.blurple)
-  async def primary_button(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
-    await interaction.send("You clicked Primary", ephemeral = True)'''
 
   @discord.ui.button(label = "", custom_id = "-10", emoji = "⬅️")
   async def arrowleft(self, button: discord.ui.Button, interaction = discord.MessageInteraction):
