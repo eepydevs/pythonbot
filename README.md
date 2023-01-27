@@ -6,7 +6,8 @@
 ## Links
 
 [![discord](https://img.shields.io/discord/910131051320475648?color=5865F2&label=Support%20server&logo=discord&logoColor=white)](https://discord.gg/jRK82RNx73) \
-[![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat)
+[![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat) \
+[![boosty](https://img.shields.io/badge/Support%20me%20on-Boosty!-orange)](https://boosty.to/number1)
 
 ### Economy API: [Balance](https://pb-api.up.railway.app/balance)/[Inventory](https://pb-api.up.railway.app/api/inventory)
 
@@ -45,4 +46,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/01/22, 10:31 pm (UTC+03, MSK), v10.5.0
+## Last updated: 2023/01/27, 11:34 pm (UTC+03, MSK), v10.5.5
