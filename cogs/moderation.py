@@ -157,10 +157,10 @@ class Moderation(commands.Cog):
     ----------
     number: Number used for purging, min=0, max=100
     '''
-    if number >= 0: number = 1
-    if number <= 100: number = 100
+    if number <= 0: number = 1
+    if number >= 100: number = 100
     await inter.channel.purge(limit = number)
-    pquote = purgequotes[random.choice(purgequotes)]
+    pquote = random.choice(purgequotes)
     e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))
     await inter.send(embed = e, delete_after = 5)
   #pin command

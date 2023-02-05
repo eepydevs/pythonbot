@@ -5,6 +5,7 @@ from enum import Enum
 import ossapi as osu
 import re
 import os
+import sys
 import utils
 import random
 import asyncio
@@ -68,6 +69,33 @@ class Required2(str, Enum):
   Normal = "Normal"
   Await = "Await"
 
+class EmbedColors(str, Enum):
+  Random = "None"
+  Default = "0x000000"
+  Aqua = "0x1ABC9C"
+  DarkAqua = "0x11806A"
+  Green = "0x57F287"
+  DarkGreen = "0x1F8B4C"
+  Blue = "0x3498DB"
+  DarkBlue = "0x206694"
+  Purple = "0x9B59B6"
+  DarkPurple = "0x71368A"
+  LuminousVividPink = "0xE91E63"
+  DarkVividPink = "0xAD1457"
+  Gold = "0xF1C40F"
+  DarkGold = "0xC27C0E"
+  Orange = "0xE67E22"
+  DarkOrange = "0xA84300" 
+  Red = "0xED4245"
+  DarkRed = "0x992D22"
+  Grey = "0x95A5A6"
+  DarkGrey = "0x979C9F"
+  DarkerGrey = "0x7F8C8D"
+  LightGrey = "0xBCC0C0"
+  Navy = "0x34495E"
+  DarkNavy = "0x2C3E50"
+  Yellow = "0xFFFF00"
+  
 class menuthing(discord.ui.Select):
   def __init__(self, inter: discord.Interaction):
     self.inter = inter
@@ -315,9 +343,9 @@ class Nonsense(commands.Cog):
         if not params is None:
           for i in params.split(","):
             param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
-        ms = time.perf_counter()
+        ms = time.time()
         response = rq.get(url = url, params = param if param else None)
-        ms = round((time.perf_counter() - ms) * 1000)
+        ms = round((time.time() - ms) * 1000)
         e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", description = f"Response: `{response.status_code}`, `{ms}ms`", color = random.randint(0, 16667215))
         e.add_field(name = "Complete URL", value = f"```{response.url}```", inline = False)
         try:
@@ -867,7 +895,7 @@ class Nonsense(commands.Cog):
       await sent.delete()
 
   #eval python command
-  @commands.slash_command(name = "evalpy", description = "ONLY FOR PEOPLE THAT ARE IN WHITELIST. Execute python code and see results")
+  @commands.slash_command(name = "evalpy")
   @commands.check(lambda inter: inter.author.id in whitelist_id)
   async def evalpy(inter, *, ephemeral: Required1 = Required1.You, send_way: Required2 = Required2.Normal, code):
     '''
@@ -884,12 +912,21 @@ class Nonsense(commands.Cog):
     try:
       if inter.author.id == inter.bot.owner.id:
         if send_way == "Normal":
-          e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{eval(code)}\n```", color = random.randint(0, 16777215)) 
+          before = time.perf_counter()
+          evaluation = eval(code)
+          e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
+          after = time.perf_counter()
+          e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
           await inter.send(embed = e)
         elif send_way == "Await":
           e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
+          before = time.perf_counter()
           await inter.send(embed = e)
-          await eval(code)
+          evaluation = await eval(code)
+          e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
+          after = time.perf_counter()
+          e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
+          await inter.edit_original_message(embed = e)
       else:
         if send_way == "Normal":
           if any(i in code for i in blacklist):
@@ -930,7 +967,7 @@ class Nonsense(commands.Cog):
   
   #embed command
   @commands.slash_command(name = "embed")
-  async def slashembed(inter, ephemeral: Required1, *, content = "", author_name = "", author_icon = "", title = "", desc = "", footer = "", footer_icon = "", color = random.randint(0, 16777215), thumbnail = "", image = ""):
+  async def slashembed(inter, ephemeral: Required1, *, content = "", author_name = "", author_icon = "", title = "", title_url = "", desc = "", footer = "", footer_icon = "", color_default: EmbedColors = EmbedColors.Random, color_hex: str = "", thumbnail = "", image = ""):
     '''
     Makes an embed for you
     Parameters
@@ -940,18 +977,28 @@ class Nonsense(commands.Cog):
     author_name: Author name, default is your name
     author_icon: Author icon, default is your pfp
     title: Embed title, default is none
+    title_url: Title URL, default is none
     desc: Embed Description, default is none
     footer: Embed footer, default is none
     footer_icon: Footer icon, default is none
-    color: Embed color, default is random
+    color_default: Discord's Embed colors, default is random
+    color_hex: Custom hex color, default is none
     thumbnail: Embed thumbnail, default is none
     image: Embed image, default is none
     '''
+    if color_default == "None":
+      color_default = hex(random.randint(0, 16777215))
+    if color_hex:
+      if len(color_hex) < 6:
+        color_hex = color_hex[0:5]
+      color = color_hex
+    else:
+      color = color_default
     if author_icon == "":
       author_icon = str(inter.author.avatar)[:-10]
     if author_name == "":
       author_name = inter.author.name
-    e = discord.Embed(title = title, description = desc, color = color)
+    e = discord.Embed(url = title_url, title = title, description = desc, color = int(color, 16))
     e.set_author(name = author_name, icon_url = author_icon)
     e.set_footer(text = footer, icon_url = footer_icon)
     e.set_thumbnail(url = thumbnail)
