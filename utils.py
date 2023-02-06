@@ -2,7 +2,6 @@ from typing import Union
 import datetime, time
 import disnake as discord
 import requests as rq
-from rocksdict import Rdict
 from disnake.ext import commands
 import redis as rd
 import json

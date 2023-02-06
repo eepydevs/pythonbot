@@ -1,4 +1,3 @@
-from rocksdict import Rdict
 import redis as rd
 import json
 import os
