@@ -177,18 +177,22 @@ class Moderation(commands.Cog):
     '''
     await message.pin()
     await inter.send(f"[Message]({message.jump_url}) pinned successfully")
+    
+  @commands.slash_command()
+  async def warns(self, inter):
+    pass
 
-  @commands.slash_command(name = "warn", description = "Warn people (BETA)")
+  @warns.slash_command(name = "add")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
-  async def slashwarn(inter, member: discord.Member, reason = "None"):
+  async def slashwarn(self, inter, member: discord.Member, reason = "None"):
     '''
     Warn people
 
     Parameters
     ----------
     member: Mention member
-    reason: Reason for the warn, will be shown in /warns member: @mention
+    reason: Reason for the warn, will be shown in /warns show member: @mention
     '''
     with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
       if not inter.author.top_role < member.top_role:
@@ -211,10 +215,10 @@ class Moderation(commands.Cog):
         e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
-  @commands.slash_command(name = "warns", description =  "See people's warns (BETA)")
+  @warns.slash_command(name = "show")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
-  async def slashwarns(inter, member: discord.Member):
+  async def slashwarns(self, inter, member: discord.Member):
     '''
     See people's warns
 
@@ -241,10 +245,10 @@ class Moderation(commands.Cog):
         e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
-  @commands.slash_command(name = "removewarn", description = "Remove people's warns (BETA)")
+  @warns.slash_command(name = "remove")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
-  async def removewarn(inter, member: discord.Member, index: int):
+  async def removewarn(self, inter, member: discord.Member, index: int):
     '''
     Remove people's warns
 

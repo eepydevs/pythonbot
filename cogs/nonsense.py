@@ -11,6 +11,7 @@ import random
 import asyncio
 import json
 import math
+import ast
 from webcolors import hex_to_rgb
 import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
@@ -24,8 +25,8 @@ load_dotenv()
 popcat = PopcatAPI()
 
 osuapi = osu.OssapiV2(18955, os.environ["OSU"])
-whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602]
-apirequests_id = whitelist_id.copy() + [712342308565024818, 699420041103540264, 767102460673916958, 462098932571308033]
+whitelist_id = [417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
+apirequests_id = whitelist_id.copy() + [699420041103540264, 767102460673916958, 462098932571308033]
 
 ranks = {
   'D': '<:D_:1054751662394318888>',
@@ -896,10 +897,9 @@ class Nonsense(commands.Cog):
 
   #eval python command
   @commands.slash_command(name = "evalpy")
-  @commands.check(lambda inter: inter.author.id in whitelist_id)
   async def evalpy(inter, *, ephemeral: Required1 = Required1.You, send_way: Required2 = Required2.Normal, code):
     '''
-    Only for people that are in whitelist
+    This is very limited for normal people, Await does not work for them
 
     Parameters
     ----------
@@ -914,7 +914,7 @@ class Nonsense(commands.Cog):
         if send_way == "Normal":
           before = time.perf_counter()
           evaluation = eval(code)
-          e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nOutput: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
           after = time.perf_counter()
           e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
           await inter.send(embed = e)
@@ -923,28 +923,44 @@ class Nonsense(commands.Cog):
           before = time.perf_counter()
           await inter.send(embed = e)
           evaluation = await eval(code)
-          e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```\nResult: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```\nOutput: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
           after = time.perf_counter()
           e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
           await inter.edit_original_message(embed = e)
-      else:
+      elif inter.author.id in whitelist_id:
         if send_way == "Normal":
           if any(i in code for i in blacklist):
             e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
             await inter.send(embed = e)
           else:
-            e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nResult:\n```\n{eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})}\n```", color = random.randint(0, 16777215))
+            before = time.perf_counter()
+            evaluation = eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})
+            after = time.perf_counter()
+            e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```\nOutput:\n```\n{evaluation}\n```", color = random.randint(0, 16777215))
+            e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
             await inter.send(embed = e)
-        else:
+        elif send_way == "Await":
           if any(i in code for i in blacklist):
             e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
             await inter.send(embed = e)
           else:
-            e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
+            e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```", color = random.randint(0, 16777215))
+            before = time.perf_counter()
             await inter.send(embed = e)
-            await eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})
-    except Exception as error:
-      e = discord.Embed(title = "Error", description = f"```{error}```", color = random.randint(0, 16777215))
+            evaluation = await eval(code, {'__builtins__': __builtins__, '__import__': None, 'eval': None, 'random': random, 'inter': inter, 'int': int, 'str': str, 'len': len, 'time': time, 'datetime': datetime, 'mktime': time.mktime, 'math': math, 'quit': None, 'exit': None, 'help': None, 'license': None, 'exec': None, 'print': None, 'os': None, 'open': None, 'sleep': None, 'time.sleep': None, 'shuffle': lambda x: random.sample(x, len(x)), 'reset_cooldown': None, 'run': None, 'clear': None, 'unload_extension': None, 'load_extension': None, 'discord': discord})
+            e = discord.Embed(title = "Await PyEval:", description = f"```py\n{code}\n```\nOutput: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
+            after = time.perf_counter()
+            e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
+            await inter.edit_original_message(embed = e)
+      # else:
+      #   before = time.perf_counter()
+      #   evaluation = ast.literal_eval(str(code))
+      #   e = discord.Embed(title = "PyEval:", description = ("Await does not work for regualr people\n" if send_way == "Await" else "") + f"```py\n{code}\n```\nOutput: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
+      #   after = time.perf_counter()
+      #   e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
+      #   await inter.send(embed = e)
+    except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError, Exception) as error:
+      e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```Error: ```{error}```", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     
   #eval brainfudge command
