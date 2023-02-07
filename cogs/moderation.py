@@ -182,7 +182,7 @@ class Moderation(commands.Cog):
   async def warns(self, inter):
     pass
 
-  @warns.slash_command(name = "add")
+  @warns.sub_command(name = "add")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
   async def slashwarn(self, inter, member: discord.Member, reason = "None"):
@@ -215,7 +215,7 @@ class Moderation(commands.Cog):
         e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
-  @warns.slash_command(name = "show")
+  @warns.sub_command(name = "show")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
   async def slashwarns(self, inter, member: discord.Member):
@@ -245,7 +245,7 @@ class Moderation(commands.Cog):
         e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
-  @warns.slash_command(name = "remove")
+  @warns.sub_command(name = "remove")
   @commands.has_permissions(kick_members = True)
   @commands.bot_has_permissions(kick_members = True)
   async def removewarn(self, inter, member: discord.Member, index: int):
