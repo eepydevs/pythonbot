@@ -10,12 +10,30 @@ import asyncio
 import datetime, time
 from utils import RedisManager
 
-botbuild = "10.5.8" # major.sub.minor/fix
+botbuild = "10.5.9" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
 reportblacklist = []
-pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max 
+pollemojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"] #10 is the max
+
+statusemotes = {
+  "mobile": {
+             "online": "<:mobonline:1073331669261623307>",
+             "idle": "<:mobidle:1073331671371354252>",
+             "dnd": "<:mobdnd:1073331651586830397>"
+            },
+  "desktop": {
+              "online": "<:pconline:1073331654464127006>",
+              "idle": "<:pcidle:1073331656322187364>",
+              "dnd": "<:pcdnd:1073331659149164636>"
+             },
+  "web": {
+          "online": "<:webonline:1073331661225332766>",
+          "idle": "<:webidle:1073331664115216527>",
+          "dnd": "<:webdnd:1073331666170429471>"
+         }
+}
 
 with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
   if "notes" not in db:
@@ -416,7 +434,7 @@ class Utility(commands.Cog):
           
     role_list.reverse()
     b = ", ".join(role_list)
-    e = discord.Embed(title = f"Member info: {member} ({dividers(['🖥️' if str(member.desktop_status) != 'offline' else None, '🌐' if str(member.web_status) != 'offline' else None, '📱' if str(member.mobile_status) != 'offline' else None])}{': 🟢' if member.status == discord.Status.online else ''}{': 🟡' if member.status == discord.Status.idle else ''}{': 🔴' if member.status == discord.Status.dnd else ''}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Member info: {member} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
     if member.avatar != None:
       e.set_thumbnail(url = str(member.avatar))
     e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
@@ -713,9 +731,10 @@ class Utility(commands.Cog):
 
   #find command
   @find.sub_command()
+  @commands.is_owner()
   async def user(self, inter, user: str = commands.Param(autocomplete = suggest_user)):
     '''
-    Find a user i guess
+    Find a user i guess (owner only)
     
     Parameters
     ----------
@@ -761,7 +780,7 @@ class Utility(commands.Cog):
         name = member.name
         i = name.lower().find(qmember.lower())
         found = name.replace(name[i:len(qmember) + i], f"**__{name[i:len(qmember) + i]}__**")
-        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''}{' 🟢' if member.status == discord.Status.online else ''}{' 🟡' if member.status == discord.Status.idle else ''}{' 🔴' if member.status == discord.Status.dnd else ''}{' ⚫' if member.status == discord.Status.offline else ''}")
+        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''} {dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None], ', ')}{'⚫' if member.status == discord.Status.offline else ''}")
   
     fields, fi, mul = [[]], 0, 1
     for i, m in enumerate(result):

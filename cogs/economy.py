@@ -534,7 +534,7 @@ class Economy(commands.Cog):
   @commands.guild_only()
   async def leaderboard(self, inter):
     leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-    color = random.randint(0, 16667215)
+    color = random.randint(0, 16777215)
     e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
     await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
   
@@ -543,7 +543,7 @@ class Economy(commands.Cog):
   @commands.guild_only()
   async def globalleaderboard(self, inter):
     leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
-    color = random.randint(0, 16667215)
+    color = random.randint(0, 16777215)
     e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
     await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
 

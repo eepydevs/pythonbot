@@ -24,7 +24,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got jailed", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got jailed", color = random.randint(0, 16777215))
     e.set_image(popcat.jail(str(member.avatar)))
     await inter.send(embed = e)
     
@@ -38,7 +38,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.unforgivable(text))
     await inter.send(embed = e)
     
@@ -52,7 +52,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.sad_cat(text))
     await inter.send(embed = e)
     
@@ -63,7 +63,7 @@ class Image(commands.Cog):
     '''
     await inter.response.defer()
     r = popcat.car_pictures()
-    e = discord.Embed(title = r["title"], color = random.randint(0, 16667215))
+    e = discord.Embed(title = r["title"], color = random.randint(0, 16777215))
     e.set_image(r["image"])
     await inter.send(embed = e)
     
@@ -78,7 +78,7 @@ class Image(commands.Cog):
     bottom_text: Bottom text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.pooh(top_text, bottom_text))
     await inter.send(embed = e)
     
@@ -91,7 +91,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} is wanted", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} is wanted", color = random.randint(0, 16777215))
     e.set_image(popcat.wanted(str(member.avatar)))
     await inter.send(embed = e)
     
@@ -106,7 +106,7 @@ class Image(commands.Cog):
     image_url2: Right image
     '''
     await inter.response.defer()
-    e = discord.Embed(title = "Who would win?", color = random.randint(0, 16667215))
+    e = discord.Embed(title = "Who would win?", color = random.randint(0, 16777215))
     e.set_image(popcat.who_would_win(image_url1, image_url2))
     await inter.send(embed = e)
     
@@ -119,7 +119,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} is now armed", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} is now armed", color = random.randint(0, 16777215))
     e.set_image(popcat.gun(str(member.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)
     
@@ -134,7 +134,7 @@ class Image(commands.Cog):
     bottom_text: Bottom text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.drake(top_text, bottom_text))
     await inter.send(embed = e)
     
@@ -151,7 +151,7 @@ class Image(commands.Cog):
     await inter.response.defer()
     if member1 is None: member1 = inter.author
     if member2 is None: member2 = random.choice(inter.guild.members)
-    e = discord.Embed(title = "You two make a cute couple together!", color = random.randint(0, 16667215))
+    e = discord.Embed(title = "You two make a cute couple together!", color = random.randint(0, 16777215))
     e.set_image(popcat.ship(str(member1.avatar).replace("?size=1024", str()), str(member2.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)\
     
@@ -165,7 +165,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.biden_tweet(text))
     await inter.send(embed = e)
   
@@ -179,7 +179,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.pikachu(text))
     await inter.send(embed = e)
     
@@ -194,7 +194,7 @@ class Image(commands.Cog):
     color_hex: HEX of a color
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.colorify(str(member.avatar), color_hex))
     await inter.send(embed = e)  
   
@@ -207,7 +207,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got dripped up", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got dripped up", color = random.randint(0, 16777215))
     e.set_image(popcat.drip(str(member.avatar)))
     await inter.send(embed = e)
     
@@ -220,7 +220,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got clowned", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got clowned", color = random.randint(0, 16777215))
     e.set_image(popcat.clown(str(member.avatar)))
     await inter.send(embed = e)
     
@@ -233,7 +233,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got advertised", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got advertised", color = random.randint(0, 16777215))
     e.set_image(popcat.ad(str(member.avatar)))
     await inter.send(embed = e)
     
@@ -246,7 +246,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got blured", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got blured", color = random.randint(0, 16777215))
     e.set_image(popcat.blur(str(member.avatar)))
     await inter.send(embed = e)
   
@@ -259,7 +259,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got inverted", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got inverted", color = random.randint(0, 16777215))
     e.set_image(popcat.invert(str(member.avatar)))
     await inter.send(embed = e)
     
@@ -272,7 +272,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got grayscaled", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got grayscaled", color = random.randint(0, 16777215))
     e.set_image(popcat.grayscale(str(member.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)
     
@@ -285,7 +285,7 @@ class Image(commands.Cog):
     ----------
     member: Member here'''
     await inter.response.defer()
-    e = discord.Embed(title = f"{member.name} got a joke over their head", color = random.randint(0, 16667215))
+    e = discord.Embed(title = f"{member.name} got a joke over their head", color = random.randint(0, 16777215))
     e.set_image(popcat.joke_overhead(str(member.avatar).replace("?size=1024", str())))
     await inter.send(embed = e)
     
@@ -302,7 +302,7 @@ class Image(commands.Cog):
     dl.download()
     with open(f"./image/pet{member.id}.gif", "rb") as file:
       msg = await inter.bot.get_channel(1060317600057393317).send(file = discord.File(file))
-      e = discord.Embed(title = f"{member.name} got petted", color = random.randint(0, 16667215))
+      e = discord.Embed(title = f"{member.name} got petted", color = random.randint(0, 16777215))
       e.set_image(msg.attachments[0].url)
       await inter.send(embed = e)
     dl.delete()
@@ -317,7 +317,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.caution(text))
     await inter.send(embed = e)
     
@@ -331,7 +331,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.alert(text))
     await inter.send(embed = e)
     
@@ -345,7 +345,7 @@ class Image(commands.Cog):
     text: Text
     '''
     await inter.response.defer()
-    e = discord.Embed(color = random.randint(0, 16667215))
+    e = discord.Embed(color = random.randint(0, 16777215))
     e.set_image(popcat.facts(text))
     await inter.send(embed = e)
   

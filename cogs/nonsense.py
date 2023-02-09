@@ -347,7 +347,7 @@ class Nonsense(commands.Cog):
         ms = time.time()
         response = rq.get(url = url, params = param if param else None)
         ms = round((time.time() - ms) * 1000)
-        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", description = f"Response: `{response.status_code}`, `{ms}ms`", color = random.randint(0, 16667215))
+        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", description = f"Response: `{response.status_code}`, `{ms}ms`", color = random.randint(0, 16777215))
         e.add_field(name = "Complete URL", value = f"```{response.url}```", inline = False)
         try:
           rjson = [json.dumps(response.json()), True]
@@ -358,7 +358,7 @@ class Nonsense(commands.Cog):
           rjson = ["Something went wrong...", False]
         e.add_field(name = "Results", value = f"```json\n{rjson[0] if len(rjson[0]) < 1024 else 'Too long JSON response to display'}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
       else:
-        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16667215))
+        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16777215))
         param = {}
         if not params is None:
           for i in params.split(","):
@@ -425,7 +425,7 @@ class Nonsense(commands.Cog):
     '''
     await inter.response.defer()
     r = popcat.github(username)
-    e = discord.Embed(url = r["url"], title = (username + f" [{r['account_type']}]"), description = f"Followers: `{r['followers']}`\nFollowing: `{r['following']}`" + (f'\nPublic repos: `{r["public_repos"]}`' if r['public_repos'] != '0' else '') + (f'\nPublic gists: `{r["public_gists"]}`' if r['public_gists'] != '0' else '') + "\n" + (f'\nLocation: `{r["location"]}`' if r['location'] != 'None' else '') + (f'\nCompany: `{r["company"]}`' if r['company'] != 'None' else '') + (f'\nBlog: `{r["blog"]}`' if r['blog'] != 'None' else '') + (f'\nEmail: `{r["email"]}`' if r['email'] != 'None' else '') + (f'\nTwitter: `{r["twitter"]}`' if r['twitter'] != 'Not set' else ''), color = random.randint(0, 16667215)) 
+    e = discord.Embed(url = r["url"], title = (username + f" [{r['account_type']}]"), description = f"Followers: `{r['followers']}`\nFollowing: `{r['following']}`" + (f'\nPublic repos: `{r["public_repos"]}`' if r['public_repos'] != '0' else '') + (f'\nPublic gists: `{r["public_gists"]}`' if r['public_gists'] != '0' else '') + "\n" + (f'\nLocation: `{r["location"]}`' if r['location'] != 'None' else '') + (f'\nCompany: `{r["company"]}`' if r['company'] != 'None' else '') + (f'\nBlog: `{r["blog"]}`' if r['blog'] != 'None' else '') + (f'\nEmail: `{r["email"]}`' if r['email'] != 'None' else '') + (f'\nTwitter: `{r["twitter"]}`' if r['twitter'] != 'Not set' else ''), color = random.randint(0, 16777215)) 
     e.add_field(name = "Registered", value = f"<t:{r['created_at']}:R>")
     e.add_field(name = "Last updated", value = f"<t:{r['updated_at']}:R>")
     e.add_field(name = "Bio", value = r["bio"], inline = False)
@@ -444,14 +444,14 @@ class Nonsense(commands.Cog):
     await inter.response.defer()
     r = popcat.steam(game_name)
     if not "error" in r:
-      e = discord.Embed(url = r["website"] if r["website"] != "None" else None, title = f"{r['name']} [{r['type'].title()}]", description = r["description"].replace("&quot;", '"'), color = random.randint(0, 16667215))
+      e = discord.Embed(url = r["website"] if r["website"] != "None" else None, title = f"{r['name']} [{r['type'].title()}]", description = r["description"].replace("&quot;", '"'), color = random.randint(0, 16777215))
       e.add_field(name = "Developed by", value = ", ".join(r["developers"]))
       e.add_field(name = "Published by", value = ", ".join(r["publishers"]))
       e.add_field(name = "Price", value = r["price"], inline = False)
       e.set_image(r["banner"])
       await inter.send(embed = e)
     else:
-      e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16777215))
       await inter.send(embed = e)
       
 
@@ -468,7 +468,7 @@ class Nonsense(commands.Cog):
     url = "https://ch.tetr.io/api/general/stats"
     response = rq.request("GET", url)
     rjson = response.json()["data"]
-    e = discord.Embed(url = "https://ch.tetr.io/", title = "TETR.IO Server stats", color = random.randint(0, 16667215))
+    e = discord.Embed(url = "https://ch.tetr.io/", title = "TETR.IO Server stats", color = random.randint(0, 16777215))
     e.add_field(name = f"Total players: {rjson['usercount']}", value = f"> Of which registered: `{rjson['usercount'] - rjson['anoncount']}`" + "\n" + f"> Of which anonymous: `{rjson['anoncount']}`" + "\n" + f"> Of which ranked: `{rjson['rankedcount']}`" + "\n" + f"Users registered a second\*: `{round(rjson['usercount_delta'])}` (rounded)" + "\n" + "\n" + f"Replays stored: `{rjson['replaycount']}`" + "\n" + f"Games played: `{rjson['gamesplayed']}`" + "\n" + f"> Of which finished: `{rjson['gamesfinished']}`" + "\n" + f"Games played a second\*: `{round(rjson['gamesplayed_delta'])}` (rounded)"+ "\n" + "\n" + f"Time played\*\*: `{round(rjson['gametime'] / 60 / 60)}` hours" + "\n" + f"--------------- or `{round(rjson['gametime'] / 60 / 60 / 24)}` days" + "\n" + f"--------------- or `{round(rjson['gametime'] / 60 / 60 / 24 / 365)}` years" + "\n" + "\n" + f"Pieces placed: `{rjson['piecesplaced']}`" + "\n" + f"Keypresses: `{rjson['inputs']}`", inline = False)
     e.set_footer(text = "* Through the last minute, ** Rounded")
     await inter.edit_original_message(embed = e)
@@ -489,7 +489,7 @@ class Nonsense(commands.Cog):
     if "data" in response.json():
       rjson = response.json()["data"]["user"]
       league = rjson["league"]
-      e = discord.Embed(url = f"https://ch.tetr.io/u/{user}", title = f"{esc_md(rjson['username'])} `[{rjson['role'].upper()}]`" + (f" `[✅]`" if rjson['verified'] else "") + (f" `[{'⭐' * rjson['supporter_tier']}]`" if rjson['supporter_tier'] else ""), description = ((f"Country: :flag_{rjson['country'].lower()}:" if rjson['country'] != "XM" else "Country: The Moon") if rjson["country"] else ""), color = random.randint(0, 16667215))
+      e = discord.Embed(url = f"https://ch.tetr.io/u/{user}", title = f"{esc_md(rjson['username'])} `[{rjson['role'].upper()}]`" + (f" `[✅]`" if rjson['verified'] else "") + (f" `[{'⭐' * rjson['supporter_tier']}]`" if rjson['supporter_tier'] else ""), description = ((f"Country: :flag_{rjson['country'].lower()}:" if rjson['country'] != "XM" else "Country: The Moon") if rjson["country"] else ""), color = random.randint(0, 16777215))
       e.add_field(name = "Joined:", value = f"<t:{str(time.mktime(time.strptime(rjson['ts'].replace('T', ' ')[:rjson['ts'].find('.')], '%Y-%m-%d %H:%M:%S')))[:-2]}:R>" if "ts" in rjson else "Here since the beginning")
       e.add_field(name = "Statistics:", value = f"Experience: `{rjson['xp']}`\nPlay time: `{round(rjson['gametime'] / 60 / 60) if rjson['gametime'] else 0}` hours\nOnline games: `{rjson['gamesplayed']}`\n> Of which wins: `{rjson['gameswon']}`", inline = False)
       if league['gamesplayed']:
@@ -497,7 +497,7 @@ class Nonsense(commands.Cog):
       e.set_footer(text = f"ID: {rjson['_id']}")
     else:
       rjson = response.json()
-      e = discord.Embed(title = "Error", description = f"```{rjson['error']}```", color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Error", description = f"```{rjson['error']}```", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   @commands.slash_command()
@@ -537,7 +537,7 @@ class Nonsense(commands.Cog):
     try:
       info = osuapi.user(user = user)
       rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
-      e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16667215))
+      e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16777215))
       e.add_field(name = "Joined:", value = f"<t:{int(info.join_date.timestamp())}:R>", inline = True)
       e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
       if not info.is_bot:
@@ -548,7 +548,7 @@ class Nonsense(commands.Cog):
       e.set_footer(text = f"ID: {info.id}")
       await inter.send(embed = e)
     except ValueError:
-      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       
   @osu.sub_command()
@@ -582,15 +582,15 @@ class Nonsense(commands.Cog):
           acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
           ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
           ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f'%(info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f'%(accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f'%(info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16667215))
+        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f'%(info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f'%(accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f'%(info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
         e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
         e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
         await inter.send(f"**Recent {info.mode.name.lower()}! score for [{esc_md(osuapi.user(user = user).username)}](https://osu.ppy.sh/users/{osuapi.user(user = user).id}):**", embed = e)
       else:
-        e = discord.Embed(title = "Error", description = "This user does not have any recent scores...", color = random.randint(0, 16667215))
+        e = discord.Embed(title = "Error", description = "This user does not have any recent scores...", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
     except ValueError:
-      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
       
   @osu.sub_command()
@@ -610,10 +610,10 @@ class Nonsense(commands.Cog):
     try:
       info = osuapi.beatmap(beatmap_id = id)
       ppacc = pp.pp(l = f'https://osu.ppy.sh/osu/{id}', acc = acc, mod_s = (str(mods)) if str(mods) != 'NM' else '')
-      e = discord.Embed(url = f"https://osu.ppy.sh/osu/{id}",title = f"PP calculation for: {info.beatmapset().title} [{info.version}] {('+' + str(mods).upper() + ' ') if str(mods).upper() != 'NM' else ''}[{info.difficulty_rating}⭐]", description = f"**`{ppacc}PP`** - `{acc}%`", color = random.randint(0, 16667215))
+      e = discord.Embed(url = f"https://osu.ppy.sh/osu/{id}",title = f"PP calculation for: {info.beatmapset().title} [{info.version}] {('+' + str(mods).upper() + ' ') if str(mods).upper() != 'NM' else ''}[{info.difficulty_rating}⭐]", description = f"**`{ppacc}PP`** - `{acc}%`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     except ValueError:
-      e = discord.Embed(title = "Error", description = "Beatmap not found", color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Error", description = "Beatmap not found", color = random.randint(0, 16777215))
       await inter.send(embed = e)
       
   @osu.sub_command()
@@ -630,11 +630,11 @@ class Nonsense(commands.Cog):
     ''' 
     if any([c300, c100, c50, misses]):
       result = calc_acc(c300, c100, c50, misses)
-      e = discord.Embed(title = "Accuracy calculation", description = f"**`{result}%`** - [{c300}/{c100}/{c50}/{misses}]", color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Accuracy calculation", description = f"**`{result}%`** - [{c300}/{c100}/{c50}/{misses}]", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     else:
       result = 100.00
-      e = discord.Embed(title = "Accuracy calculation", description = f"**`{result}%`**", color = random.randint(0, 16667215))
+      e = discord.Embed(title = "Accuracy calculation", description = f"**`{result}%`**", color = random.randint(0, 16777215))
       await inter.send(embed = e)
       
   #roblox group
@@ -952,14 +952,10 @@ class Nonsense(commands.Cog):
             after = time.perf_counter()
             e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
             await inter.edit_original_message(embed = e)
-      # else:
-      #   before = time.perf_counter()
-      #   evaluation = ast.literal_eval(str(code))
-      #   e = discord.Embed(title = "PyEval:", description = ("Await does not work for regualr people\n" if send_way == "Await" else "") + f"```py\n{code}\n```\nOutput: ```\n{evaluation}\n```", color = random.randint(0, 16777215))
-      #   after = time.perf_counter()
-      #   e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) * 1000)}ms")
-      #   await inter.send(embed = e)
-    except (ValueError, TypeError, SyntaxError, MemoryError, RecursionError, Exception) as error:
+      else:
+        e = discord.Embed(title = "Error", description = "You are not allowed to use /evalpy", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+    except Exception as error:
       e = discord.Embed(title = "PyEval:", description = f"```py\n{code}\n```Error: ```{error}```", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     

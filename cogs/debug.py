@@ -105,6 +105,29 @@ class Debug(commands.Cog):
     '''
     bot.unload_extension(f"cogs.{extension}")
     await inter.send(f"cogs.{extension} is unloaded", ephemeral = True)
-  
+    
+  #restart bot
+  # @debug.sub_command()
+  # @commands.is_owner()
+  # async def restart(self, inter):
+  #   '''
+  #   Restarts the bot
+  #   '''
+  #   await inter.send("Restarting", ephemeral = True)
+  #   before = time.perf_counter()
+  #   await bot.close()
+  #   await bot.login(os.environ["DISCORD_TOKEN"])
+  #   after = time.perf_counter()
+  #   await inter.edit_original_message(f"Restarted, took `{round((after - before) * 1000)}`ms")
+    
+  @debug.sub_command()
+  @commands.is_owner()
+  async def shutdown(self, inter):
+    '''
+    Shutdowns the bot
+    '''
+    await inter.send("Shutdown", ephemeral = True)
+    await bot.close()
+    
 def setup(bot):
   bot.add_cog(Debug(bot))
