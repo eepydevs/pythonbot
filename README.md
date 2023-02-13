@@ -16,7 +16,7 @@ Example: <https://pb-api.up.railway.app/api/balance?userid=439788095483936768>
 
 ## Commands
 
-Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `afk`, `suggest`, `invite`, `emoji`, `quote`, `server(whois, suggest, info, roleinfo, hasrole, poll)`
+Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `afk`, `invite`, `emoji`, `quote`, `server(whois, suggest, info, roleinfo, hasrole, poll)`
 
 Text: `text(encode(braille, binary, morse), decode(braille, binary, morse),flipify, reversify, strokify, fuwwify, ifyify, izeize, brickify, shoutify, spoilerize, indicatorify, ifyinglyedy, repleach)`
 
@@ -26,15 +26,15 @@ Image: `image(jail, unforgivable, sadcat, cars, pooh, wanted, whowouldwin, gun, 
 
 Nonsense: `cc(info, eval, create, use, delete)`, `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`, `api(request, snip, delete)`
 
-Stats/Info: `bot(ping, credits, info)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `steam`, `github`
+Stats/Info: `bot(ping, credits, info, sideprojects)`, `osu(beatmap, user, rs, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user/id, group)`, `steam`, `github`
 
-Moderation: `kick`, `ban`, `unban`, `purge`, `pin`, `warn`, `warns`, `removewarn`, `switchsetting`, `createchannel`
+Moderation: `kick`, `ban`, `unban`, `purge`, `pin`, `warns(add, show, remove)`, `switchsetting`, `channel(create, setting(imageonly))`
 
 Fun: `meme`, `say`, `choice`, `8ball`, `coinflip`, `random`, `dice`, `minigame(math, gtn, rps)`
 
 ### Required permissions
 
-Manage channels: `createchannel`, `purge`, `pin`
+Manage channels: `channel(create, setting(imageonly))Aa`, `purge`, `pin`
 
 Manage nicknames: `afk` (changing nickname)
 
@@ -46,4 +46,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/01/27, 11:34 pm (UTC+03, MSK), v10.5.5
+## Last updated: 2023/02/14, 12:08 am (UTC+03, MSK), v10.5.10

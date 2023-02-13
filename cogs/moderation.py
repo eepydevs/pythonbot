@@ -19,19 +19,158 @@ with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"]
     db["serversetting"]["gpd"] = {}
     db["serversetting"]["nqn"] = {}
 
+  if "channelsetting" not in db:
+    db["channelsetting"] = {}
+    db["channelsetting"]["imageonly"] = {}
+
 class Requiredc(str, Enum):
   Text_Channel = "text"
   Voice_Channel = "voice"
   Stage_Channel = "stage"
 
-class Requiredcnsfw(str, Enum):
+class Requiredtoggler(str, Enum):
   true = "True"
   false = ""
   
 class Moderation(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
-  
+
+  @commands.slash_command()
+  async def channel(self, inter):
+    pass
+
+  @channel.sub_command_group()
+  async def settings(self, inter):
+    pass
+
+  @settings.sub_command()
+  @commands.has_permissions(manage_channels = True)
+  @commands.bot_has_permissions(manage_channels = True, manage_messages = True)
+  async def imageonly(self, inter, id: int = None, *, toggler: Requiredtoggler = Requiredtoggler.false):
+    if id is None:
+      id = inter.channel.id
+    if not inter.bot.get_channel(id):
+      e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+      if toggler == Requiredtoggler.true:
+        if str(id) not in db["channelsetting"]["imageonly"]:
+          db["channelsetting"]["imageonly"].update({str(id): True})
+          e = discord.Embed(title="Success", description=f"Set `{id}` to image only", color=random.randint(0, 16777215))
+          await inter.send(embed=e, ephemeral=True)
+          return
+        else:
+          e = discord.Embed(title="Error", description="This channel is already image only", color=random.randint(0, 16777215))
+          await inter.send(embed=e, ephemeral=True)
+      else:
+        if str(id) in db["channelsetting"]["imageonly"]:
+          del db["channelsetting"]["imageonly"][str(id)]
+          e = discord.Embed(title="Success", description=f"Set `{id}` to text only", color=random.randint(0, 16777215))
+          await inter.send(embed=e, ephemeral=True)
+          return
+        else:
+          e = discord.Embed(title="Error", description="This channel is not image only", color=random.randint(0, 16777215))
+          await inter.send(embed=e, ephemeral=True)
+
+
+  @channel.sub_command()
+  @commands.is_owner()
+  async def link(self, inter, id):
+    '''
+    Creates a link with current channelimp and mentioned channel (ID)
+
+    Parameters
+    ----------
+    id: Channel ID
+    '''
+    if inter.bot.get_channel(int(id)) is None or str(inter.channel.id) == id:
+      e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
+      await inter.send(embed=e, ephemeral=True)
+      return
+    with RedisManager(host=os.environ["REDISHOST"], port=os.environ["REDISPORT"], password=os.environ["REDISPASSWORD"], client_name=os.environ["REDISUSER"]) as db:
+      if str(inter.channel.id) not in db["linkchannels"]:
+        db["linkchannels"][str(inter.channel.id)] = []
+      if id not in db["linkchannels"]:
+        db["linkchannels"][id] = []
+
+      if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
+        db["linkchannels"][id].append(str(inter.channel.id))
+        db["linkchannels"][str(inter.channel.id)].append(id)
+        e = discord.Embed(title="Success", description=f"Linked `{id}` and this channel", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
+      else:
+        e = discord.Embed(title="Error", description="This channel is already linked with another channel", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
+
+  @channel.sub_command()
+  @commands.is_owner()
+  async def unlink(self, inter, id):
+    '''
+    Unlinks current channel and mentioned channel (ID)
+
+    Parameters
+    ----------
+    id: Channel ID
+    '''
+    with RedisManager(host=os.environ["REDISHOST"], port=os.environ["REDISPORT"], password=os.environ["REDISPASSWORD"], client_name=os.environ["REDISUSER"]) as db:
+      if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
+        e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
+        return
+      e = discord.Embed(title="Successfully deleted", color=random.randint(0, 16777215))
+      id2 = db["linkchannels"][str(inter.channel.id)]
+      id1 = db["linkchannels"][id]
+      if str(inter.channel.id) in id1:
+        if len(id1) == 1:
+          del db["linkchannels"][str(inter.channel.id)]
+        else:
+          del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
+        e.add_field(name=f"{id} > {inter.channel.id}", value="_ _", inline=False)
+      if id in id2:
+        if len(id2) == 1:
+          del db["linkchannels"][id]
+        else:
+          del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
+        e.add_field(name=f"{inter.channel.id} > {id}", value="_ _", inline=False)
+      await inter.send(embed=e, ephemeral=True)
+
+  @channel.sub_command(name = "create", description = "Create a channel")
+  @commands.has_permissions(manage_channels = True)
+  @commands.bot_has_permissions(manage_channels = True)
+  async def createchannel(inter, *, name, channeltype: Requiredc = Requiredc.Text_Channel, topic = "", nsfw: Requiredtoggler = Requiredtoggler.false):
+    '''
+    Create a channel
+
+    Parameters
+    ----------
+    name: Name of new channel
+    channeltype: Existing types: text, voice, stage
+    topic: Description of new channel
+    nsfw: false or true
+    '''
+    if nsfw == Requiredtoggler.true:
+      nsfw = True
+    else:
+      nsfw = False
+
+    if channeltype == "text":
+      await inter.guild.create_text_channel(name = name.replace(" ", "-"), category = inter.channel.category, topic = topic, nsfw = nsfw)
+      e = discord.Embed(title = "Success", description = f"Text channel {name} is created!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    elif channeltype == "voice":
+      await inter.guild.create_voice_channel(name = name, category = inter.channel.category)
+      e = discord.Embed(title = "Success", description = f"Voice channel {name} is created!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    elif channeltype == "stage":
+      await inter.guild.create_stage_channel(name = name.replace(" ", "-"), category = inter.channel.category, topic = topic)
+      e = discord.Embed(title = "Success", description = f"Stage channel {name} is created!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "Unknown type!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
   #kick command
   @commands.slash_command(name = "kick", description = "Kick mentioned member")
   @commands.has_permissions(kick_members = True)
@@ -330,41 +469,6 @@ class Moderation(commands.Cog):
             else:
               e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
               await inter.send(embed = e)
-
-
-  @commands.slash_command(name = "createchannel", description = "Create a channel")
-  @commands.has_permissions(manage_channels = True)
-  @commands.bot_has_permissions(manage_channels = True)
-  async def createchannel(inter, *, name, channeltype: Requiredc = Requiredc.Text_Channel, topic = "", nsfw: Requiredcnsfw = Requiredcnsfw.false):
-    '''
-    Create a channel
-
-    Parameters
-    ----------
-    name: Name of new channel
-    channeltype: Existing types: text, voice, stage
-    topic: Description of new channel
-    nsfw: false or true
-    '''    
-    if nsfw:
-      nsfw = True
-    else:
-      nsfw = False
-    if channeltype == "text":
-      await inter.guild.create_text_channel(name = name.replace(" ", "-"), category = inter.channel.category, topic = topic, nsfw = nsfw)
-      e = discord.Embed(title = "Success", description = f"Text channel {name} is created!", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
-    elif channeltype == "voice":
-      await inter.guild.create_voice_channel(name = name, category = inter.channel.category)
-      e = discord.Embed(title = "Success", description = f"Voice channel {name} is created!", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
-    elif channeltype == "stage":
-      await inter.guild.create_stage_channel(name = name.replace(" ", "-"), category = inter.channel.category, topic = topic)
-      e = discord.Embed(title = "Success", description = f"Stage channel {name} is created!", color = random.randint(0, 16777215))
-      await inter.send(embed = e)
-    else:
-      e = discord.Embed(title = "Error", description = "Unknown type!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
 
 def setup(bot):
   bot.add_cog(Moderation(bot))
