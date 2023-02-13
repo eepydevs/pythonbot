@@ -54,9 +54,10 @@ async def suggest_usableitem(inter, input):
    return [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] if db['inventory'][str(inter.author.id)] and [item for item in list(db['inventory'][str(inter.author.id)].keys()) if input.lower() in item.lower() and item.lower() in ["lottery"]][0:24] else ["You have nothing to use!"]
   
 def lottery():
+  win = None
   while True:
     chance = random.randint(0, 100)
-    if chance >= 25 and chance <= 50:
+    if 25 <= chance <= 50:
       win = random.randint(5, 50)
     elif chance >= 25:
       win = random.randint(25, 125)

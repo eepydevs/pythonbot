@@ -12,7 +12,8 @@ class PopcatAPI():
   def __init__(self):
     self.BASE_URL = "https://api.popcat.xyz/"
     
-  def __convert_iso8601(self, timestamp: str) -> int:
+  @staticmethod
+  def __convert_iso8601(timestamp: str) -> int:
     """Converts ISO 8601 to UNIX
 
     Args:
@@ -726,6 +727,8 @@ async def Webhook(ctx, channel = None):
         return webhook
     return (await ctx.channel.create_webhook(name="PythonBot Webhook"))
 
+
+# noinspection PyBroadException
 class Upload():
   def __init__(self, url: str, filename: str, path: str = "./", _chunk_size: int = 1024, _delete_after: float = 0):
     self._url = url
@@ -750,7 +753,7 @@ class Upload():
     if self.__delete_after:
       time.sleep(self.__delete_after)
     os.remove(f"{self._path}{self._filename}")
-    
+
   def createDirectory(self, directories: str):
     c_path = "."
     for dirs in directories.split("/")[1:]:
@@ -758,7 +761,7 @@ class Upload():
         c_path = c_path + f"/{dirs}"
         if not os.path.exists(c_path):
           os.mkdir(c_path)
-    
+
   def download(self):
     if not os.path.exists(self._path):
       self.createDirectory(self._path)

@@ -273,6 +273,9 @@ class Nonsense(commands.Cog):
       return
     try:
       with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
+        if str(msg.channel.id) in db["channelsetting"]["imageonly"] and not msg.attachments:
+          await msg.delete()
+          return
         if str(msg.guild.id) in db["serversetting"]["nqn"]:
           reg = ':[a-zA-Z]+:'
           other = re.split(reg, msg.content)
@@ -282,7 +285,7 @@ class Nonsense(commands.Cog):
             myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
             emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
             content+=emj+other[i+1]
-            
+
           if content==msg.content: return
           if msg.reference and len(msg.content.split())==1:
             await msg.delete()
@@ -291,19 +294,18 @@ class Nonsense(commands.Cog):
             webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None))))
             await msg.delete()
             await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-            
+
         if "linkchannels" in db:
-          with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-            if str(msg.channel.id) in list(db["linkchannels"].keys()):
-              for channel in db["linkchannels"][str(msg.channel.id)]:
-                webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
-                atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
-                rlatch = None
-                rmsg = ''
-                if not msg.reference is None:
-                  rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-                  rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-                await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+          if str(msg.channel.id) in list(db["linkchannels"].keys()):
+            for channel in db["linkchannels"][str(msg.channel.id)]:
+              webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
+              atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+              rlatch = None
+              rmsg = ''
+              if not msg.reference is None:
+                rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+                rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+              await webhook.send(content= ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
     
@@ -561,6 +563,7 @@ class Nonsense(commands.Cog):
     user: User name or id
     index: Index of score (default: 1)
     """
+    accfc, ppaccfc, ppaccss = 0, 0, 0
     try:
       if req := osuapi.user_scores(osuapi.user(user = user).id, "recent"):
         await inter.response.defer()
@@ -721,72 +724,6 @@ class Nonsense(commands.Cog):
     e.set_footer(text = f"ID: {group.id}")
     e.set_thumbnail(url = icon[0].image_url)
     await inter.send(embed = e)
-
-  #channel group
-  @commands.slash_command()
-  async def channel(self, inter):
-    pass
-
-  @channel.sub_command()
-  @commands.is_owner()
-  async def link(self, inter, id):
-    '''
-    Creates a link with current channelimp and mentioned channel (ID)
-    
-    Parameters
-    ----------
-    id: Channel ID
-    '''
-    if inter.bot.get_channel(int(id)) is None or str(inter.channel.id) == id:
-      e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
-      return
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.channel.id) not in db["linkchannels"]:
-        db["linkchannels"][str(inter.channel.id)] = []
-      if id not in db["linkchannels"]:
-        db["linkchannels"][id] = []
-
-      if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
-        db["linkchannels"][id].append(str(inter.channel.id))
-        db["linkchannels"][str(inter.channel.id)].append(id)
-        e = discord.Embed(title = "Success", description = f"Linked `{id}` and this channel", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = "Error", description = "This channel is already linked with another channel", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-
-  @channel.sub_command()
-  @commands.is_owner()
-  async def unlink(self, inter, id):
-    '''
-    Unlinks current channel and mentioned channel (ID)
-    
-    Parameters
-    ----------
-    id: Channel ID
-    '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
-        e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-        return
-      e = discord.Embed(title = "Successfully deleted", color = random.randint(0, 16777215))
-      id2 = db["linkchannels"][str(inter.channel.id)]
-      id1 = db["linkchannels"][id]
-      if str(inter.channel.id) in id1:
-        if len(id1) == 1:
-          del db["linkchannels"][str(inter.channel.id)]
-        else:
-          del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
-        e.add_field(name = f"{id} > {inter.channel.id}", value = "_ _", inline = False)
-      if id in id2:
-        if len(id2) == 1:
-          del db["linkchannels"][id]
-        else:
-          del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
-        e.add_field(name = f"{inter.channel.id} > {id}", value = "_ _", inline = False)
-      await inter.send(embed = e, ephemeral = True)
       
   @commands.slash_command(name = "urban")
   async def slashurban(inter, query):

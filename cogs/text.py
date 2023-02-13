@@ -185,7 +185,7 @@ class Text(commands.Cog):
   async def decode(self, inter):
     pass
 
-  @decode.sub_command
+  @decode.sub_command()
   async def braille(self, inter, text):
     '''
     Braille decode your inputted text
