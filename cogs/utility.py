@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import RedisManager
 
-botbuild = "10.5.10" # major.sub.minor/fix
+botbuild = "10.6.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -354,7 +354,7 @@ class Utility(commands.Cog):
   @bot.sub_command(description = "Shows side projects im working on")
   async def sideprojects(self, inter):
     e = discord.Embed(title = "Side projects im working on", description = "Some of projects may not be mine", color = random.randint(0, 16777215))
-    e.add_field(name = "Telicards (by Telcaum#9774)", value = "> PVP Card game\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/6X7hGMMPAv)", inline = False)
+    e.add_field(name = "Telicards (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/6X7hGMMPAv)", inline = False)
     await inter.send(embed = e)
     
   @commands.slash_command()
