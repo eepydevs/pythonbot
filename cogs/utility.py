@@ -8,9 +8,9 @@ import os
 import requests
 import asyncio
 import datetime, time
-from utils import RedisManager
+from utils import RedisManager, dividers
 
-botbuild = "10.6.1" # major.sub.minor/fix
+botbuild = "10.6.2" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -41,13 +41,6 @@ with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"]
 
   if "reminders" not in db:
     db["reminders"] = {}
-
-def dividers(array: list, divider: str = " | "):
-  ft = []
-  for i in array:
-    if i:
-      ft.append(i)
-  return divider.join(ft) if divider else ""
 
 def sbs(members):
   rval = {"offline": 0, "online": 0, "idle": 0, "dnd": 0}

@@ -781,4 +781,10 @@ class Upload():
     except:
       pass
     return None
-  
+
+def dividers(array: list, divider: str = " | "):
+  ft = []
+  for i in array:
+    if i:
+      ft.append(i)
+  return divider.join(ft) if divider else ""
