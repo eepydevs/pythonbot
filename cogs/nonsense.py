@@ -634,6 +634,94 @@ class Nonsense(commands.Cog):
       await inter.send(embed = e, ephemeral = True)
 
   @osu.sub_command()
+  async def top_plays(self, inter, user: str, index: int = 1):
+    '''
+    See users top plays
+
+    Parameters
+    ----------
+    user: User name or id
+    index: Index of score (default: 1)
+    '''
+    accfc, ppaccfc, ppaccss = 0, 0, 0
+    try:
+      if req := osuapi.user_scores(osuapi.user(user = user).id, "best"):
+        await inter.response.defer()
+        if index < 1:
+          index = 1
+        elif index > len(req):
+          index = len(req)
+        info = req[index - 1]
+        ppifranked = 0
+        ppaccifranked = 0
+        if info.pp and info.mode.value == "osu":
+          if not info.perfect and info.mode.value == 'osu':
+            accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
+            # ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (
+              str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
+            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (
+              str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        elif not info.pp and info.mode.value == "osu":
+          acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
+          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (
+            str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (
+            str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f' % (info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (f" (`{round(info.weight.pp, 2)}PP ({round(info.weight.percentage, 2)}%) weighted`)" if info.pp and info.mode.value == 'osu' else "") + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f' % (accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f' % (info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
+        e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
+        e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
+        await inter.send(f"**Top {info.mode.name.lower()}! score of [{esc_md(osuapi.user(user = user).username)}](https://osu.ppy.sh/users/{osuapi.user(user = user).id}):**", embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "This user does not have any top scores...", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+    except ValueError:
+      e = discord.Embed(title = "Error", description = "User not found", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  @osu.sub_command()
+  async def score(self, inter, id: str):
+    '''
+    See a score information
+
+    Parameters
+    ----------
+    id: Score ID
+    '''
+    accfc, ppaccfc, ppaccss = 0, 0, 0
+    try:
+      if info := osuapi.score(mode = "osu", score_id = id):
+        await inter.response.defer()
+        ppifranked = 0
+        ppaccifranked = 0
+        if info.pp and info.mode.value == "osu":
+          if not info.perfect and info.mode.value == 'osu':
+            accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
+            # ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (
+              str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
+            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (
+              str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        elif not info.pp and info.mode.value == "osu":
+          acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
+          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (
+            str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (
+            str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f' % (info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f' % (accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f' % (info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
+        e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
+        e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
+        await inter.send(f"**An {info.mode.name.lower()}! score of [{esc_md(osuapi.user(user = info.user_id).username)}](https://osu.ppy.sh/users/{osuapi.user(user = info.user_id).id}):**", embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "This score does not exist...", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+    except ValueError:
+      e = discord.Embed(title = "Error", description = "Score not found", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+
+  @osu.sub_command()
   async def ppacc(self, inter, id: str, acc: float = 100.00, mods: str = "NM"):
     '''
     Calculate osu! PP using accuracy
