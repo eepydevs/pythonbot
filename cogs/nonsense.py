@@ -24,7 +24,7 @@ load_dotenv()
 
 popcat = PopcatAPI()
 
-osuapi = osu.OssapiV2(18955, os.environ["OSU"])
+osuapi = osu.Ossapi(18955, os.environ["OSU"])
 whitelist_id = [417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
 apirequests_id = whitelist_id.copy() + [699420041103540264, 767102460673916958, 462098932571308033]
 
@@ -70,6 +70,11 @@ class Required2(str, Enum):
   Normal = "Normal"
   Await = "Await"
 
+class ScoreTypes(str, Enum):
+  Top_plays = "best"
+  Firsts = "firsts"
+  Recent = "recent"
+
 class EmbedColors(str, Enum):
   Random = "None"
   Default = "0x000000"
@@ -96,7 +101,7 @@ class EmbedColors(str, Enum):
   Navy = "0x34495E"
   DarkNavy = "0x2C3E50"
   Yellow = "0xFFFF00"
-  
+
 class menuthing(discord.ui.Select):
   def __init__(self, inter: discord.Interaction):
     self.inter = inter
@@ -117,7 +122,7 @@ class menuthing(discord.ui.Select):
             await inter.send("This selection menu is not for you", ephemeral = True)
             return False
         return True
-    
+
   async def callback(self, interaction: discord.MessageInteraction):
     await interaction.send(f"You selected Option {self.values[0]}!", ephemeral = True)
 
@@ -334,7 +339,7 @@ class Nonsense(commands.Cog):
         if "linkchannels" in db:
           if str(msg.channel.id) in list(db["linkchannels"].keys()):
             for channel in db["linkchannels"][str(msg.channel.id)]:
-              if inter.bot.get_channel(int(channel)):
+              if self.bot.get_channel(int(channel)):
                 webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
                 atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
                 rlatch = None
@@ -658,18 +663,14 @@ class Nonsense(commands.Cog):
           if not info.perfect and info.mode.value == 'osu':
             accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
             # ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (
-              str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
           if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
-            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (
-              str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         elif not info.pp and info.mode.value == "osu":
           acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
-          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (
-            str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (
-            str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f' % (info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (f" (`{round(info.weight.pp, 2)}PP ({round(info.weight.percentage, 2)}%) weighted`)" if info.pp and info.mode.value == 'osu' else "") + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f' % (accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f' % (info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
+          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+        e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f' % (info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f" (`{ppaccfc}PP` for `{'%.2f' % (accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + (f" (`{round(info.weight.pp, 2)}PP ({round(info.weight.percentage, 2)}%) weighted`)" if info.pp and info.mode.value == 'osu' else "") + f" - **`{'%.2f' % (info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
         e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
         e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
         await inter.send(f"**Top {info.mode.name.lower()}! score of [{esc_md(osuapi.user(user = user).username)}](https://osu.ppy.sh/users/{osuapi.user(user = user).id}):**", embed = e)

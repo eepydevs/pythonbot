@@ -24,7 +24,3 @@ class RedisManager(metaclass = Singleton):
   def __exit__(self, exc_type, exc_value, exc_traceback):
     if self._var != json.loads(self._redis.hget(self._name, self._key)):
       self._redis.hset(self._name, self._key, json.dumps(self._var))
-      
-  def update(self):
-    if self._var != json.loads(var := self._redis.hget(self._name, self._key)):
-      self._var = var
