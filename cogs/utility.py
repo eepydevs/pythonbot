@@ -123,7 +123,7 @@ class Utility(commands.Cog):
   #x reaction
   @commands.Cog.listener()
   async def on_reaction_add(self, reaction, user):
-    if reaction.message.author == self.bot.user and reaction.emoji == "❌" and user.guild_permissions.manage_messages:
+    if reaction.message.author == self.bot.user and reaction.emoji == "❌" and (user.guild_permissions.manage_messages or user.id == 439788095483936768):
       await reaction.message.delete()
     
   #context menu user info command
@@ -332,22 +332,33 @@ class Utility(commands.Cog):
   #bot ping command
   @bot.sub_command(name = "ping", description = "Shows bot's ping")
   async def slashping(self, inter):
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: {int(inter.bot.latency * 1000)}ms\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{inter.bot.latency * 1000}, {inter.bot.launch_time.timestamp()}")
+    s4dutilping = None
+    fshping = None
+    await inter.response.defer()
+    if inter.guild.id == 866689038731313193:
+      try:
+        await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `{inter.author.name}#{inter.author.discriminator}`")
+        await inter.guild.get_channel(1077214640754405417).send(f"s4d!check")
+        message = await inter.bot.wait_for("message", check = lambda message: message.author.id == 1030156986140074054 and message.channel.id == 1077214640754405417 and not message.embeds, timeout = 3)
+        s4dutilping = message.content
+      except asyncio.TimeoutError:
+        s4dutilping = 0
+    if fshexist := inter.guild.get_member(1068572316986003466):
+      fshping = int(requests.get("https://fsh-bot.frostzzone.repl.co/api/ping?plain=1").json())
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities" if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh" if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   #bot credits command
   @bot.sub_command(name = "credits", description = "Shows contributor list")
   async def credits(self, inter):
-    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\nTjMat#0001 - Contributor\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\nRage#6456 - Tester", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone#4486`\n> `inventionpro#6814`\n> `LarsIsHere#3320`", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   @bot.sub_command(description = "Shows side projects im working on")
   async def sideprojects(self, inter):
     e = discord.Embed(title = "Side projects im working on", description = "Some of projects may not be mine", color = random.randint(0, 16777215))
-    e.add_field(name = "Telicards (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/6X7hGMMPAv)", inline = False)
+    e.add_field(name = "Telicards [BOT] (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/6X7hGMMPAv)", inline = False)
+    e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm a `Inspiration` or/and `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\nNo support server", inline = False)
     await inter.send(embed = e)
     
   @commands.slash_command()

@@ -197,7 +197,7 @@ async def suggest_rblxuser(inter, input):
 
 async def suggest_command(inter, input):
   with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["notes  "]:
+    if str(inter.author.id) not in db["customcmd"]:
       db["customcmd"][str(inter.author.id)] = {}
     return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
@@ -298,7 +298,7 @@ class Nonsense(commands.Cog):
 
             if getmsg.reference:
               getmsgref = getmsg.reference.resolved
-              e = discord.Embed(url = getmsgref.jump_url, title = f"Replying to (Click to jump)", description = getmsgref.content, color = random.randint(0, 16777215), timestamp = getmsgref.created_at)
+              e = discord.Embed(url = getmsgref.jump_url, title = f"[Msg-link] Replying to (Click to jump)", description = getmsgref.content, color = random.randint(0, 16777215), timestamp = getmsgref.created_at)
               if getmsgref.attachments:
                 e.set_image(getmsgref.attachments[0])
               e.set_author(name = str(getmsgref.author.name) + (f"#{getmsgref.author.discriminator}" if int(getmsgref.author.discriminator) != 0000 else ''), icon_url = getmsgref.author.avatar)
@@ -350,6 +350,48 @@ class Nonsense(commands.Cog):
                 await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
+
+  @commands.slash_command(guild_ids = [866689038731313193])
+  async def s4d(self, inter):
+    pass
+
+  @s4d.sub_command_group()
+  async def economy(self, inter):
+    pass
+
+  @economy.sub_command()
+  async def payment(self, inter, user: discord.Member, amount: int):
+    '''
+    Payment in S4D Economy
+
+    Parameters
+    ----------
+    user: A user you want to pay
+    amount: Amount of cash you want to pay
+    '''
+    if amount < 1:
+      e = discord.Embed(title = f"Error", description = f"Amount should be greater than 0", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+
+    await inter.response.defer(ephemeral = True)
+    try:
+      await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `{inter.author.name}#{inter.author.discriminator}`")
+      await inter.guild.get_channel(1077214640754405417).send(f"se!api payment {user.id} {inter.author.id} {inter.channel.id} {amount}")
+      e = discord.Embed(title = f"Waiting for confirmation", description = f"Waiting for you to accept or cancel payment", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      message = await inter.bot.wait_for("message", check = lambda message: message.author.id == 1037498071094927382 and message.channel.id == 1077214640754405417 and not message.embeds, timeout = 300)
+      if "PS" in message.content:
+        await inter.edit_original_message("Payment Successful!", embed = None)
+      elif "NEM" in message.content:
+        await inter.edit_original_message("Not enough money...", embed = None)
+      elif "PC" in message.content:
+        await inter.edit_original_message("Payment Canceled!", embed = None)
+      else:
+        await inter.edit_original_message("Unknown Error...", embed = None)
+    except asyncio.TimeoutError:
+      await inter.edit_original_message("Payment unfinished...", embed = None)
+
 
   @commands.slash_command()
   async def api(self, inter):
