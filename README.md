@@ -9,10 +9,10 @@
 [![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat) \
 [![boosty](https://img.shields.io/badge/Support%20me%20on-Boosty!-orange)](https://boosty.to/number1)
 
-### Economy API: [Balance](https://pb-api.up.railway.app/balance)/[Inventory](https://pb-api.up.railway.app/api/inventory)
+### Economy API: [Balance](https://pb.number2d.repl.co/api/balance)/[Inventory](https://pb.number2d.repl.co/api/inventory)
 
 To search particular user use `userid` parameter \
-Example: <https://pb-api.up.railway.app/api/balance?userid=439788095483936768>
+Example: <https://pb.number2d.repl.co/api/balance?userid=439788095483936768>
 
 ## Commands
 

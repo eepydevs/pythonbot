@@ -332,20 +332,21 @@ class Utility(commands.Cog):
   #bot ping command
   @bot.sub_command(name = "ping", description = "Shows bot's ping")
   async def slashping(self, inter):
-    s4dutilping = None
-    fshping = None
+    s4dutilping = -1
+    fshping = -1
     await inter.response.defer()
-    if inter.guild.id == 866689038731313193:
+    if inter.guild.id == 866689038731313193 and not inter.guild.get_member(1030156986140074054).status == discord.Status.offline:
       try:
         await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `{inter.author.name}#{inter.author.discriminator}`")
         await inter.guild.get_channel(1077214640754405417).send(f"s4d!check")
         message = await inter.bot.wait_for("message", check = lambda message: message.author.id == 1030156986140074054 and message.channel.id == 1077214640754405417 and not message.embeds, timeout = 3)
         s4dutilping = message.content
       except asyncio.TimeoutError:
-        s4dutilping = 0
-    if fshexist := inter.guild.get_member(1068572316986003466):
+        s4dutilping = -1
+    fshexist = inter.guild.get_member(1068572316986003466)
+    if fshexist and not fshexist.status == discord.Status.offline:
       fshping = int(requests.get("https://fsh-bot.frostzzone.repl.co/api/ping?plain=1").json())
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities" if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh" if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities" if int(s4dutilping) >= 0 else "\n> `S4D Utilities` Unavailable..." if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh" if fshping >= 0 else "\n> `Fsh` Unavailable..." if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   #bot credits command
@@ -358,7 +359,7 @@ class Utility(commands.Cog):
   async def sideprojects(self, inter):
     e = discord.Embed(title = "Side projects im working on", description = "Some of projects may not be mine", color = random.randint(0, 16777215))
     e.add_field(name = "Telicards [BOT] (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/6X7hGMMPAv)", inline = False)
-    e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm a `Inspiration` or/and `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\nNo support server", inline = False)
+    e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm `Inspiration` and a `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\nNo support server", inline = False)
     await inter.send(embed = e)
     
   @commands.slash_command()

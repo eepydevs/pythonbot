@@ -25,7 +25,7 @@ load_dotenv()
 popcat = PopcatAPI()
 
 osuapi = osu.Ossapi(18955, os.environ["OSU"])
-whitelist_id = [417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
+whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
 apirequests_id = whitelist_id.copy() + [699420041103540264, 767102460673916958, 462098932571308033]
 
 ranks = {
@@ -253,21 +253,11 @@ def calc(text):
   else:
     raise ValueError("Something went wrong... (You may have used non-int)")
 
-def express(inter, text):
-  table = {"{author}": inter.author.name, "{author.mention}": f"<@{inter.author.id}>",
-           "{server}": inter.guild.name, "{server.id}": str(inter.guild.id),
-           "{channel}": inter.channel.name, "{channel.id}": str(inter.channel.id)}
+def express(text):
+  if found := re.compile("\{\S+}").findall(text):
+    found = [i[1:-1].split("|") for i in found]
+    print(f"{found=}")
 
-  result = []
-  splitted = text.split(" ")
-  for word in splitted:
-    if word.lower() in table:
-      result.append(table[word.lower()])
-    else:
-      result.append(word)
-
-  return " ".join(result)
-    
 class Nonsense(commands.Cog):
   def __init__(self, bot):
     self.bot = bot  
