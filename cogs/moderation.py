@@ -5,23 +5,22 @@ import asyncio
 from enum import Enum
 import random
 import os
-from utils import RedisManager
+from utils import db
 
 purgequotes = ["Stop spamming!", "Spamming is bad.", "Purge the chat! Haha!", "Purge after these silly young spammers...", "Is it just me, or is spamming more likely now than notime else?"]
 modquotes = ["I hope they learned their lesson.", "Make them cry!", "Haha!", "Gotcha!", "They should've readed the rules.", "Why they didn't readed the rules...", "That's lesson for you to read rules!", "'no reason ban' they say... Right at your eyes broke rule number 1337!", "Oops!"]
 
-with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-  if "warns" not in db:
-    db["warns"] = {}
+if "warns" not in db:
+  db["warns"] = {}
 
-  if "serversetting" not in db:
-    db["serversetting"] = {}
-    db["serversetting"]["gpd"] = {}
-    db["serversetting"]["nqn"] = {}
+if "serversetting" not in db:
+  db["serversetting"] = {}
+  db["serversetting"]["gpd"] = {}
+  db["serversetting"]["nqn"] = {}
 
-  if "channelsetting" not in db:
-    db["channelsetting"] = {}
-    db["channelsetting"]["imageonly"] = {}
+if "channelsetting" not in db:
+  db["channelsetting"] = {}
+  db["channelsetting"]["imageonly"] = {}
 
 class Requiredc(str, Enum):
   Text_Channel = "text"
@@ -54,25 +53,24 @@ class Moderation(commands.Cog):
       e = discord.Embed(title = "Error", description = "Invalid channel id", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if toggler == Requiredtoggler.true:
-        if str(id) not in db["channelsetting"]["imageonly"]:
-          db["channelsetting"]["imageonly"].update({str(id): True})
-          e = discord.Embed(title="Success", description=f"Set `{id}` to image only", color=random.randint(0, 16777215))
-          await inter.send(embed=e, ephemeral=True)
-          return
-        else:
-          e = discord.Embed(title="Error", description="This channel is already image only", color=random.randint(0, 16777215))
-          await inter.send(embed=e, ephemeral=True)
+    if toggler == Requiredtoggler.true:
+      if str(id) not in db["channelsetting"]["imageonly"]:
+        db["channelsetting"]["imageonly"].update({str(id): True})
+        e = discord.Embed(title="Success", description=f"Set `{id}` to image only", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
+        return
       else:
-        if str(id) in db["channelsetting"]["imageonly"]:
-          del db["channelsetting"]["imageonly"][str(id)]
-          e = discord.Embed(title="Success", description=f"Set `{id}` to text only", color=random.randint(0, 16777215))
-          await inter.send(embed=e, ephemeral=True)
-          return
-        else:
-          e = discord.Embed(title="Error", description="This channel is not image only", color=random.randint(0, 16777215))
-          await inter.send(embed=e, ephemeral=True)
+        e = discord.Embed(title="Error", description="This channel is already image only", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
+    else:
+      if str(id) in db["channelsetting"]["imageonly"]:
+        del db["channelsetting"]["imageonly"][str(id)]
+        e = discord.Embed(title="Success", description=f"Set `{id}` to text only", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
+        return
+      else:
+        e = discord.Embed(title="Error", description="This channel is not image only", color=random.randint(0, 16777215))
+        await inter.send(embed=e, ephemeral=True)
 
 
   @channel.sub_command()
@@ -89,20 +87,19 @@ class Moderation(commands.Cog):
       e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
       await inter.send(embed=e, ephemeral=True)
       return
-    with RedisManager(host=os.environ["REDISHOST"], port=os.environ["REDISPORT"], password=os.environ["REDISPASSWORD"], client_name=os.environ["REDISUSER"]) as db:
-      if str(inter.channel.id) not in db["linkchannels"]:
-        db["linkchannels"][str(inter.channel.id)] = []
-      if id not in db["linkchannels"]:
-        db["linkchannels"][id] = []
+    if str(inter.channel.id) not in db["linkchannels"]:
+      db["linkchannels"][str(inter.channel.id)] = []
+    if id not in db["linkchannels"]:
+      db["linkchannels"][id] = []
 
-      if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
-        db["linkchannels"][id].append(str(inter.channel.id))
-        db["linkchannels"][str(inter.channel.id)].append(id)
-        e = discord.Embed(title="Success", description=f"Linked `{id}` and this channel", color=random.randint(0, 16777215))
-        await inter.send(embed=e, ephemeral=True)
-      else:
-        e = discord.Embed(title="Error", description="This channel is already linked with another channel", color=random.randint(0, 16777215))
-        await inter.send(embed=e, ephemeral=True)
+    if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
+      db["linkchannels"][id].append(str(inter.channel.id))
+      db["linkchannels"][str(inter.channel.id)].append(id)
+      e = discord.Embed(title="Success", description=f"Linked `{id}` and this channel", color=random.randint(0, 16777215))
+      await inter.send(embed=e, ephemeral=True)
+    else:
+      e = discord.Embed(title="Error", description="This channel is already linked with another channel", color=random.randint(0, 16777215))
+      await inter.send(embed=e, ephemeral=True)
 
   @channel.sub_command()
   @commands.is_owner()
@@ -114,27 +111,26 @@ class Moderation(commands.Cog):
     ----------
     id: Channel ID
     '''
-    with RedisManager(host=os.environ["REDISHOST"], port=os.environ["REDISPORT"], password=os.environ["REDISPASSWORD"], client_name=os.environ["REDISUSER"]) as db:
-      if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
-        e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
-        await inter.send(embed=e, ephemeral=True)
-        return
-      e = discord.Embed(title="Successfully deleted", color=random.randint(0, 16777215))
-      id2 = db["linkchannels"][str(inter.channel.id)]
-      id1 = db["linkchannels"][id]
-      if str(inter.channel.id) in id1:
-        if len(id1) == 1:
-          del db["linkchannels"][str(inter.channel.id)]
-        else:
-          del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
-        e.add_field(name=f"{id} > {inter.channel.id}", value="_ _", inline=False)
-      if id in id2:
-        if len(id2) == 1:
-          del db["linkchannels"][id]
-        else:
-          del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
-        e.add_field(name=f"{inter.channel.id} > {id}", value="_ _", inline=False)
+    if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
+      e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
       await inter.send(embed=e, ephemeral=True)
+      return
+    e = discord.Embed(title="Successfully deleted", color=random.randint(0, 16777215))
+    id2 = db["linkchannels"][str(inter.channel.id)]
+    id1 = db["linkchannels"][id]
+    if str(inter.channel.id) in id1:
+      if len(id1) == 1:
+        del db["linkchannels"][str(inter.channel.id)]
+      else:
+        del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
+      e.add_field(name=f"{id} > {inter.channel.id}", value="_ _", inline=False)
+    if id in id2:
+      if len(id2) == 1:
+        del db["linkchannels"][id]
+      else:
+        del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
+      e.add_field(name=f"{inter.channel.id} > {id}", value="_ _", inline=False)
+    await inter.send(embed=e, ephemeral=True)
 
   @channel.sub_command(name = "create", description = "Create a channel")
   @commands.has_permissions(manage_channels = True)
@@ -333,26 +329,25 @@ class Moderation(commands.Cog):
     member: Mention member
     reason: Reason for the warn, will be shown in /warns show member: @mention
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if not inter.author.top_role < member.top_role:
-        if str(inter.guild.id) not in db["warns"]:
-          db["warns"][str(inter.guild.id)] = {}
-        if str(member.id) not in db["warns"][str(inter.guild.id)]:
-          db["warns"][str(inter.guild.id)][str(member.id)] = []
-          updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
-          updatelist.append(reason)
-          db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
-          e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-        else:
-          updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
-          updatelist.append(reason)
-          db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
-          e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
+    if not inter.author.top_role < member.top_role:
+      if str(inter.guild.id) not in db["warns"]:
+        db["warns"][str(inter.guild.id)] = {}
+      if str(member.id) not in db["warns"][str(inter.guild.id)]:
+        db["warns"][str(inter.guild.id)][str(member.id)] = []
+        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+        updatelist.append(reason)
+        db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+        e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
         await inter.send(embed = e)
+      else:
+        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+        updatelist.append(reason)
+        db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+        e = discord.Embed(title = "Success", description = f"Warned `{member.name}` for reason: `{reason}`", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You can't warn a person higher than you", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   @warns.sub_command(name = "show")
   @commands.has_permissions(kick_members = True)
@@ -365,24 +360,23 @@ class Moderation(commands.Cog):
     ----------
     member: Mention member
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if not inter.author.top_role < member.top_role:
-        if str(inter.guild.id) not in db["warns"]:
-          db["warns"][str(inter.guild.id)] = {}
-        if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
-          list = db["warns"][str(inter.guild.id)][str(member.id)]
-          text = ""
-          text += f"1. `{list[0]}`"
-          for i in range(len(list) - 1):
-            text += f"\n{i + 2}. `{list[i + 1]}`"
-          e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-        else:
-          e = discord.Embed(title = f"{member.name}'s Warns:", description = "They have no warns", color = random.randint(0, 16777215))
-          await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
+    if not inter.author.top_role < member.top_role:
+      if str(inter.guild.id) not in db["warns"]:
+        db["warns"][str(inter.guild.id)] = {}
+      if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
+        list = db["warns"][str(inter.guild.id)][str(member.id)]
+        text = ""
+        text += f"1. `{list[0]}`"
+        for i in range(len(list) - 1):
+          text += f"\n{i + 2}. `{list[i + 1]}`"
+        e = discord.Embed(title = f"{member.name}'s Warns:", description = text, color = random.randint(0, 16777215))
         await inter.send(embed = e)
+      else:
+        e = discord.Embed(title = f"{member.name}'s Warns:", description = "They have no warns", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You can't see warns of a person higher than you", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   @warns.sub_command(name = "remove")
   @commands.has_permissions(kick_members = True)
@@ -397,30 +391,29 @@ class Moderation(commands.Cog):
     index: index of the warn, shown in /warns member: @mention
     '''
     if not inter.author.top_role < member.top_role:
-      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-        if str(inter.guild.id) not in db["warns"]:
-          db["warns"][str(inter.guild.id)] = {}
-        if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
-          updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
-          try:
-            if not len(updatelist) < index or not 0 > index:
-              reason = updatelist.pop(int(index - 1))
-              db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
-              e = discord.Embed(title = "Success!", description = f"`{member.name}`'s warn: {index}: `{reason}` is deleted!", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-            else:
-              e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-          except IndexError:
+      if str(inter.guild.id) not in db["warns"]:
+        db["warns"][str(inter.guild.id)] = {}
+      if str(member.id) in db["warns"][str(inter.guild.id)] and db["warns"][str(inter.guild.id)][str(member.id)] != []:
+        updatelist = db["warns"][str(inter.guild.id)][str(member.id)]
+        try:
+          if not len(updatelist) < index or not 0 > index:
+            reason = updatelist.pop(int(index - 1))
+            db["warns"][str(inter.guild.id)][str(member.id)] = updatelist
+            e = discord.Embed(title = "Success!", description = f"`{member.name}`'s warn: {index}: `{reason}` is deleted!", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
             e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
             await inter.send(embed = e)
-        else:
-          e = discord.Embed(title = "Error", description = "They have no warns", color = random.randint(0, 16777215))
+        except IndexError:
+          e = discord.Embed(title = "Error", description = "This index doesn't exist!", color = random.randint(0, 16777215))
           await inter.send(embed = e)
+      else:
+        e = discord.Embed(title = "Error", description = "They have no warns", color = random.randint(0, 16777215))
+        await inter.send(embed = e)
     else:
       e = discord.Embed(title = "Error", description = "You can't remove warns from a person higher than you", color = random.randint(0, 16777215))
       await inter.send(embed = e)
-    
+
 
   #setting group
   @commands.slash_command(name = "setting", description = "See current setting or change it. Available settings: gpd")
@@ -433,42 +426,41 @@ class Moderation(commands.Cog):
     setting: Available settings: gpd, nqn
     switch: basically anything
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if switch != "info":
-        if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
-          if setting == "gpd":
-            if str(inter.guild.id) in db["serversetting"]["gpd"] and db["serversetting"]["gpd"][str(inter.guild.id)]:
-              db["serversetting"]["gpd"][str(inter.guild.id)] = None
-              e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-            else:
-              db["serversetting"]["gpd"][str(inter.guild.id)] = "True"
-              e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-          if setting == "nqn":
-            if str(inter.guild.id) in db["serversetting"]["nqn"] and db["serversetting"]["nqn"][str(inter.guild.id)]:
-              db["serversetting"]["nqn"][str(inter.guild.id)] = None
-              e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-            else:
-              db["serversetting"]["nqn"][str(inter.guild.id)] = "True"
-              e = discord.Embed(title = "Success", description = "You enabled NQN feature for this server", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-        else:
-          if setting == "gpd":
-            if str(inter.guild.id) in db["serversetting"]["gpd"]:
-              e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-            else:
-              e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-          if setting == "nqn":
-            if str(inter.guild.id) in db["serversetting"]["nqn"]:
-              e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature enabled", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
-            else:
-              e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
-              await inter.send(embed = e)
+    if switch != "info":
+      if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
+        if setting == "gpd":
+          if str(inter.guild.id) in db["serversetting"]["gpd"] and db["serversetting"]["gpd"][str(inter.guild.id)]:
+            db["serversetting"]["gpd"][str(inter.guild.id)] = None
+            e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            db["serversetting"]["gpd"][str(inter.guild.id)] = "True"
+            e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+        if setting == "nqn":
+          if str(inter.guild.id) in db["serversetting"]["nqn"] and db["serversetting"]["nqn"][str(inter.guild.id)]:
+            db["serversetting"]["nqn"][str(inter.guild.id)] = None
+            e = discord.Embed(title = "Success", description = "You disabled NQN feature for this server", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            db["serversetting"]["nqn"][str(inter.guild.id)] = "True"
+            e = discord.Embed(title = "Success", description = "You enabled NQN feature for this server", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+      else:
+        if setting == "gpd":
+          if str(inter.guild.id) in db["serversetting"]["gpd"]:
+            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+        if setting == "nqn":
+          if str(inter.guild.id) in db["serversetting"]["nqn"]:
+            e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature enabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
+          else:
+            e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature disabled", color = random.randint(0, 16777215))
+            await inter.send(embed = e)
 
 def setup(bot):
   bot.add_cog(Moderation(bot))

@@ -17,7 +17,7 @@ import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
 import requests as rq
-from utils import RedisManager, PopcatAPI, dividers
+from utils import PopcatAPI, dividers, db
 from dotenv import load_dotenv
 from pp_calc import calc as pp
 load_dotenv()
@@ -41,21 +41,20 @@ ranks = {
 
 crblx = rblx.Client(os.environ["RBLXS"])
 
-with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-  if "tupper" not in db:
-    db["tupper"] = {}
+if "tupper" not in db:
+  db["tupper"] = {}
 
-  if "customcmd" not in db:
-    db["customcmd"] = {}
+if "customcmd" not in db:
+  db["customcmd"] = {}
 
-  if "linkchannels" not in db:
-    db["linkchannels"] = {}
+if "linkchannels" not in db:
+  db["linkchannels"] = {}
 
-  if "bookmarks" not in db:
-    db["bookmarks"] = {}
-    
-  if "apifavs" not in db:
-    db["apifavs"] = {}
+if "bookmarks" not in db:
+  db["bookmarks"] = {}
+
+if "apifavs" not in db:
+  db["apifavs"] = {}
     
 def esc_md(text: str):
   return text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
@@ -166,24 +165,21 @@ def shuffle(x):
   return random.sample(x, len(x))
 
 async def suggest_snip(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["apifavs"]:
-      db["apifavs"][str(inter.author.id)] = {}
-    if not input:
-      input = "https://api.popcat.xyz"
-    return [input] + [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:23] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else [input]
+  if str(inter.author.id) not in db["apifavs"]:
+    db["apifavs"][str(inter.author.id)] = {}
+  if not input:
+    input = "https://api.popcat.xyz"
+  return [input] + [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:23] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else [input]
   
 async def suggest_dsnip(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["apifavs"]:
-      db["apifavs"][str(inter.author.id)] = {}
-    return [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else ["You have nothing! Go create a snippet!"]
+  if str(inter.author.id) not in db["apifavs"]:
+    db["apifavs"][str(inter.author.id)] = {}
+  return [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] if db["apifavs"][str(inter.author.id)] and [fav for fav in list(db["apifavs"][str(inter.author.id)].keys()) if input.lower() in fav.lower()][0:24] else ["You have nothing! Go create a snippet!"]
 
 async def suggest_tupper(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["tupper"]:
-      db["tupper"][str(inter.author.id)] = {}
-    return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
+  if str(inter.author.id) not in db["tupper"]:
+    db["tupper"][str(inter.author.id)] = {}
+  return [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] if db["tupper"][str(inter.author.id)] and [tupper for tupper in list(db["tupper"][str(inter.author.id)].keys()) if input.lower() in tupper.lower()][0:24] else ["You have nothing! Go create a tupper!"]
 
 async def suggest_rblxuser(inter, input):
   if not input:
@@ -196,10 +192,9 @@ async def suggest_rblxuser(inter, input):
     return ["Users not found"]
 
 async def suggest_command(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["customcmd"]:
-      db["customcmd"][str(inter.author.id)] = {}
-    return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
+  if str(inter.author.id) not in db["customcmd"]:
+    db["customcmd"][str(inter.author.id)] = {}
+  return [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] if db["customcmd"][str(inter.author.id)] and [command for command in list(db["customcmd"][str(inter.author.id)].keys()) if input.lower() in command.lower()][0:24] else ["You have nothing! Go create a command!"]
 
 def runbf(str):
   array = [0] * 30000
@@ -253,10 +248,10 @@ def calc(text):
   else:
     raise ValueError("Something went wrong... (You may have used non-int)")
 
-def express(text):
-  if found := re.compile("\{\S+}").findall(text):
-    found = [i[1:-1].split("|") for i in found]
-    print(f"{found=}")
+# def express(text):
+#   if found := re.compile("\{\S+}").findall(text):
+#     found = [i[1:-1].split("|") for i in found]
+#     print(f"{found=}")
 
 class Nonsense(commands.Cog):
   def __init__(self, bot):
@@ -303,41 +298,41 @@ class Nonsense(commands.Cog):
           await webhook.send(content = content if content else None, embeds = embeds, username = msg.author.display_name, avatar_url = msg.author.avatar, allowed_mentions = discord.AllowedMentions.none())
           return
 
-      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-        if str(msg.channel.id) in db["channelsetting"]["imageonly"] and not msg.attachments:
+      if str(msg.channel.id) in db["channelsetting"]["imageonly"] and not msg.attachments:
+        await msg.delete()
+        return
+      if str(msg.guild.id) in db["serversetting"]["nqn"]:
+        myemjs = None
+        reg = ':[a-zA-Z]+:'
+        other = re.split(reg, msg.content)
+        emjs = re.findall(reg, msg.content)
+        content=other[0]
+        for i in range(len(emjs)):
+          myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
+          emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
+          content+=emj+other[i+1]
+
+        if content==msg.content: return
+        if msg.reference and len(msg.content.split())==1:
           await msg.delete()
-          return
-        if str(msg.guild.id) in db["serversetting"]["nqn"]:
-          reg = ':[a-zA-Z]+:'
-          other = re.split(reg, msg.content)
-          emjs = re.findall(reg, msg.content)
-          content=other[0]
-          for i in range(len(emjs)):
-            myemjs = tuple(filter(lambda emj: emj.name==emjs[i][1:-1], self.bot.emojis))
-            emj = f'<:{myemjs[0].name}:{myemjs[0].id}>' if (any(myemjs) and not other[i].endswith('<')) else emjs[i]
-            content+=emj+other[i+1]
+          await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
+        else:
+          webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None))))
+          await msg.delete()
+          await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
 
-          if content==msg.content: return
-          if msg.reference and len(msg.content.split())==1:
-            await msg.delete()
-            await self.react.__call__(msg, myemjs[0], msg.reference.resolved)
-          else:
-            webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None))))
-            await msg.delete()
-            await webhook.send(content=content, username=msg.author.display_name, avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-
-        if "linkchannels" in db:
-          if str(msg.channel.id) in list(db["linkchannels"].keys()):
-            for channel in db["linkchannels"][str(msg.channel.id)]:
-              if self.bot.get_channel(int(channel)):
-                webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
-                atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
-                rlatch = None
-                rmsg = ''
-                if not msg.reference is None:
-                  rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-                  rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-                await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+      if "linkchannels" in db:
+        if str(msg.channel.id) in list(db["linkchannels"].keys()):
+          for channel in db["linkchannels"][str(msg.channel.id)]:
+            if self.bot.get_channel(int(channel)):
+              webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
+              atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+              rlatch = None
+              rmsg = ''
+              if not msg.reference is None:
+                rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+                rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+              await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
 
@@ -385,10 +380,9 @@ class Nonsense(commands.Cog):
 
   @commands.slash_command()
   async def api(self, inter):
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["apifavs"]:
-        db["apifavs"][str(inter.author.id)] = {}
-  
+    if str(inter.author.id) not in db["apifavs"]:
+      db["apifavs"][str(inter.author.id)] = {}
+
   @api.sub_command()
   async def request(self, inter, baseurl: str = commands.Param(autocomplete = suggest_snip), options = None, params: str = None, ephemeral: Required1 = Required1.You):
     '''
@@ -401,46 +395,49 @@ class Nonsense(commands.Cog):
     options: Options for API request | Example: /github/peppy
     params: Parameters to use in the request | Example: uid=123, score=456
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if options:
-        if baseurl in db["apifavs"][str(inter.author.id)]: baseurl = db["apifavs"][str(inter.author.id)][baseurl]       
-        if baseurl.endswith("/") and options.startswith("/"): url = baseurl[:-1] + options
-        else:
-          if not any([baseurl.endswith("/"), options.startswith("/")]):
-            url = baseurl + "/" + options
-          else:
-            url = baseurl + options
+    response = None
+    if options:
+      if baseurl in db["apifavs"][str(inter.author.id)]: baseurl = db["apifavs"][str(inter.author.id)][baseurl]
+      if baseurl.endswith("/") and options.startswith("/"): url = baseurl[:-1] + options
       else:
-        url = baseurl
-      if not url.startswith(("https://", "http://")): url = "https://" + url
-      furl = None
-      await inter.response.defer(ephemeral = ephemeral)
-      if inter.author.id in apirequests_id:
-        param = {}
-        if not params is None:
-          for i in params.split(","):
-            param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
-        ms = time.perf_counter_ns()
-        response = rq.get(url = url, params = param if param else None)
-        ms = round((time.perf_counter_ns() - ms) / 1000000)
-        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", description = f"Response: `{response.status_code}`, `{ms}ms`", color = random.randint(0, 16777215))
-        e.add_field(name = "Complete URL", value = f"```{response.url}```", inline = False)
-        try:
-          rjson = [json.dumps(response.json()), True]
-        except rq.JSONDecodeError:
+        if not any([baseurl.endswith("/"), options.startswith("/")]):
+          url = baseurl + "/" + options
+        else:
+          url = baseurl + options
+    else:
+      url = baseurl
+    if not url.startswith(("https://", "http://")): url = "https://" + url
+    furl = None
+    await inter.response.defer(ephemeral = ephemeral)
+    if inter.author.id in apirequests_id:
+      param = {}
+      if not params is None:
+        for i in params.split(","):
+          param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
+      ms = time.perf_counter_ns()
+      response = rq.get(url = url, params = param if param else None)
+      ms = round((time.perf_counter_ns() - ms) / 1000000)
+      e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", description = f"Response: `{response.status_code}`, `{ms}ms`", color = random.randint(0, 16777215))
+      e.add_field(name = "Complete URL", value = f"```{response.url}```", inline = False)
+      try:
+        rjson = [json.dumps(response.json()), True]
+      except rq.JSONDecodeError:
+        if not response.text:
           e.set_image(url = response.url)
           rjson = ["VVV (no picture means there is nothing as result or an error)", False]
-        except rq.ConnectionError:
-          rjson = ["Something went wrong...", False]
-        e.add_field(name = "Results", value = f"```json\n{rjson[0] if len(rjson[0]) < 1024 else 'Too long JSON response to display'}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
-      else:
-        e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16777215))
-        param = {}
-        if not params is None:
-          for i in params.split(","):
-            param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
-        furl = f"{url}?" + "&".join(f"{k}={v}" for k, v in zip(param.keys(), param.values()))
-        e.add_field(name = "Complete URL", value = f"```{furl}```", inline = False)
+        else:
+          rjson = [response.text, False]
+      except rq.ConnectionError:
+        rjson = ["Something went wrong...", False]
+      e.add_field(name = "Results", value = f"```json\n{rjson[0] if len(rjson[0]) < 1024 else 'Too long JSON response to display'}\n```" if rjson[1] else f"`{rjson[0]}`", inline = False)
+    else:
+      e = discord.Embed(url = url, title = f"API: {url if len(url) < 256 else 'Too long URL to display'}", color = random.randint(0, 16777215))
+      param = {}
+      if not params is None:
+        for i in params.split(","):
+          param.update({i.split("=")[0].strip(): i.split("=")[1].strip()})
+      furl = f"{url}?" + "&".join(f"{k}={v}" for k, v in zip(param.keys(), param.values()))
+      e.add_field(name = "Complete URL", value = f"```{furl}```", inline = False)
     view = discord.ui.View()
     style = discord.ButtonStyle.gray
     item = discord.ui.Button(style = style, label = "Requested API URL", url = furl if furl else response.url)
@@ -458,14 +455,13 @@ class Nonsense(commands.Cog):
     url: API Base URL | Example: https://api.popcat.xyz/
     '''
     await inter.response.defer(ephemeral = True)
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if snipname not in db["apifavs"][str(inter.author.id)]:
-        db["apifavs"][str(inter.author.id)].update({snipname: url})
-        e = discord.Embed(title = "Successful", description = f"Successfully added `{snipname}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = "A snippet with this name already exists", color = random.randint(0, 16777215))
-        await inter.send(embed = e)    
+    if snipname not in db["apifavs"][str(inter.author.id)]:
+      db["apifavs"][str(inter.author.id)].update({snipname: url})
+      e = discord.Embed(title = "Successful", description = f"Successfully added `{snipname}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "A snippet with this name already exists", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   @api.sub_command()
   async def delete(self, inter, snipname: str = commands.Param(autocomplete = suggest_dsnip)):
@@ -477,14 +473,13 @@ class Nonsense(commands.Cog):
     snipname: Snippet to delete 
     '''
     await inter.response.defer(ephemeral = True)
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if snipname in db["apifavs"][str(inter.author.id)]:
-        db["apifavs"][str(inter.author.id)].pop(snipname)
-        e = discord.Embed(title = "Successful", description = f"Successfully removed `{snipname}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = "This snippet doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+    if snipname in db["apifavs"][str(inter.author.id)]:
+      db["apifavs"][str(inter.author.id)].pop(snipname)
+      e = discord.Embed(title = "Successful", description = f"Successfully removed `{snipname}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "This snippet doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   @commands.slash_command()
   async def info(self, inter):
@@ -1182,9 +1177,8 @@ class Nonsense(commands.Cog):
   #tupper group
   @commands.slash_command()
   async def tupper(self, inter):
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["tupper"]:
-        db["tupper"][str(inter.author.id)] = {}
+    if str(inter.author.id) not in db["tupper"]:
+      db["tupper"][str(inter.author.id)] = {}
 
   #create tupper
   @tupper.sub_command()
@@ -1197,16 +1191,15 @@ class Nonsense(commands.Cog):
     name: Name for tupper
     avatar: Avatar for tupper (MUST BE A LINK)
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      await inter.response.defer(ephemeral = True)
-      if name not in db["tupper"][str(inter.author.id)]:
-        db["tupper"][str(inter.author.id)].update({str(name): str(avatar)})
-        e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
-        e.set_image(url = avatar)
-        await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = f"Tupper named: `{name}` already exists!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+    await inter.response.defer(ephemeral = True)
+    if name not in db["tupper"][str(inter.author.id)]:
+      db["tupper"][str(inter.author.id)].update({str(name): str(avatar)})
+      e = discord.Embed(title = "Success", description = f"Tupper named: `{name}` is created!", color = random.randint(0, 16777215))
+      e.set_image(url = avatar)
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{name}` already exists!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #use tupper
   @tupper.sub_command()
@@ -1220,26 +1213,25 @@ class Nonsense(commands.Cog):
     tupper: Tupper you want to use
     content: Text here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      await inter.response.defer(ephemeral = True)
-      if tupper in db["tupper"][str(inter.author.id)]:
-        e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-        channel_webhooks = await inter.channel.webhooks()
-        webhook_count = 0
+    await inter.response.defer(ephemeral = True)
+    if tupper in db["tupper"][str(inter.author.id)]:
+      e = discord.Embed(title = "Success", description = f"Successfully sent `{content}` as `{tupper}`", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+      channel_webhooks = await inter.channel.webhooks()
+      webhook_count = 0
 
-        for webhook in channel_webhooks:
-          if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
-              await webhook.send(
-                  content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none()
-              )
-              return
+      for webhook in channel_webhooks:
+        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
+            await webhook.send(
+                content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none()
+            )
+            return
 
-        new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
-        await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none())
-      else:
-        e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+      new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
+      await new_webhook.send(content = content, username = tupper, avatar_url = db["tupper"][str(inter.author.id)].get(tupper), allowed_mentions=discord.AllowedMentions.none())
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #delete tupper
   @tupper.sub_command()
@@ -1251,15 +1243,14 @@ class Nonsense(commands.Cog):
     ----------
     tupper: Tupper you want to delete
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      await inter.response.defer(ephemeral = True)
-      if tupper in db["tupper"][str(inter.author.id)]:
-        del db["tupper"][str(inter.author.id)][tupper]
-        e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-      else:
-        e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
+    await inter.response.defer(ephemeral = True)
+    if tupper in db["tupper"][str(inter.author.id)]:
+      del db["tupper"][str(inter.author.id)][tupper]
+      e = discord.Embed(title = "Success", description = f"Tupper named: `{tupper}` is deleted!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
 
   #edit tupper
   @tupper.sub_command()
@@ -1273,16 +1264,15 @@ class Nonsense(commands.Cog):
     new_name: New name for tupper
     avatar: New avatar for tupper (MUST BE A LINK)
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if tupper in db["tupper"][str(inter.author.id)]:
-        del db["tupper"][str(inter.author.id)][tupper]
-        db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
-        e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
-        e.set_image(url = avatar)
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    if tupper in db["tupper"][str(inter.author.id)]:
+      del db["tupper"][str(inter.author.id)][tupper]
+      db["tupper"][str(inter.author.id)].update({str(new_name): str(avatar)})
+      e = discord.Embed(title = "Success", description = f"Tupper's name: `{tupper}` is now edited to `{new_name}`!", color = random.randint(0, 16777215))
+      e.set_image(url = avatar)
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = "Error", description = f"Tupper named: `{tupper}` doesn't exist!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @commands.slash_command()
   async def screenshot(inter, site: str):
@@ -1301,88 +1291,84 @@ class Nonsense(commands.Cog):
       e = discord.Embed(title = "Error", description = "Invalid URL", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
-  @commands.slash_command()
-  async def cc(self, inter):
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["customcmd"]:
-        db["customcmd"][str(inter.author.id)] = {}
-                        
-  @cc.sub_command()
-  async def info(inter):
-    '''
-    Expression info here
-    '''
-    table = {"{author}": inter.author.name, "{author.mention}": f"<@{inter.author.id}>",
-           "{server}": inter.guild.name, "{server.id}": str(inter.guild.id),
-           "{channel}": inter.channel.name, "{channel.id}": str(inter.channel.id)}
-    e = discord.Embed(title = "Expression info", description = '\n'.join((key + ': ' + value) for key, value in zip(table.keys(), table.values())), color = random.randint(0, 16777215))
-    await inter.send(embed = e, ephemeral = True)
-
-  @cc.sub_command()
-  async def eval(inter, expr, ephemeral: Required1 = Required1.You):
-    '''
-    Eval Custom Command expressions
-
-    Parameters
-    ----------
-    expr: Expressions here
-    ephemeral: True or False
-    '''
-    e = discord.Embed(title = "CC Eval", description = f"this is ultra beta alpha version\n```{expr}```\nResults:\n{express(inter, expr)}", color = random.randint(0, 16777215))
-    await inter.send(embed = e , ephemeral = ephemeral)
-
-  @cc.sub_command()
-  async def create(inter, cmd_name, expr):
-    '''
-    Create a Custom Command for yourself
-
-    Parameters
-    ----------
-    cmd_name: Command name
-    expr: Expressions here
-    '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if cmd_name not in db["customcmd"][str(inter.author.id)]:
-        db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
-        e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = "Error", description = "A command with this name already exists", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-
-  @cc.sub_command()
-  async def use(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
-    '''
-    Use an exising command
-
-    Parameters
-    ----------
-    cmd_name: Command name
-    '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if cmd_name in db["customcmd"][str(inter.author.id)]:
-        await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
-      else:
-        e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-
-  @cc.sub_command()
-  async def delete(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
-    '''
-    Delete an existing command
-
-    Parameters
-    ----------
-    cmd_name: Command name
-    '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if cmd_name in db["customcmd"][str(inter.author.id)]:
-        db["customcmd"][str(inter.author.id)].pop(cmd_name)
-        e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+  # @commands.slash_command()
+  # async def cc(self, inter):
+  #   if str(inter.author.id) not in db["customcmd"]:
+  #     db["customcmd"][str(inter.author.id)] = {}
+  #
+  # @cc.sub_command()
+  # async def info(inter):
+  #   '''
+  #   Expression info here
+  #   '''
+  #   table = {"{author}": inter.author.name, "{author.mention}": f"<@{inter.author.id}>",
+  #          "{server}": inter.guild.name, "{server.id}": str(inter.guild.id),
+  #          "{channel}": inter.channel.name, "{channel.id}": str(inter.channel.id)}
+  #   e = discord.Embed(title = "Expression info", description = '\n'.join((key + ': ' + value) for key, value in zip(table.keys(), table.values())), color = random.randint(0, 16777215))
+  #   await inter.send(embed = e, ephemeral = True)
+  #
+  # @cc.sub_command()
+  # async def eval(inter, expr, ephemeral: Required1 = Required1.You):
+  #   '''
+  #   Eval Custom Command expressions
+  #
+  #   Parameters
+  #   ----------
+  #   expr: Expressions here
+  #   ephemeral: True or False
+  #   '''
+  #   e = discord.Embed(title = "CC Eval", description = f"this is ultra beta alpha version\n```{expr}```\nResults:\n{express(inter, expr)}", color = random.randint(0, 16777215))
+  #   await inter.send(embed = e , ephemeral = ephemeral)
+  #
+  # @cc.sub_command()
+  # async def create(inter, cmd_name, expr):
+  #   '''
+  #   Create a Custom Command for yourself
+  #
+  #   Parameters
+  #   ----------
+  #   cmd_name: Command name
+  #   expr: Expressions here
+  #   '''
+  #   if cmd_name not in db["customcmd"][str(inter.author.id)]:
+  #     db["customcmd"][str(inter.author.id)].update({cmd_name: expr})
+  #     e = discord.Embed(title = "Successful", description = f"Successfully added `{cmd_name}`", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e, ephemeral = True)
+  #   else:
+  #     e = discord.Embed(title = "Error", description = "A command with this name already exists", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e, ephemeral = True)
+  #
+  # @cc.sub_command()
+  # async def use(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
+  #   '''
+  #   Use an exising command
+  #
+  #   Parameters
+  #   ----------
+  #   cmd_name: Command name
+  #   '''
+  #   if cmd_name in db["customcmd"][str(inter.author.id)]:
+  #     await inter.send(express(inter, db["customcmd"][str(inter.author.id)][cmd_name]))
+  #   else:
+  #     e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e, ephemeral = True)
+  #
+  # @cc.sub_command()
+  # async def delete(inter, cmd_name: str = commands.Param(autocomplete = suggest_command)):
+  #   '''
+  #   Delete an existing command
+  #
+  #   Parameters
+  #   ----------
+  #   cmd_name: Command name
+  #   '''
+  #   if cmd_name in db["customcmd"][str(inter.author.id)]:
+  #     db["customcmd"][str(inter.author.id)].pop(cmd_name)
+  #     e = discord.Embed(title = "Successful", description = f"Successfully removed `{cmd_name}`", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e, ephemeral = True)
+  #   else:
+  #     e = discord.Embed(title = "Error", description = "This command doesn't exist", color = random.randint(0, 16777215))
+  #     await inter.send(embed = e, ephemeral = True)
   
 def setup(bot):
   bot.add_cog(Nonsense(bot))

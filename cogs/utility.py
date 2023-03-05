@@ -8,9 +8,9 @@ import os
 import requests
 import asyncio
 import datetime, time
-from utils import RedisManager, dividers
+from utils import dividers, db
 
-botbuild = "10.7.2" # major.sub.minor/fix
+botbuild = "10.8.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -35,12 +35,11 @@ statusemotes = {
          }
 }
 
-with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-  if "notes" not in db:
-    db["notes"] = {}
+if "notes" not in db:
+  db["notes"] = {}
 
-  if "reminders" not in db:
-    db["reminders"] = {}
+if "reminders" not in db:
+  db["reminders"] = {}
 
 def sbs(members):
   rval = {"offline": 0, "online": 0, "idle": 0, "dnd": 0}
@@ -50,10 +49,9 @@ def sbs(members):
   return rval
 
 async def suggest_note(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["notes"]:
-      db["notes"][str(inter.author.id)] = {}
-    return [note for note in list(db['notes'][str(inter.author.id)].keys()) if input.lower() in note.lower()][0:24]
+  if str(inter.author.id) not in db["notes"]:
+    db["notes"][str(inter.author.id)] = {}
+  return [note for note in list(db['notes'][str(inter.author.id)].keys()) if input.lower() in note.lower()][0:24]
 
 async def suggest_user(inter, input):
   return [input] + [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:23] if input else [user.name for user in inter.bot.users if input.lower() in user.name.lower()][0:24]  
@@ -62,17 +60,15 @@ async def suggest_member(inter, input):
   return [input] + [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:23] if input else [member.name for member in inter.guild.members if input.lower() in member.name.lower() or input.lower() in member.display_name.lower()][0:24]
 
 async def suggest_bookmark(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["bookmarks"]:
-      db["bookmarks"][str(inter.author.id)] = {}
-    return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
+  if str(inter.author.id) not in db["bookmarks"]:
+    db["bookmarks"][str(inter.author.id)] = {}
+  return [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
 
 async def suggest_sbookmark(inter, input):
-  with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-    if str(inter.author.id) not in db["bookmarks"]:
-      db["bookmarks"][str(inter.author.id)] = {}
-    return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
-  
+  if str(inter.author.id) not in db["bookmarks"]:
+    db["bookmarks"][str(inter.author.id)] = {}
+  return [input] + [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:23] if db["bookmarks"][str(inter.author.id)] and [bm for bm in list(db["bookmarks"][str(inter.author.id)].keys()) if input.lower() in bm.lower()][0:24] else ["You have nothing! Go create a bookmark!"]
+
 class rbbuttons(discord.ui.View):
   def __init__(self, inter: discord.Interaction, color, lb, rolename):
     super().__init__(timeout = 60)
@@ -97,9 +93,8 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(interaction.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
+    if str(interaction.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
 
   @discord.ui.button(label = "", custom_id = "10", emoji = "➡️")
@@ -111,9 +106,8 @@ class rbbuttons(discord.ui.View):
       description = "\n".join(self.leaderboard[self.page:self.page + 10]),
       color = self.color
     )
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(interaction.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
+    if str(interaction.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{self.page}")
     await interaction.response.edit_message(embed = e)
 
 class Utility(commands.Cog):
@@ -125,39 +119,6 @@ class Utility(commands.Cog):
   async def on_reaction_add(self, reaction, user):
     if reaction.message.author == self.bot.user and reaction.emoji == "❌" and (user.guild_permissions.manage_messages or user.id == 439788095483936768):
       await reaction.message.delete()
-    
-  #context menu user info command
-  @commands.user_command(name="User Info")  
-  async def userinfo(self, inter, member: discord.Member):
-    role_list = []
-    await inter.response.defer(ephemeral = True)
-    for role in member.roles:
-      if role.name != "@everyone":
-        role_list.append(role.mention)
-          
-    role_list.reverse()
-    b = ", ".join(role_list)
-    e = discord.Embed(title = f"Member info: {member}", description = f"{member.mention}", color = random.randint(0, 16777215))
-    if member.avatar != None:
-      e.set_thumbnail(url = str(member.avatar))
-    e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
-    e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
-    if member.activity != None:
-      e.add_field(name = "Activity", value = f"{member.activity.type[0].capitalize()} **{member.activity.name}**", inline = False)
-    if len(role_list) != 0:
-      e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]) if len("".join([b])) < 1024 else "Too many roles to show", inline = False)
-    else:
-      e.add_field(name = "Roles (0)", value = "None")
-    if member.top_role != None:
-      e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
-    if member.guild_permissions.administrator:
-      e.add_field(name = "Administrator?", value = "True", inline = False)
-    else:
-      e.add_field(name = "Administrator?", value = "False", inline = False)
-    e.add_field(name = "Device using:", value = f"🖥️ {'✅' if str(member.desktop_status) != 'offline' else '❌'}\n🌐 {'✅' if str(member.web_status) != 'offline' else '❌'}\n📱 {'✅' if str(member.mobile_status) != 'offline' else '❌'}", inline = False)
-    e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
-    e.set_footer(text = f"ID: {member.id}")
-    await inter.edit_original_response(embed = e)
 
   #context menu message info command
   @commands.message_command(name="Message Info") 
@@ -168,25 +129,23 @@ class Utility(commands.Cog):
   @commands.message_command(name="Add bookmark") 
   async def addbm(self, inter, msgid: discord.Message):
     await inter.response.defer(ephemeral = True)
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["bookmarks"]:
-        db["bookmarks"][str(inter.author.id)] = {}
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
 
-      if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
-        e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-        return
+    if str(msgid.id) in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
 
-      msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-      db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
-      e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
-      await inter.edit_original_response(embed = e)
+    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+    db["bookmarks"][str(inter.author.id)].update({str(msgid.id): {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}`", color = random.randint(0, 16777215))
+    await inter.edit_original_response(embed = e)
 
   @commands.slash_command()
   async def bookmarks(self, inter):
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["bookmarks"]:
-        db["bookmarks"][str(inter.author.id)] = {}
+    if str(inter.author.id) not in db["bookmarks"]:
+      db["bookmarks"][str(inter.author.id)] = {}
     
   @bookmarks.sub_command()
   async def add(self, inter, *, bmname = None, msgid: discord.Message):
@@ -200,16 +159,15 @@ class Utility(commands.Cog):
     '''
     if bmname is None:
       bmname = str(msgid.id)
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if bmname in db["bookmarks"][str(inter.author.id)]:
-        e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-        return
-
-      msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
-      db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
-      e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
+    if bmname in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "A bookmark with name already exists", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
+      return
+
+    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+    db["bookmarks"][str(inter.author.id)].update({bmname: {"items": {"content": msg.content, "jumpurl": msg.jump_url}}})
+    e = discord.Embed(title = "Success", description = f"Added `{msgid.id}` as `{bmname}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
   @bookmarks.sub_command()
   async def remove(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
@@ -220,17 +178,16 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if bmname not in db["bookmarks"][str(inter.author.id)]:
-        e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-        return
-      
-      upd = db["bookmarks"]
-      del upd[str(inter.author.id)][bmname]
-      db["bookmarks"] = upd
-      e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
+    if bmname not in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
+      return
+
+    upd = db["bookmarks"]
+    del upd[str(inter.author.id)][bmname]
+    db["bookmarks"] = upd
+    e = discord.Embed(title = "Success", description = f"Removed `{bmname}`", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
   @bookmarks.sub_command()
   async def show(self, inter, bmname: str = commands.Param(autocomplete = suggest_bookmark)):
@@ -241,13 +198,12 @@ class Utility(commands.Cog):
     ----------
     bmname: Name of bookmark
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if bmname not in db["bookmarks"][str(inter.author.id)]:
-        e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-        return
-      e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
+    if bmname not in db["bookmarks"][str(inter.author.id)]:
+      e = discord.Embed(title = "Error", description = "Invalid bookmark name: Bookmark doesn't exist", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
+      return
+    e = discord.Embed(title = f"Bookmark: {bmname}", description = db["bookmarks"][str(inter.author.id)][bmname]["items"]["content"], color = random.randint(0, 16777215), url = db["bookmarks"][str(inter.author.id)][bmname]["items"]["jumpurl"])
+    await inter.send(embed = e, ephemeral = True)
 
   #remind command
   @commands.slash_command()
@@ -270,28 +226,26 @@ class Utility(commands.Cog):
     rtime = int(time.time()) + 86400 * days + 3600 * hours + 60 * minutes
     ruser = inter.author.id
     rtext = text
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
-      e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
-      if str(inter.author.id) in db["debug"]:
-        e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
-      await inter.send(embed = e)
-    
-  
+    db["reminders"][str(inter.author.id)] = {"rtext": rtext, "rid": ruser, "time": rtime}
+    e = discord.Embed(title = "Success", description = f"Reminder done!\nWill remind you <t:{int(rtime)}:R>", color = random.randint(0, 16777215))
+    if str(inter.author.id) in db["debug"]:
+      e.add_field(name = "Debug", value = f"Variables value:\n{dict(db['reminders'][str(inter.author.id)])}")
+    await inter.send(embed = e)
+
+
   @remind.sub_command()
   async def remove(self, inter):
     '''
     Remove the reminder you made
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      e = discord.Embed(title = "Error", description = f"Reminder deleted", color = random.randint(0, 16777215))
-      if str(inter.author.id) in db["reminders"]:
-        del db["reminders"][str(inter.author.id)]
-        e = discord.Embed(title = "Success", description = f"Reminder deleted", color = random.randint(0, 16777215))
-        await inter.send(embed = e)
-        return
-      e = discord.Embed(title = "Error", description = f"Reminder is not found", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    e = discord.Embed(title = "Error", description = f"Reminder deleted", color = random.randint(0, 16777215))
+    if str(inter.author.id) in db["reminders"]:
+      del db["reminders"][str(inter.author.id)]
+      e = discord.Embed(title = "Success", description = f"Reminder deleted", color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+      return
+    e = discord.Embed(title = "Error", description = f"Reminder is not found", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
@@ -303,12 +257,11 @@ class Utility(commands.Cog):
       ----------
       reason: Reason for afk
       '''
-      with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-        db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
-        if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role:
-          db["afk"][str(inter.author.id)].update({"bname": (str(inter.author.nick) if inter.author.nick else str(inter.author.name)), "serverid": inter.guild.id})
-          await inter.author.edit(nick = f"[AFK] {str(inter.author.nick) if inter.author.nick else str(inter.author.name)}")
-      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`", color = random.randint(0, 16777215))
+      db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
+      if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role:
+        db["afk"][str(inter.author.id)].update({"bname": (str(inter.author.nick) if inter.author.nick else str(inter.author.name)), "serverid": inter.guild.id})
+        await inter.author.edit(nick = f"[AFK] {str(inter.author.nick) if inter.author.nick else str(inter.author.name)}")
+      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`\n> Tip: Add a `[afk]` anywhere in your message to stay afk but still write", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
   #bot group
@@ -323,7 +276,7 @@ class Utility(commands.Cog):
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [maxy#2866](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False) 
+    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'Daki.cc'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
     e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/1randomguyspecial/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/1randomguyspecial/projects/2)\n[🧰 Disnake Github page](https://github.com/DisnakeDev/disnake)\n[🐍 Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
@@ -523,20 +476,18 @@ class Utility(commands.Cog):
   #group smh
   @commands.slash_command(description = "Make notes with the bot")
   async def note(self, inter):
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["notes"]:
-        db["notes"][str(inter.author.id)] = {}
+    if str(inter.author.id) not in db["notes"]:
+      db["notes"][str(inter.author.id)] = {}
   
   @note.sub_command(description = "Shows list of notes you have")
   async def list(self, inter):
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
-        notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
-        e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
+      notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
+      e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Creates note")
   async def create(self, inter, name, text):
@@ -547,39 +498,38 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) in db["notes"]:
-        if name not in db["notes"][str(inter.author.id)]:
-          if text != None:
-            updatenotes = db["notes"][str(inter.author.id)]
-            updatenotes[name] = text
-            db["notes"][str(inter.author.id)] = updatenotes
-            e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = True)
-          else:
-            updatenotes = db["notes"][str(inter.author.id)]
-            updatenotes[name] = "New note"
-            db["notes"][str(inter.author.id)] = updatenotes
-            e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = True)
-        else:
-          e = discord.Embed(title = "Error", description = "This name is used!", color = random.randint(0, 16777215))
-          await inter.send(embed = e, ephemeral = True)
-      else:
+    if str(inter.author.id) in db["notes"]:
+      if name not in db["notes"][str(inter.author.id)]:
         if text != None:
-          db["notes"][str(inter.author.id)] = {}
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = text
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
         else:
-          db["notes"][str(inter.author.id)] = {}
           updatenotes = db["notes"][str(inter.author.id)]
           updatenotes[name] = "New note"
           db["notes"][str(inter.author.id)] = updatenotes
           e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = "Error", description = "This name is used!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+    else:
+      if text != None:
+        db["notes"][str(inter.author.id)] = {}
+        updatenotes = db["notes"][str(inter.author.id)]
+        updatenotes[name] = text
+        db["notes"][str(inter.author.id)] = updatenotes
+        e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+      else:
+        db["notes"][str(inter.author.id)] = {}
+        updatenotes = db["notes"][str(inter.author.id)]
+        updatenotes[name] = "New note"
+        db["notes"][str(inter.author.id)] = updatenotes
+        e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description =  "Replaces whole note text")
   async def overwrite(inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
@@ -590,16 +540,15 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here, // to newline
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      try:
-        updatenotes = db["notes"][str(inter.author.id)]
-        updatenotes[name] = text.replace("//", "\n")
-        db["notes"][str(inter.author.id)] = updatenotes
-        e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      except KeyError:
-        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    try:
+      updatenotes = db["notes"][str(inter.author.id)]
+      updatenotes[name] = text.replace("//", "\n")
+      db["notes"][str(inter.author.id)] = updatenotes
+      e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    except KeyError:
+      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end")
   async def add(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
@@ -610,16 +559,15 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      try:
-        updatenotes = db["notes"][str(inter.author.id)]
-        updatenotes[name] += f" {text}"
-        db["notes"][str(inter.author.id)] = updatenotes
-        e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      except KeyError:
-        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    try:
+      updatenotes = db["notes"][str(inter.author.id)]
+      updatenotes[name] += f" {text}"
+      db["notes"][str(inter.author.id)] = updatenotes
+      e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    except KeyError:
+      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Inserts text at the end on new line")
   async def newline(self, inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
@@ -630,16 +578,15 @@ class Utility(commands.Cog):
     name: Note's name here
     text: Note's text here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      try:
-        updatenotes = db["notes"][str(inter.author.id)]
-        updatenotes[name] += f"\n{text}"
-        db["notes"][str(inter.author.id)] = updatenotes
-        e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      except KeyError:
-        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    try:
+      updatenotes = db["notes"][str(inter.author.id)]
+      updatenotes[name] += f"\n{text}"
+      db["notes"][str(inter.author.id)] = updatenotes
+      e = discord.Embed(title = "Success", description = f"Changed `{name}`'s text", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    except KeyError:
+      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Reads selected note")
   async def read(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
@@ -649,13 +596,12 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if name in db["notes"][str(inter.author.id)]:
-        e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    if name in db["notes"][str(inter.author.id)]:
+      e = discord.Embed(title = f"Notes: {name}", description = f"{db['notes'][str(inter.author.id)].get(name)}", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Deletes selected note")
   async def delete(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
@@ -665,24 +611,23 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) in db["notes"]:
-        if name != None:
-          if name in db["notes"][str(inter.author.id)]:
-            updatenotes = db["notes"][str(inter.author.id)]
-            e = discord.Embed(title = "Success", description = f"Note named `{name}` is deleted!", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = True)
-            updatenotes.pop(name)
-            db["notes"][str(inter.author.id)] = updatenotes
-          else:
-            e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
-            await inter.send(embed = e, ephemeral = True)
+    if str(inter.author.id) in db["notes"]:
+      if name != None:
+        if name in db["notes"][str(inter.author.id)]:
+          updatenotes = db["notes"][str(inter.author.id)]
+          e = discord.Embed(title = "Success", description = f"Note named `{name}` is deleted!", color = random.randint(0, 16777215))
+          await inter.send(embed = e, ephemeral = True)
+          updatenotes.pop(name)
+          db["notes"][str(inter.author.id)] = updatenotes
         else:
-          e = discord.Embed(title = f"Error", description = "You can't delete nothing!", color = random.randint(0, 16777215))
+          e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
       else:
-        e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Error", description = "You can't delete nothing!", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @note.sub_command(description = "Reads selected note but escapes markdown")
   async def read_raw(self, inter, *, name: str = commands.Param(autocomplete = suggest_note)):
@@ -692,19 +637,18 @@ class Utility(commands.Cog):
     ----------
     name: Note's name here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) in db["notes"]:
-        if name in db["notes"][str(inter.author.id)]:
-          text = db['notes'][str(inter.author.id)].get(name)
-          rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
-          e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
-          await inter.send(embed = e, ephemeral = True)
-        else:
-          e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
-          await inter.send(embed = e, ephemeral = True)
-      else:
-        e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
+    if str(inter.author.id) in db["notes"]:
+      if name in db["notes"][str(inter.author.id)]:
+        text = db['notes'][str(inter.author.id)].get(name)
+        rtext = text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
+        e = discord.Embed(title = f"Notes: {name}", description = "`" + text.replace("\n", "//") + "`\n\n" + rtext, color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
+      else:
+        e = discord.Embed(title = f"Error", description = f"Note `{name}` doesn't exist!", color = random.randint(0, 16777215))
+        await inter.send(embed = e, ephemeral = True)
+    else:
+      e = discord.Embed(title = f"Error", description = "You have no notes!", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   #exec command
   @commands.slash_command(name = "exec", description = "bot owner only")
@@ -716,11 +660,10 @@ class Utility(commands.Cog):
     ----------
     code: Code here
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      exec(code)
-      print(f"{code} is executed")
-      e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
-      await inter.send(embed = e, ephemeral = True)
+    exec(code)
+    print(f"{code} is executed")
+    e = discord.Embed(title = "Success", description = f"`{code}` is executed!", color = random.randint(0, 16777215))
+    await inter.send(embed = e, ephemeral = True)
 
   #quote command
   @commands.slash_command(name = "quote")

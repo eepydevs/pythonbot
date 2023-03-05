@@ -7,11 +7,10 @@ from main import bot
 from enum import Enum
 import datetime, time
 from disnake.ext import commands
-from utils import RedisManager
+from utils import db
 
-with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-  if "debug" not in db:
-    db["debug"] = {}
+if "debug" not in db:
+  db["debug"] = {}
 
 class Required1(str, Enum):
   true = "True"
@@ -50,16 +49,15 @@ class Debug(commands.Cog):
     ----------
     text: None
     '''
-    with RedisManager(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"]) as db:
-      if str(inter.author.id) not in db["debug"] and toggler:
-        db["debug"][str(inter.author.id)] = "True"
-        e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
-        return
-      if str(inter.author.id) in db["debug"] and not toggler:
-        del db["debug"][str(inter.author.id)]
-        e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
-        await inter.send(embed = e, ephemeral = True)
+    if str(inter.author.id) not in db["debug"] and toggler:
+      db["debug"][str(inter.author.id)] = "True"
+      e = discord.Embed(title = "Success", description = "Debug mode enabled", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
+      return
+    if str(inter.author.id) in db["debug"] and not toggler:
+      del db["debug"][str(inter.author.id)]
+      e = discord.Embed(title = "Success", description = "Debug mode disabled", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
         
   #load extension command
@@ -126,6 +124,7 @@ class Debug(commands.Cog):
     Shutdowns the bot
     '''
     await inter.send("Shutdown", ephemeral = True)
+    db._save()
     await bot.close()
     
 def setup(bot):
