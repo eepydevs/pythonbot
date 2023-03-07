@@ -257,11 +257,15 @@ class Utility(commands.Cog):
       ----------
       reason: Reason for afk
       '''
-      db["afk"][str(inter.author.id)] = {"reason": reason, "time": int(time.time())}
-      if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role:
-        db["afk"][str(inter.author.id)].update({"bname": (str(inter.author.nick) if inter.author.nick else str(inter.author.name)), "serverid": inter.guild.id})
-        await inter.author.edit(nick = f"[AFK] {str(inter.author.nick) if inter.author.nick else str(inter.author.name)}")
-      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason}`\n> Tip: Add a `[afk]` anywhere in your message to stay afk but still write", color = random.randint(0, 16777215))
+      cond = False
+      if "[AFK]" not in inter.author.nick or str(inter.author.id) not in db["afk"]:
+        cond = True
+      db["afk"][str(inter.author.id)] = {"reason": reason[0:127], "time": int(time.time())}
+      if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role and inter.author.roles[1:]:
+        if cond:
+          db["afk"][str(inter.author.id)].update({"bname": (str(inter.author.nick) if inter.author.nick else str(inter.author.name)), "serverid": inter.guild.id})
+          await inter.author.edit(nick = f"[AFK] {str(inter.author.nick) if inter.author.nick else str(inter.author.name)}"[0:31])
+      e = discord.Embed(title = "AFK", description = f"Set your afk reason to `{reason[0:127]}`" + ("\n> Warning: You can use only 128 characters as AFK reason" if len(reason) > 128 else "") + "\n> Tip: Add a `[afk]` anywhere in your message to stay afk but still write", color = random.randint(0, 16777215))
       await inter.send(embed = e)
 
   #bot group

@@ -1,5 +1,6 @@
 #cog by maxy#2866
 import asyncio
+import sys
 import disnake as discord
 import random
 import os
@@ -124,8 +125,11 @@ class Debug(commands.Cog):
     Shutdowns the bot
     '''
     await inter.send("Shutdown", ephemeral = True)
-    db._save()
-    await bot.close()
+    try:
+      await bot.close()
+    except:
+      print("something went wrong")
+    sys.exit()
     
 def setup(bot):
   bot.add_cog(Debug(bot))

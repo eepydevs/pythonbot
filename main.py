@@ -27,15 +27,15 @@ async def on_message(message):
     if str(message.author.id) in db["afk"]:
       if not "[afk]" in message.content.lower():
         if "serverid" in db["afk"][str(message.author.id)] and db["afk"][str(message.author.id)]["serverid"] != message.guild.id:
-          if bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.guild_permissions.manage_nicknames and bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.top_role > message.author.top_role:
-            await bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).get_member(message.author.id).edit(nick = db["afk"][str(message.author.id)]["bname"])
+            if bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.guild_permissions.manage_nicknames and bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.top_role > message.author.top_role and message.author.roles[1:]:
+              await bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).get_member(message.author.id).edit(nick = db["afk"][str(message.author.id)]["bname"])
         else:
-          if message.guild.me.guild_permissions.manage_nicknames and message.guild.me.top_role > message.author.top_role:
+          if message.guild.me.guild_permissions.manage_nicknames and message.guild.me.top_role > message.author.top_role and message.author.roles[1:]:
             await message.author.edit(nick = db["afk"][str(message.author.id)]["bname"])
         await message.channel.send(f"Welcome back, {message.author.mention}", delete_after = 3)
         del db["afk"][str(message.author.id)]
     for member in message.mentions:
-      if str(member.id) in db["afk"]:
+      if str(member.id) in db["afk"] and str(member.id) != str(message.author.id):
         e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]['reason']}\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
         await message.channel.send(embed = e)
       return
