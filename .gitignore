@@ -9,3 +9,5 @@ image/
 venv/
 .idea/
 .git/
+backup.json
+db.json

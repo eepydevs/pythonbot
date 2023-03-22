@@ -36,7 +36,7 @@ async def on_message(message):
         del db["afk"][str(message.author.id)]
     for member in message.mentions:
       if str(member.id) in db["afk"] and str(member.id) != str(message.author.id):
-        e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: {db['afk'][str(member.id)]['reason']}\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: `{db['afk'][str(member.id)]['reason']}`\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
         await message.channel.send(embed = e)
       return
   except:

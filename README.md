@@ -7,14 +7,19 @@
 
 [![discord](https://img.shields.io/discord/910131051320475648?color=5865F2&label=Support%20server&logo=discord&logoColor=white)](https://discord.gg/jRK82RNx73) \
 [![guilded](https://img.shields.io/badge/Guilded%20Support%20server-keNWeOPp-yellow)](https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat) \
-[![boosty](https://img.shields.io/badge/Support%20me%20on-Boosty!-orange)](https://boosty.to/number1)
+\
+[![boosty](https://img.shields.io/badge/Support%20me%20on-Boosty!-orange)](https://boosty.to/number1) \
+[![DonationAlerts](https://img.shields.io/badge/Support%20me%20on-DonationAlerts!-yellow)](https://www.donationalerts.com/r/maxy1) \
+[![python bot repo](https://img.shields.io/badge/Github%20repo-Python%20Bot-blue?logo=github&logoColor=white&labelColor=24282d)](https://github.com/1randomguyspecial/pythonbot)
 
-### Economy API: [Balance](https://pb.number2d.repl.co/api/balance)/[Inventory](https://pb.number2d.repl.co/api/inventory)
+### [![api](https://img.shields.io/badge/-Economy%20API-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/): [![api balance](https://img.shields.io/badge/-api%2Fbalance-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance)/[![api inventory](https://img.shields.io/badge/-api%2Finventory-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/inventory)
 
 To search particular user use `userid` parameter \
-Example: <https://pb.number2d.repl.co/api/balance?userid=439788095483936768>
+Example: [![api inventory](https://img.shields.io/badge/-%2Fbalance%3Fuserid%3D439788095483936768-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance?userid=439788095483936768)
 
 ## Commands
+
+Lists only **__PUBLIC__** commands
 
 Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `afk`, `invite`, `emoji`, `quote`, `server(whois, suggest, info, roleinfo, hasrole, poll)`
 
@@ -36,7 +41,7 @@ Fun: `meme`, `say`, `choice`, `8ball`, `coinflip`, `random`, `dice`, `minigame(m
 
 Manage channels: `channel(create, setting(imageonly))Aa`, `purge`, `pin`
 
-Manage nicknames: `afk` (changing nickname)
+Manage nicknames: `afk` (changing nickname) (optional)
 
 Manage webhooks: `copy-person`, `tupper`
 

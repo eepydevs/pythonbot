@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.8.0" # major.sub.minor/fix
+botbuild = "10.8.1" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -249,7 +249,7 @@ class Utility(commands.Cog):
 
   #afk command
   @commands.slash_command(name = "afk", description = "Set your afk and reason for it")
-  async def slashafk(inter, reason = "None"):
+  async def slashafk(inter, reason = "Not specified"):
       '''
       Set your afk and reason for it
   
@@ -258,7 +258,7 @@ class Utility(commands.Cog):
       reason: Reason for afk
       '''
       cond = False
-      if "[AFK]" not in inter.author.nick or str(inter.author.id) not in db["afk"]:
+      if "[AFK]" not in (inter.author.nick if inter.author.nick else inter.author.name) or str(inter.author.id) not in db["afk"]:
         cond = True
       db["afk"][str(inter.author.id)] = {"reason": reason[0:127], "time": int(time.time())}
       if inter.guild.me.guild_permissions.manage_nicknames and inter.guild.me.top_role > inter.author.top_role and inter.author.roles[1:]:

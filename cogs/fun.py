@@ -14,52 +14,49 @@ random.shuffle(responselist)
 if "queue" not in db:
   db["queue"] = None
 
-class menurps(discord.ui.Select):
+class menurps(discord.ui.View):
   def __init__(self, inter: discord.Interaction):
+    super().__init__(timeout = 60)
     self.inter = inter
-    options = [
-      discord.SelectOption(label = "Rock", emoji = "🪨", value = "Rock"),
-      discord.SelectOption(label = "Paper", emoji = "📄", value = "Paper"),
-      discord.SelectOption(label = "Scissors", emoji = "✂️", value = "Scissors")
-    ]
 
-    super().__init__(
-      placeholder="Select option",
-      min_values=1,
-      max_values=1,
-      options=options,
-    )
-  async def interaction_check(self, inter: discord.MessageInteraction):
-        if inter.author != self.inter.author:
-            await inter.send("This selection menu is not for you", ephemeral = True)
-            return False
-        return True
-    
-  async def callback(self, inter: discord.MessageInteraction):
+  async def move(self, inter: discord.MessageInteraction, button: discord.ui.Button):
     moves = ("Rock", "Paper", "Scissors")
-    p1 = moves.index(self.values[0].capitalize())
-    p2 = random.randrange(0, len(moves))
+    p1 = moves.index(button.custom_id.capitalize())
+    p2 = moves.index(random.choice(moves))
 
     if p1 - p2 in (-2, 1):
       e = discord.Embed(title = f"{inter.author.name} won!", description = "Congratulations!", color = random.randint(0, 16777215))
-      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
+      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python Bot: {moves[p2]}")
       await inter.response.edit_message(embed = e, view = None)
       return
     elif p1 - p2 in (-1, 2):
       e = discord.Embed(title = f"{inter.author.name} lost!", description = "Be lucky next time!", color = random.randint(0, 16777215))
-      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
+      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python Bot: {moves[p2]}")
       await inter.response.edit_message(embed = e, view = None)
       return
     else:
       e = discord.Embed(title = "Tie!", description = "Quite lucky", color = random.randint(0, 16777215))
-      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python bot: {moves[p2]}")
+      e.set_footer(text = f"{inter.author.name}: {moves[p1]} | Python Bot: {moves[p2]}")
       await inter.response.edit_message(embed = e, view = None)
       return
 
-class rpsView(discord.ui.View):
-  def __init__(self, inter: discord.Interaction):
-      super().__init__(timeout = 30)
-      self.add_item(menurps(inter))
+  async def interaction_check(self, inter: discord.MessageInteraction):
+    if inter.author != self.inter.author:
+      await inter.send("Those buttons are not for you", ephemeral = True)
+      return False
+    return True
+
+  @discord.ui.button(label = "Rock", custom_id = "Rock", emoji = "🪨", style = discord.ButtonStyle.blurple)
+  async def rock(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await self.move(interaction, button)
+
+  @discord.ui.button(label = "Paper", custom_id = "Paper", emoji = "📄", style = discord.ButtonStyle.blurple)
+  async def paper(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await self.move(interaction, button)
+
+  @discord.ui.button(label = "Scissors", custom_id = "Scissors", emoji = "✂️", style = discord.ButtonStyle.blurple)
+  async def scissors(self, button: discord.ui.Button, interaction: discord.MessageInteraction):
+    await self.move(interaction, button)
 
 class Fun(commands.Cog):
   def __init__(self, bot):
@@ -277,7 +274,7 @@ class Fun(commands.Cog):
   @minigame.sub_command(description = "Play rock paper scissors")
   async def rps(self, inter):
     e = discord.Embed(title = "RPS", description = "Choose a move below!", color = random.randint(0, 16777215))
-    await inter.send(embed = e, view = rpsView(inter))
+    await inter.send(embed = e, view = menurps(inter))
   
     """
     Rock & Paper: Lose -1
