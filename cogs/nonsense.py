@@ -336,6 +336,14 @@ class Nonsense(commands.Cog):
     except:
       pass
 
+  @commands.slash_command()
+  async def discrim(self, inter):
+    '''
+    See people with same discriminator as you!
+    '''
+    e = discord.Embed(description = "\n".join(f"{m.name}#{m.discriminator}" for m in inter.guild.members if m.discriminator == inter.author.discriminator), color = random.randint(0, 16667215))
+    await inter.send(embed = e)
+
   @commands.slash_command(guild_ids = [866689038731313193])
   async def s4d(self, inter):
     pass
@@ -524,7 +532,127 @@ class Nonsense(commands.Cog):
     else:
       e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16777215))
       await inter.send(embed = e)
-      
+
+  @info.sub_command()
+  async def color(self, inter, color: str):
+    '''
+    See info about a Color
+
+    Parameters
+    ----------
+    color: Color HEX code
+    '''
+    await inter.response.defer()
+    r = popcat.color(color)
+    if not "error" in r:
+      e = discord.Embed(title = r["name"], description = f"Hex: {r['hex']}\nBrightened: {r['brightened']}\nRGB: {r['rgb']}", color = random.randint(0, 16777215))
+      e.set_image(r["color_image"])
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+
+  @info.sub_command()
+  async def element(self, inter, element_name: str):
+    '''
+    See info of periodic elements
+
+    Parameters
+    ----------
+    element_name: Element name/symbol
+    '''
+    await inter.response.defer()
+    r = popcat.periodic_table(element_name)
+    if not "error" in r:
+      e = discord.Embed(url = f"https://en.wikipedia.org/wiki/{r['name']}", title = f"{r['name']} [{r['symbol']}]", description = f"Atomic Number: {r['atomic_number']}\nAtomic Mass: {r['atomic_mass']}\nDiscovered by: {r['discovered_by']}\n\n**Period:** {r['period']}\n**Phase:** {r['phase']}", color = random.randint(0, 16777215))
+      e.add_field(name = "Summary", value = r["summary"])
+      e.set_thumbnail(r["image"])
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+
+  @info.sub_command()
+  async def subreddit(self, inter, subreddit: str):
+    '''
+    See info about subreddits!
+
+    Parameters
+    ----------
+    subreddit: Subreddit name (gmod for example)
+    '''
+    await inter.response.defer()
+    r = popcat.subreddit(subreddit)
+    if not "error" in r:
+      e = discord.Embed(url = r["url"], title = f"{r['title']} [r/{r['name']}] {'[+18]' if r['over_18'] else ''}", description = f"{r['description']}\n\nMembers: {r['members']}\nActive Users: {r['active_users']}\n\nAllows Images?: {r['allow_images']}\nAllows Videos?: {r['allow_videos']}", color = random.randint(0, 16777215))
+      if r["icon"]:
+        e.set_thumbnail(r["icon"])
+      if r["banner"]:
+        e.set_image(r["banner"])
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = r["error"], color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+
+  @commands.slash_command()
+  async def shower_thoughts(self, inter):
+    '''
+    Showers thoughts!!
+    '''
+    e = None
+    await inter.response.defer()
+    try:
+      r = popcat.shower_thoughts()
+      e = discord.Embed(description = r, color = random.randint(0, 16777215))
+    except:
+      e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
+    await inter.send(embed = e)
+
+  @commands.slash_command()
+  async def facts(self, inter):
+    '''
+    Shows a random fact
+    '''
+    e = None
+    await inter.response.defer()
+    try:
+      r = popcat.fact()
+      e = discord.Embed(description = r, color = random.randint(0, 16777215))
+    except:
+      e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
+    await inter.send(embed = e)
+
+  @commands.slash_command()
+  async def translate(self, inter, text: str, translate_to: str = "English"):
+    '''
+    Translates text to another language
+
+    Parameters
+    ----------
+    text: Text to translate
+    translate_to: Language to translate to
+    '''
+    await inter.response.defer()
+    try:
+      r = popcat.translate(translate_to, text)
+      e = discord.Embed(title = f"Translating to {translate_to.capitalize()}", description = r, color = random.randint(0, 16777215))
+    except:
+      e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
+    await inter.send(embed = e)
+
+  @commands.slash_command()
+  async def jokes(self, inter):
+    '''
+    Shows a random joke
+    '''
+    e = None
+    await inter.response.defer()
+    try:
+      r = popcat.joke()
+      e = discord.Embed(description = r, color = random.randint(0, 16777215))
+    except:
+      e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
+    await inter.send(embed = e)
 
   @commands.slash_command()
   async def tetrio(self, inter):

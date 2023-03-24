@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.8.1" # major.sub.minor/fix
+botbuild = "10.9.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 

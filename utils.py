@@ -455,7 +455,7 @@ class PopcatAPI():
     """Translate text to alot of languages
 
     Args:
-        translate_to (str): Translate to (2 chars)
+        translate_to (str): Translate to
         text (str): Text to translate
 
     Returns:
