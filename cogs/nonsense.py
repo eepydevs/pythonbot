@@ -1066,7 +1066,7 @@ class Nonsense(commands.Cog):
     
   @commands.slash_command(name = "copy-person")
   @commands.bot_has_permissions(manage_webhooks = True)
-  async def userecho(inter, member: discord.Member, *, content):
+  async def userecho(inter, member: discord.Member, *, content, channel: discord.GuildChannel = inter.channel):
     '''
     Copy someone!
     Parameters
@@ -1075,7 +1075,7 @@ class Nonsense(commands.Cog):
     content: Input text here
     '''
     await inter.send(f"Successfully sent `{content}` as `{member}`", ephemeral = True) 
-    channel_webhooks = await inter.channel.webhooks()
+    channel_webhooks = await channel.webhooks()
     webhook_count = 0
 
     for webhook in channel_webhooks:
@@ -1085,7 +1085,7 @@ class Nonsense(commands.Cog):
             )
             return
 
-    new_webhook = await inter.channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
+    new_webhook = await channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
     await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none())
 
   @commands.slash_command()
