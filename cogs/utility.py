@@ -10,7 +10,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.9.0" # major.sub.minor/fix
+botbuild = "10.10.0" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -280,7 +280,7 @@ class Utility(commands.Cog):
     
     e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [maxy#2866](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'Daki.cc'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
+    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'DanBot Hosting'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
     e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/1randomguyspecial/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/1randomguyspecial/projects/2)\n[🧰 Disnake Github page](https://github.com/DisnakeDev/disnake)\n[🐍 Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
     #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
@@ -309,16 +309,30 @@ class Utility(commands.Cog):
   #bot credits command
   @bot.sub_command(name = "credits", description = "Shows contributor list")
   async def credits(self, inter):
-    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone#4486`\n> `inventionpro#6814`\n> `LarsIsHere#3320`", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\ngodslayerakp#3587 - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone#4486`\n> `inventionpro#6814`\n> `LarsIsHere#3320`", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   @bot.sub_command(description = "Shows side projects im working on")
   async def sideprojects(self, inter):
     e = discord.Embed(title = "Side projects im working on", description = "Some of projects may not be mine", color = random.randint(0, 16777215))
-    e.add_field(name = "Telicards [BOT] (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/6X7hGMMPAv)", inline = False)
+    e.add_field(name = "Telicards [BOT] (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/4bZJ2pnVgS)", inline = False)
     e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm `Inspiration` and a `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\nNo support server", inline = False)
     await inter.send(embed = e)
-    
+
+  #invite command
+  @bot.sub_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
+  async def slashinvite(inter):
+    e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
+    view = discord.ui.View()
+    style = discord.ButtonStyle.gray
+    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
+    item1 = discord.ui.Button(style = style, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
+    item2 = discord.ui.Button(style = style, label = "Invite to Guilded support server", url = "https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat")
+    view.add_item(item = item)
+    view.add_item(item = item1)
+    view.add_item(item = item2)
+    await inter.send(embed = e, view = view)
+
   @commands.slash_command()
   async def server(self, inter):
     pass
@@ -455,19 +469,19 @@ class Utility(commands.Cog):
     for i in range(len(optionstuple)):
       await msg.add_reaction(pollemojis[i])
 
-  #invite command
-  @commands.slash_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
-  async def slashinvite(inter):
-    e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
-    view = discord.ui.View()
-    style = discord.ButtonStyle.gray
-    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
-    item1 = discord.ui.Button(style = style, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
-    item2 = discord.ui.Button(style = style, label = "Invite to Guilded support server", url = "https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat")
-    view.add_item(item = item)
-    view.add_item(item = item1)
-    view.add_item(item = item2)
-    await inter.send(embed = e, view = view)
+  @server.sub_command()
+  async def discrim(self, inter, discriminator = None):
+    '''
+    See people with same discriminator as you!
+    '''
+    if discriminator is None:
+      discriminator = inter.author.discriminator
+    if discriminator[0:4].isnumeric:
+      discriminator = discriminator[0:4]
+      e = discord.Embed(title = f"Searching for discriminator {discriminator}", description = "\n".join(f"{m.name}#{m.discriminator}" for m in inter.guild.members if m.discriminator == str(discriminator)), color = random.randint(0, 16667215))
+    else:
+      e = discord.Embed(title = "Error", description = "Invalid discriminator", color = random.randint(0, 16667215))
+    await inter.send(embed = e)
 
   """#servers command
   @commands.slash_command(description = "See other servers' member counter")

@@ -87,13 +87,13 @@ class Fun(commands.Cog):
   @commands.slash_command(name = "choice", description = "Usage: /choice thing 1, thing2, 3 thing")
   async def slashchoice(inter, options):
     '''
-    Let the bot to choose something for you
+    Let the bot choose something for you
 
     Parameters
     ----------
     options: Example: thing 1, thing2, 3thing
     '''
-    e = discord.Embed(title = "Choice:", description = f"I choose.. {random.choice(options.split(', '))}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Choice:", description = f"I choose.. **{random.choice(options.split(',')).strip()}!**", color = random.randint(0, 16777215))
     await inter.response.send_message(embed = e)    
 
   #8ball command slash

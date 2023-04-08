@@ -17,16 +17,19 @@ import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
 import datetime, time
 import requests as rq
-from utils import PopcatAPI, dividers, db
+from utils import PopcatAPI, dividers, db, CallChannel, callsInProgress
 from dotenv import load_dotenv
+import gdshortener
 from pp_calc import calc as pp
 load_dotenv()
 
 popcat = PopcatAPI()
 
+vgdshort = gdshortener.VGDShortener()
+
 osuapi = osu.Ossapi(18955, os.environ["OSU"])
-whitelist_id = [439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
-apirequests_id = whitelist_id.copy() + [699420041103540264, 767102460673916958, 462098932571308033]
+whitelist_id = [816691475844694047, 767102460673916958, 439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
+apirequests_id = whitelist_id.copy() + [830071104088440875, 699420041103540264, 767102460673916958, 462098932571308033]
 
 ranks = {
   'D': '<:D_:1054751662394318888>',
@@ -38,6 +41,13 @@ ranks = {
   'XH': '<:XH:1054751664436944897>',
   'X': '<:X_:1054751667687522336>',
 }
+
+cache_exec_msgs = {}
+
+calls_links = {}
+queue = []
+queueremember = []
+
 
 crblx = rblx.Client(os.environ["RBLXS"])
 
@@ -58,6 +68,14 @@ if "apifavs" not in db:
     
 def esc_md(text: str):
   return text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
+
+def reorder(dictionary: dict, i_from: int, i_to: int):
+  return {k: v for k, v in tuple(dictionary.items())[i_from:i_to]}
+
+def cachemsg(msgid, msgid2):
+  global cache_exec_msgs
+  cache_exec_msgs = reorder(cache_exec_msgs, 1, 4096)
+  cache_exec_msgs.update({str(msgid): msgid2})
   
 calc_acc = lambda c300 = 0, c100 = 0, c50 = 0, miss = 0: round((300 * c300 + 100 * c100 + 50 * c50) / 300 / (c300 + c100 + c50 + miss) * 100, 2)
   
@@ -258,10 +276,52 @@ class Nonsense(commands.Cog):
     self.bot = bot  
 
   @commands.Cog.listener()
+  async def on_message_edit(self, before, after):
+    try:
+      if str(before.id) in cache_exec_msgs:
+        if "#pbt" in after.content:
+          if after.author.id in apirequests_id:
+            if (code := re.search(r"(```py\n(.|\n)+```)", after.content)) != 0:
+              code = code.group()[6:-4]
+              body = {"source": str(code),
+                          "options": {"compilerOptions": {
+                                  "skipAsm": False,
+                                  "executorRequest": True},
+                          "filters": {"execute": True}}, "lang": "python"}
+              ms = time.perf_counter_ns()
+              response = rq.post("https://godbolt.org/api/compiler/python311/compile", json = body)
+              ms = round(((beforems := time.perf_counter_ns()) - ms) / 1000000, (3 if round((beforems) - ms / 1000000) < 1 else None))
+              e = discord.Embed(url = "https://godbolt.org/", title = "Python 3.11 Compilation", description = ("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") if len("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") < 4096 else "```Response too long to display!```", color = random.randint(0, 16667215))
+              e.set_footer(text = f"{after.author.name}#{after.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
+              fmsg = await after.channel.fetch_message(cache_exec_msgs[str(before.id)])
+              await fmsg.edit(embed = e)
+              cachemsg(after.id, cache_exec_msgs[str(before.id)])
+              return
+    except:
+      pass
+
+  @commands.Cog.listener()
   async def on_message(self, msg):
     if msg.author.bot or msg.author.discriminator == 0000:
       return
     try:
+      if "#pbt" in msg.content:
+        if msg.author.id in apirequests_id:
+          if (code := re.search(r"(```py\n(.|\n)+```)", msg.content)):
+            code = code.group()[6:-4]
+            body = {"source": str(code),
+                        "options": {"compilerOptions": {
+                                "skipAsm": False,
+                                "executorRequest": True},
+                        "filters": {"execute": True}}, "lang": "python"}
+            ms = time.perf_counter_ns()
+            response = rq.post("https://godbolt.org/api/compiler/python311/compile", json = body)
+            ms = round(((before := time.perf_counter_ns()) - ms) / 1000000, (3 if round((before := time.perf_counter_ns()) - ms / 1000000) < 1 else None))
+            e = discord.Embed(url = "https://godbolt.org/", title = "Python 3.11 Compilation", description = ("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") if len("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") < 4096 else "```Response too long to display!```", color = random.randint(0, 16667215))
+            e.set_footer(text = f"{msg.author.name}#{msg.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
+            message = await msg.channel.send(embed = e)
+            cachemsg(msg.id, message.id)
+            return
       if "https://discord.com/channels/" in msg.content:
         links = msg.content.split(" ")
         embeds = []
@@ -333,16 +393,83 @@ class Nonsense(commands.Cog):
                 rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
                 rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
               await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+
+      if str(msg.channel.id) in list(callsInProgress.keys()):
+        channel = callsInProgress[str(msg.channel.id)][0]
+        if self.bot.get_channel(int(channel)):
+          webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
+          atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+          rlatch = None
+          rmsg = ''
+          if not msg.reference is None:
+            rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+            rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+          await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator}{' [🐍]' if msg.author.id == 439788095483936768 else ''}{' [✅]' if msg.author.id in apirequests_id else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
     except:
       pass
 
   @commands.slash_command()
-  async def discrim(self, inter):
+  async def call(self, inter):
+    pass
+
+  @call.sub_command()
+  async def start(self, inter):
     '''
-    See people with same discriminator as you!
+    Call a server!
     '''
-    e = discord.Embed(description = "\n".join(f"{m.name}#{m.discriminator}" for m in inter.guild.members if m.discriminator == inter.author.discriminator), color = random.randint(0, 16667215))
-    await inter.send(embed = e)
+    if str(inter.channel.id) in callsInProgress:
+      await inter.send("You can't call in already connected channels", ephemeral = True)
+      return
+    if inter.channel.id in queue:
+      await inter.send(f"This channel is already in the call queue!", ephemeral = True)
+      return
+
+    if inter.channel.id not in queueremember:
+      queueremember.append(inter.channel.id)
+
+    if not queue:
+      queue.append(inter.channel.id)
+      await inter.send(f"This channel is now in the call queue!")
+      return
+    else:
+      channel = queue.pop()
+      if CallChannel(inter).link(channel)[1]:
+        gotten = inter.bot.get_channel(channel)
+        await gotten.send(f"Connection with `{esc_md(inter.guild.name)}` has been made. Say hi!\n> DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
+        await inter.send(f"Connection with `{esc_md(gotten.guild.name)}` has been made. Say hi!\n> DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
+      else:
+        await inter.bot.get_channel(channel).send("Something went wrong. Try again later.")
+        await inter.send("Something went wrong. Try again later.")
+
+  @call.sub_command()
+  async def hangup(self, inter):
+    '''
+    Hang up a call if you are in one
+    '''
+    if str(inter.channel.id) in callsInProgress and inter.channel.id in queueremember:
+      channel = callsInProgress[str(inter.channel.id)][0]
+      if CallChannel(inter).unlink(int(channel))[1]:
+        await inter.send("You have hung up the call")
+        await inter.bot.get_channel(int(channel)).send("The other party has hung up the call...")
+      else:
+        await inter.send("Something went wrong. Try again later.", ephemeral = True)
+    else:
+      await inter.send("This channel is not in a call", ephemeral = True)
+
+  @commands.slash_command()
+  async def vgd(self, inter, url):
+    '''
+    Shorten your url using is.gd
+
+    Parameters
+    ----------
+    url: Valid URL
+    '''
+    try:
+      e = discord.Embed(title = "v.gd Shortener", description = f"{url} -> **{vgdshort.shorten(url)[0]}**", color = random.randint(0, 16667215))
+    except gdshortener.GDGenericError:
+      e = discord.Embed(title = "Error", description = "Invalid URL", color = random.randint(0, 16667215))
+    await inter.send(embed = e, ephemeral = True)
 
   @commands.slash_command(guild_ids = [866689038731313193])
   async def s4d(self, inter):
@@ -1066,7 +1193,7 @@ class Nonsense(commands.Cog):
     
   @commands.slash_command(name = "copy-person")
   @commands.bot_has_permissions(manage_webhooks = True)
-  async def userecho(inter, member: discord.Member, *, content, channel: discord.GuildChannel = None):
+  async def userecho(inter, member: discord.Member, *, content, channel: discord.TextChannel = None):
     '''
     Copy someone!
     Parameters

@@ -8,14 +8,17 @@ import redis as rd
 import json
 import os
 import atexit
+import random
 from dotenv import load_dotenv
 load_dotenv()
+
+callsInProgress = {}
 
 class PopcatAPI():
   """Used to communicate with Popcat API"""
   def __init__(self):
     self.BASE_URL = "https://api.popcat.xyz/"
-    
+
   @staticmethod
   def __convert_iso8601(timestamp: str) -> int:
     """Converts ISO 8601 to UNIX
@@ -27,7 +30,7 @@ class PopcatAPI():
         int: UNIX timestamp
     """
     return str(time.mktime(time.strptime(timestamp.replace('T', ' ')[:timestamp.find('.')], '%Y-%m-%d %H:%M:%S')))[:-2]
-    
+
   def welcome_card(self, top_text: str, middle_text: str, bottom_text: str, avatar_url: str, background_url: str = "https://cdn.discordapp.com/attachments/850808002545319957/859359637106065408/bg.png"):
     """Custom discord welcome card
 
@@ -42,7 +45,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}welcomecard", params = {"background": background_url, "text1": top_text, "text2": middle_text, "text3": bottom_text, "avatar": avatar_url}).url
-    
+
   def color(self, color_hex: str) -> dict:
     """Check info for a color
 
@@ -53,7 +56,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}color/{color_hex.replace('#', '')[0:6]}").json()
-  
+
   def lyrics(self, song_name: str) -> dict:
     """See lyrics of a song
 
@@ -64,7 +67,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}lyrics", params = {"song": song_name[0:119]}).json()
-  
+
   def periodic_table(self, element: str) -> dict:
     """Lets you see info about an element in periodic table
 
@@ -75,7 +78,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}periodic-table", params = {"element": element[0:119]}).json()
-  
+
   def pickup_lines(self) -> str:
     """Gives you pickup lines
 
@@ -83,7 +86,7 @@ class PopcatAPI():
         str: Pickup line
     """
     return rq.get(f"{self.BASE_URL}pickuplines").json()["pickupline"]
-  
+
   def imdb(self, query: str) -> dict:
     """Check for info of a movie
 
@@ -113,7 +116,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}jail", params = {"image": image_url}).url
-    
+
   def unforgivable(self, text: str = "Popcat api so trash") -> str:
     """God unforgives you
 
@@ -124,7 +127,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}unforgivable", params = {"text": text}).url
-  
+
   def screenshot(self, url: str = "https://google.com") -> str:
     """Screenshot a website
 
@@ -135,7 +138,7 @@ class PopcatAPI():
         str: _description_
     """
     return rq.get(f"{self.BASE_URL}screenshot", params = {"url": url if url.startswith(("https://", "http://")) else (("https://" + url[url.find("//") + 2:]) if "//" in url else "https://" + url)}).url
-  
+
   def random_color(self) -> dict:
     """Get a random color
 
@@ -143,7 +146,7 @@ class PopcatAPI():
         dict: Color info
     """
     return self.color(color_hex = rq.get(f"{self.BASE_URL}randomcolor").json()["hex"])
-  
+
   def steam(self, query: str) -> dict:
     """Get steam games info
 
@@ -154,7 +157,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}steam", params = {"q": query}).json()
-  
+
   def sad_cat(self, text: str = "people hating me for being innocent") -> str:
     """Sad cat looking at candle
 
@@ -165,10 +168,10 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}sadcat", params = {"text": text}).url
-  
+
   #def oogway_quote
   #does not work right now
-  
+
   def communism(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Makes the image communist
 
@@ -179,7 +182,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}communism", params = {"image": image_url}).url
-  
+
   def car_pictures(self) -> dict:
     """Get random car pictures
 
@@ -187,7 +190,7 @@ class PopcatAPI():
         dict: Image URL and author
     """
     return rq.get(f"{self.BASE_URL}car").json()
-  
+
   def chat_bot(self, msg: str, owner: str, botname: str) -> str:
     """Custom chatbot
 
@@ -200,7 +203,7 @@ class PopcatAPI():
         str: Response
     """
     return rq.get(f"{self.BASE_URL}chatbot", params = {"msg": msg, "owner": owner, "botname": botname}).json()["response"]
-  
+
   def pooh(self, top_text: str, bottom_text: str) -> str:
     """Pooh as normal and with a tuxedo
 
@@ -212,7 +215,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}pooh", params = {"text1": top_text, "text2": bottom_text}).url
-  
+
   def shower_thoughts(self) -> str:
     """Shower thoughts
 
@@ -221,7 +224,7 @@ class PopcatAPI():
     """
     r = rq.get(f"{self.BASE_URL}showerthoughts").json()
     return f"{r['result']}\n> {r['author']}"
-  
+
   def quote(self) -> str:
     """Get random quotes
 
@@ -229,7 +232,7 @@ class PopcatAPI():
         str: Quote
     """
     return rq.get(f"{self.BASE_URL}quote").json()["quote"]
-  
+
   def wanted(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Be wanted by your whole discord server
 
@@ -240,7 +243,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}wanted", params = {"image": image_url}).url
-  
+
   def subreddit(self, query: str) -> dict:
     """Get subreddit info
 
@@ -251,7 +254,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}subreddit/{query}").json()
-  
+
   def github(self, query: str) -> dict:
     """Get github info
 
@@ -265,7 +268,7 @@ class PopcatAPI():
     r["created_at"] = self.__convert_iso8601(r["created_at"])
     r["updated_at"] = self.__convert_iso8601(r["updated_at"])
     return r
-  
+
   def weather(self, query: str) -> dict:
     """See your city's weather
 
@@ -276,7 +279,7 @@ class PopcatAPI():
         dict: Weather info
     """
     return rq.get(f"{self.BASE_URL}weather", params = {"q": query}).json()
-  
+
   def who_would_win(self, image1_url: str = "https://cdn.iconscout.com/icon/free/png-512/javascript-2752148-2284965.png", image2_url: str = "https://cdn3.iconfinder.com/data/icons/logos-and-brands-adobe/512/267_Python-512.png") -> str:
     """Who would win?
 
@@ -288,7 +291,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}whowouldwin", params = {"image1": image1_url, "image2": image2_url}).url
-  
+
   def gun(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Make a fitting image with you holding a gun
 
@@ -299,7 +302,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}gun", params = {"image": image_url}).url
-  
+
   def lulcat(self, text: str) -> str:
     """Make your text into lulcat
 
@@ -310,10 +313,10 @@ class PopcatAPI():
         str: Result text
     """
     return rq.get(f"{self.BASE_URL}lulcat", params = {"text": text}).json()["text"]
-  
+
   #def opinion
   #doesn't work for now
-  
+
   def drake(self, top_text: str, bottom_text: str) -> str:
     """Drake
 
@@ -325,10 +328,10 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}drake", params = {"text1": top_text, "text2": bottom_text}).url
-  
+
   #def instagram
   #doesn't work for now
-  
+
   def npm(self, query: str) -> dict:
     """Get npm package info
 
@@ -339,7 +342,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}npm", params = {"q": query}).json()
-  
+
   def fact(self) -> str:
     """Get a random fact
 
@@ -347,7 +350,7 @@ class PopcatAPI():
         str: Fact
     """
     return rq.get(f"{self.BASE_URL}fact").json()["fact"]
-  
+
   def ship(self, image1_url: str = "https://cdn.popcat.xyz/popcat.png", image2_url: str = "https://cdn3.iconfinder.com/data/icons/logos-and-brands-adobe/512/267_Python-512.png") -> str:
     """Ship yourself with your loved one
 
@@ -359,7 +362,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}ship", params = {"user1": image1_url, "user2": image2_url}).url
-  
+
   def joke(self) -> str:
     """Get a random joke
 
@@ -367,7 +370,7 @@ class PopcatAPI():
         str: Joke
     """
     return rq.get(f"{self.BASE_URL}joke").json()["joke"]
-  
+
   def biden_tweet(self, text: str = "Popcat API sucks!!") -> str:
     """Biden tweets your text
 
@@ -378,7 +381,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}biden", params = {"text": text}).url
-  
+
   def pikachu(self, text: str = "Hello :O") -> str:
     """Surprised Pikachu!
 
@@ -389,7 +392,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}pikachu", params = {"text": text}).url
-  
+
   def mock(self, text: str) -> str:
     """Manipulate your text in sarcastic tone
 
@@ -400,7 +403,7 @@ class PopcatAPI():
         str: Result text
     """
     return rq.get(f"{self.BASE_URL}mock", params = {"text": text}).json()["text"]
-  
+
   def would_you_rather(self) -> dict:
     """Would you rather
 
@@ -408,7 +411,7 @@ class PopcatAPI():
         dict: 2 Choices
     """
     return rq.get(f"{self.BASE_URL}wyr").json()
-  
+
   def meme(self) -> dict:
     """Get a meme for yourself
 
@@ -416,7 +419,7 @@ class PopcatAPI():
         dict: Meme info
     """
     return rq.get(f"{self.BASE_URL}meme").json()
-  
+
   def colorify(self, image_url: str = "https://cdn.popcat.xyz/popcat.png", color: str = None):
     """Overlay a color over your image
 
@@ -428,7 +431,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}colorify", params = {"image": image_url, "color": color if color else self.random_color()["hex"][1:]}).url
-  
+
   def drip(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Have a drip on yourself
 
@@ -439,7 +442,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}drip", params = {"image": image_url}).url
-  
+
   def clown(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Be a clown
 
@@ -450,7 +453,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}clown", params = {"image": image_url}).url
-  
+
   def translate(self, translate_to: str, text: str):
     """Translate text to alot of languages
 
@@ -462,7 +465,7 @@ class PopcatAPI():
         str: Translated text
     """
     return rq.get(f"{self.BASE_URL}translate", params = {"to": translate_to, "text": text}).json()["translated"]
-  
+
   def encode(self, text: str):
     """Encode text to binary
 
@@ -473,7 +476,7 @@ class PopcatAPI():
         str: Binary
     """
     return rq.get(f"{self.BASE_URL}encode", params = {"text": text}).json()["binary"]
-  
+
   def decode(self, binary: str):
     """Decode binary to normal text
 
@@ -484,7 +487,7 @@ class PopcatAPI():
         str: Normal text
     """
     return rq.get(f"{self.BASE_URL}decode", params = {"binary": binary}).json()["text"]
-  
+
   def uncover(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Be in someones wall
 
@@ -495,7 +498,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}uncover", params = {"image": image_url}).url
-  
+
   def ad(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Advertise yourself
 
@@ -506,7 +509,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}ad", params = {"image": image_url}).url
-  
+
   def blur(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Blur yourself
 
@@ -517,7 +520,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}blur", params = {"image": image_url}).url
-  
+
   def invert(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Invert colors of yourself
 
@@ -528,7 +531,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}invert", params = {"image": image_url}).url
-  
+
   def grayscale(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Become white-black
 
@@ -539,7 +542,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}grayscale", params = {"image": image_url}).url
-  
+
   def eight_ball(self) -> str:
     """Ask 8ball some questions
 
@@ -547,10 +550,10 @@ class PopcatAPI():
         str: Response
     """
     return rq.get(f"{self.BASE_URL}8ball").json()["answer"]
-  
+
   #def playstore
   #endpoint in maintenance
-  
+
   def itunes(self, query: str) -> dict:
     """Search music in iTunes
 
@@ -561,7 +564,7 @@ class PopcatAPI():
         dict: All the info
     """
     return rq.get(f"{self.BASE_URL}itunes", params = {"q": query}).json()
-  
+
   def reverse(self, text: str) -> str:
     """Reverse your text
 
@@ -572,7 +575,7 @@ class PopcatAPI():
         str: Reversed text
     """
     return rq.get(f"{self.BASE_URL}reverse", params = {"text": text}).json()["text"]
-  
+
   def joke_overhead(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """You misheard the joke
 
@@ -583,7 +586,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}jokeoverhead", params = {"image": image_url}).url
-  
+
   def double_struck(self, text: str) -> str:
     """Make your text a bit fancier
 
@@ -594,7 +597,7 @@ class PopcatAPI():
         str: Fancy text
     """
     return rq.get(f"{self.BASE_URL}doublestruck", params = {"text": text}).json()["text"]
-  
+
   def mnm(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Become an M&M
 
@@ -605,7 +608,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}mnm", params = {"image": image_url}).url
-  
+
   def pet(self, image_url: str = "https://cdn.popcat.xyz/popcat.png") -> str:
     """Pet someone of your friends
 
@@ -616,7 +619,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}pet", params = {"image": image_url}).url
-  
+
   def text_to_morse(self, text: str) -> str:
     """Encode your text to morse
 
@@ -627,7 +630,7 @@ class PopcatAPI():
         str: Morse text
     """
     return rq.get(f"{self.BASE_URL}texttomorse", params = {"text": text}).json()["morse"]
-  
+
   def caution(self, text: str = "Sample Text") -> str:
     """Caution with your text
 
@@ -638,7 +641,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}caution", params = {"text": text}).url
-  
+
   def alert(self, text: str = "Sample Text") -> str:
     """iPhone Alert with your text
 
@@ -649,7 +652,7 @@ class PopcatAPI():
         str: Finished image URL
     """
     return rq.get(f"{self.BASE_URL}alert", params = {"text": text}).url
-  
+
   def facts(self, text: str = "Sample Text") -> str:
     """Book of facts with your text
 
@@ -661,25 +664,105 @@ class PopcatAPI():
     """
     return rq.get(f"{self.BASE_URL}facts", params = {"text": text}).url
 
+class CallChannel:
+  def __init__(self, interaction: discord.Interaction, channel_id: int = None):
+    self.cid = channel_id if (interaction.bot.get_channel(channel_id) if not channel_id else True) else interaction.channel.id
+
+  def link(self, id: str):
+    global callsInProgress
+    id = str(id)
+    if str(self.cid) not in callsInProgress:
+      callsInProgress[str(self.cid)] = []
+    if id not in callsInProgress:
+      callsInProgress[id] = []
+
+    if str(self.cid) not in callsInProgress[id] and id not in callsInProgress[str(self.cid)]:
+      callsInProgress[id] = [str(self.cid)]
+      callsInProgress[str(self.cid)] = [id]
+      return discord.Embed(title="Success", description=f"Linked `{id}` and this channel", color=random.randint(0, 16777215)), True
+    else:
+      return discord.Embed(title="Error", description="This channel is already linked with another channel", color=random.randint(0, 16777215)), False
+
+  def unlink(self, id: str):
+    global callsInProgress
+    id = str(id)
+    if id not in callsInProgress[str(self.cid)] or str(self.cid) not in callsInProgress[id]:
+      return discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215)), False
+    e = discord.Embed(title="Successfully deleted", color=random.randint(0, 16777215))
+    id2 = callsInProgress[str(self.cid)]
+    id1 = callsInProgress[id]
+    if str(self.cid) in id1:
+      if len(id1) == 1:
+        del callsInProgress[str(self.cid)]
+      else:
+        del callsInProgress[str(self.cid)][callsInProgress[str(self.cid)].index(id)]
+      e.add_field(name=f"{id} > {self.cid}", value="_ _", inline=False)
+    if id in id2:
+      if len(id2) == 1:
+        del callsInProgress[id]
+      else:
+        del callsInProgress[id][callsInProgress[id].index(str(self.cid))]
+      e.add_field(name=f"{self.cid} > {id}", value="_ _", inline=False)
+    return e, True
+
+class LinkChannel:
+  def __init__(self, interaction: discord.Interaction, channel_id: int = None):
+    self.cid = channel_id if (interaction.bot.get_channel(channel_id) if not channel_id else True) else interaction.channel.id
+
+  def link(self, id: str):
+    global db
+    if str(self.cid) not in db["linkchannels"]:
+      db["linkchannels"][str(self.cid)] = []
+    if id not in db["linkchannels"]:
+      db["linkchannels"][id] = []
+
+    if str(self.cid) not in db["linkchannels"][id] and id not in db["linkchannels"][str(self.cid)]:
+      db["linkchannels"][id].append(str(self.cid))
+      db["linkchannels"][str(self.cid)].append(id)
+      return discord.Embed(title="Success", description=f"Linked `{id}` and this channel", color=random.randint(0, 16777215)), True
+    else:
+      return discord.Embed(title="Error", description="This channel is already linked with another channel", color=random.randint(0, 16777215)), False
+
+  def unlink(self, id: str):
+    global db
+    if id not in db["linkchannels"][str(self.cid)] or str(self.cid) not in db["linkchannels"][id]:
+      return discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215)), False
+    e = discord.Embed(title="Successfully deleted", color=random.randint(0, 16777215))
+    id2 = db["linkchannels"][str(self.cid)]
+    id1 = db["linkchannels"][id]
+    if str(self.cid) in id1:
+      if len(id1) == 1:
+        del db["linkchannels"][str(self.cid)]
+      else:
+        del db["linkchannels"][str(self.cid)][db["linkchannels"][str(self.cid)].index(id)]
+      e.add_field(name=f"{id} > {self.cid}", value="_ _", inline=False)
+    if id in id2:
+      if len(id2) == 1:
+        del db["linkchannels"][id]
+      else:
+        del db["linkchannels"][id][db["linkchannels"][id].index(str(self.cid))]
+      e.add_field(name=f"{self.cid} > {id}", value="_ _", inline=False)
+    return e, True
+
 class Singleton(type):
   _instances = {}
   def __call__(cls, *args, **kwargs):
     if cls not in cls._instances:
       cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
     return cls._instances[cls]
-    
+
 class RedisManager(metaclass = Singleton):
   def __init__(self, name: str = "main", key: str = None, *, host: str, port: int, password: str, client_name: str, charset: str = "utf-8", decode_responses: bool = True):
     self._redis = rd.Redis(host = host, port = port, password = password, client_name = client_name, charset = charset, decode_responses = decode_responses)
     self._name = name
     self._key = key if key else name
-  
+
   def __enter__(self) -> dict:
     if self._key not in self._redis.keys():
       self._redis.hset(self._name, self._name, "{}")
     self._var = json.loads(self._redis.hget(self._name, self._key))
     return self._var
-  
+
   def __exit__(self, exc_type, exc_value, exc_traceback):
     if self._var != json.loads(self._redis.hget(self._name, self._key)):
       self._redis.hset(self._name, self._key, json.dumps(self._var))
@@ -714,7 +797,7 @@ class Database(dict):
 def Embed(
     msg: Union[commands.Context, discord.Interaction, discord.Message],
     description: str = '',
-    title: str = '', 
+    title: str = '',
     fields: list = [],
     footer: dict = {},
     image: dict = {},
@@ -782,21 +865,23 @@ class JsonFile(object):
       self.__data = value
 
 class RedisDB(dict):
-  def __init__(self, name: str = "main", key: str = None, *, host: str, port: int, password: str, client_name: str, charset: str = "utf-8", decode_responses: bool = True):
-    self._redis = rd.Redis(host = host, port = port, password = password, client_name = client_name, charset = charset, decode_responses = decode_responses)
+  def __init__(self, name: str = "main", key: str = None, *, host: str, port: int, password: str, client_name: str, charset: str = "utf-8", decode_responses: bool = True, dont_save: bool = False):
+    self._redis = rd.Redis(host = host, port = port, password = password, client_name = client_name, charset = charset, decode_responses = decode_responses, health_check_interval = 1000)
     super().__init__()
     self._backup = JsonFile("backup.json")
     self._name = name
+    self.__ds = dont_save
     self._key = key if key else name
     self._var = self._load(True)
     atexit.register(self.__del)
-    self._redis.close()
 
   def __getitem__(self, key):
       return self._var[key]
 
   def __setitem__(self, key, value):
       self._var[key] = value
+      if not self.__ds:
+        self._save()
 
   def __repr__(self):
       return self._var.__repr__()
@@ -805,7 +890,8 @@ class RedisDB(dict):
       return self._load()
 
   def __exit__(self, exc_type, exc_value, exc_traceback):
-      self._save()
+      if not self.__ds:
+        self._save()
 
   def __contains__(self, item):
       return item in self._var
@@ -830,7 +916,8 @@ class RedisDB(dict):
           self._backup.save()
 
   def __del(self):
-      self._save()
+      if not self.__ds:
+          self._save()
 
 async def Webhook(ctx, channel = None):
   if ctx != None:
@@ -854,9 +941,9 @@ class Upload():
     self._path = path
     self.__chunk_size = _chunk_size
     self.__delete_after = _delete_after
-  
+
   def __enter__(self):
-    if not os.path.exists(self._path): 
+    if not os.path.exists(self._path):
       self.createDirectory(self._path)
     self._opnfile = open((self._path + self._filename), "wb")
     r = rq.get(self._url, stream = True)
@@ -865,7 +952,7 @@ class Upload():
         break
       self._opnfile.write(chunk)
     return self._opnfile
-    
+
   def __exit__(self, exc_type, exc_value, exc_traceback):
     self._opnfile.close()
     if self.__delete_after:
@@ -890,7 +977,7 @@ class Upload():
           break
         opnfile.write(chunk)
       return opnfile
-  
+
   def delete(self):
     try:
       if self.__delete_after:
@@ -907,8 +994,8 @@ def dividers(array: list, divider: str = " | "):
       ft.append(i)
   return divider.join(ft) if divider else ""
 
-db = None
-try:
-  db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = os.environ["REDISUSER"])
-except:
-  db = Database()
+#db = None
+#try:
+db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = True)
+#except:
+#  db = Database()

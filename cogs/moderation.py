@@ -5,7 +5,7 @@ import asyncio
 from enum import Enum
 import random
 import os
-from utils import db
+from utils import db, LinkChannel
 
 purgequotes = ["Stop spamming!", "Spamming is bad.", "Purge the chat! Haha!", "Purge after these silly young spammers...", "Is it just me, or is spamming more likely now than notime else?"]
 modquotes = ["I hope they learned their lesson.", "Make them cry!", "Haha!", "Gotcha!", "They should've readed the rules.", "Why they didn't readed the rules...", "That's lesson for you to read rules!", "'no reason ban' they say... Right at your eyes broke rule number 1337!", "Oops!"]
@@ -77,29 +77,13 @@ class Moderation(commands.Cog):
   @commands.is_owner()
   async def link(self, inter, id):
     '''
-    Creates a link with current channelimp and mentioned channel (ID)
+    Creates a link with current channelink and mentioned channel (ID)
 
     Parameters
     ----------
     id: Channel ID
     '''
-    if inter.bot.get_channel(int(id)) is None or str(inter.channel.id) == id:
-      e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
-      await inter.send(embed=e, ephemeral=True)
-      return
-    if str(inter.channel.id) not in db["linkchannels"]:
-      db["linkchannels"][str(inter.channel.id)] = []
-    if id not in db["linkchannels"]:
-      db["linkchannels"][id] = []
-
-    if str(inter.channel.id) not in db["linkchannels"][id] and id not in db["linkchannels"][str(inter.channel.id)]:
-      db["linkchannels"][id].append(str(inter.channel.id))
-      db["linkchannels"][str(inter.channel.id)].append(id)
-      e = discord.Embed(title="Success", description=f"Linked `{id}` and this channel", color=random.randint(0, 16777215))
-      await inter.send(embed=e, ephemeral=True)
-    else:
-      e = discord.Embed(title="Error", description="This channel is already linked with another channel", color=random.randint(0, 16777215))
-      await inter.send(embed=e, ephemeral=True)
+    await inter.send(embed = LinkChannel(inter).link(id)[0], ephemeral = True)  
 
   @channel.sub_command()
   @commands.is_owner()
@@ -111,26 +95,7 @@ class Moderation(commands.Cog):
     ----------
     id: Channel ID
     '''
-    if id not in db["linkchannels"][str(inter.channel.id)] or str(inter.channel.id) not in db["linkchannels"][id]:
-      e = discord.Embed(title="Error", description="Invalid channel id", color=random.randint(0, 16777215))
-      await inter.send(embed=e, ephemeral=True)
-      return
-    e = discord.Embed(title="Successfully deleted", color=random.randint(0, 16777215))
-    id2 = db["linkchannels"][str(inter.channel.id)]
-    id1 = db["linkchannels"][id]
-    if str(inter.channel.id) in id1:
-      if len(id1) == 1:
-        del db["linkchannels"][str(inter.channel.id)]
-      else:
-        del db["linkchannels"][str(inter.channel.id)][db["linkchannels"][str(inter.channel.id)].index(id)]
-      e.add_field(name=f"{id} > {inter.channel.id}", value="_ _", inline=False)
-    if id in id2:
-      if len(id2) == 1:
-        del db["linkchannels"][id]
-      else:
-        del db["linkchannels"][id][db["linkchannels"][id].index(str(inter.channel.id))]
-      e.add_field(name=f"{inter.channel.id} > {id}", value="_ _", inline=False)
-    await inter.send(embed=e, ephemeral=True)
+    await inter.send(embed = LinkChannel(inter).unlink(id)[0], ephemeral = True)
 
   @channel.sub_command(name = "create", description = "Create a channel")
   @commands.has_permissions(manage_channels = True)

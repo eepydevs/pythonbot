@@ -303,7 +303,7 @@ class Economy(commands.Cog):
         await inter.send(embed = e)
 
   #beg command
-  @commands.slash_command(name = "beg", description = "Beg people to them give you nothing lol\nHas cooldown of 10 seconds")
+  @commands.slash_command(name = "beg", description = "Beg people to them give you nothing lol. Has cooldown of 10 seconds")
   @commands.cooldown(rate = 1, per = 10, type = commands.BucketType.user)
   async def slashbeg(inter):
     if str(inter.author.id) not in db["balance"]:
