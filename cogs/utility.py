@@ -1,4 +1,5 @@
 #cog by maxy#2866
+import json
 import disnake as discord
 from disnake.ext import commands
 import random
@@ -10,7 +11,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.10.0" # major.sub.minor/fix
+botbuild = "10.10.1" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -301,8 +302,11 @@ class Utility(commands.Cog):
       except asyncio.TimeoutError:
         s4dutilping = -1
     fshexist = inter.guild.get_member(1068572316986003466)
-    if fshexist and not fshexist.status == discord.Status.offline:
-      fshping = int(requests.get("https://fsh-bot.frostzzone.repl.co/api/ping?plain=1").json())
+    if fshexist and fshexist.status != discord.Status.offline:
+      try:
+        fshping = int(requests.get("https://fsh-bot.frostzzone.repl.co/api/ping?plain=1", timeout = 1.5).json())
+      except (json.JSONDecodeError, requests.ReadTimeout):
+        fshping = -1
     e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities" if int(s4dutilping) >= 0 else "\n> `S4D Utilities` Unavailable..." if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh" if fshping >= 0 else "\n> `Fsh` Unavailable..." if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 

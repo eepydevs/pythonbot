@@ -29,7 +29,7 @@ vgdshort = gdshortener.VGDShortener()
 
 osuapi = osu.Ossapi(18955, os.environ["OSU"])
 whitelist_id = [816691475844694047, 767102460673916958, 439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
-apirequests_id = whitelist_id.copy() + [830071104088440875, 699420041103540264, 767102460673916958, 462098932571308033]
+apirequests_id = whitelist_id.copy() + [666655393853866004, 830071104088440875, 699420041103540264, 767102460673916958, 462098932571308033]
 
 ranks = {
   'D': '<:D_:1054751662394318888>',
@@ -394,19 +394,24 @@ class Nonsense(commands.Cog):
                 rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
               await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
 
-      if str(msg.channel.id) in list(callsInProgress.keys()):
-        channel = callsInProgress[str(msg.channel.id)][0]
-        if self.bot.get_channel(int(channel)):
-          webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), self.bot.get_channel(int(channel))))
-          atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+    except:
+      pass
+
+    if str(msg.channel.id) in list(callsInProgress.keys()):
+      channel = callsInProgress[str(msg.channel.id)][0]
+      if channelConfirm := self.bot.get_channel(int(channel)):
+        atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+        try:
+          webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), channelConfirm))
           rlatch = None
           rmsg = ''
           if not msg.reference is None:
             rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
             rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
           await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator}{' [🐍]' if msg.author.id == 439788095483936768 else ''}{' [✅]' if msg.author.id in apirequests_id else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-    except:
-      pass
+        except discord.Forbidden:
+          await channelConfirm.send(f"{msg.author.name}#{msg.author.discriminator}{' [🐍]' if msg.author.id == 439788095483936768 else ''}{' [✅]' if msg.author.id in apirequests_id else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
+
 
   @commands.slash_command()
   async def call(self, inter):
@@ -435,8 +440,8 @@ class Nonsense(commands.Cog):
       channel = queue.pop()
       if CallChannel(inter).link(channel)[1]:
         gotten = inter.bot.get_channel(channel)
-        await gotten.send(f"Connection with `{esc_md(inter.guild.name)}` has been made. Say hi!\n> DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
-        await inter.send(f"Connection with `{esc_md(gotten.guild.name)}` has been made. Say hi!\n> DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
+        await gotten.send(f"Connection with `{esc_md(inter.guild.name)}` has been made. Say hi!\n> 🛑 **DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM**\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
+        await inter.send(f"Connection with `{esc_md(gotten.guild.name)}` has been made. Say hi!\n> 🛑 **DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM**\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
       else:
         await inter.bot.get_channel(channel).send("Something went wrong. Try again later.")
         await inter.send("Something went wrong. Try again later.")
