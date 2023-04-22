@@ -28,8 +28,6 @@ popcat = PopcatAPI()
 vgdshort = gdshortener.VGDShortener()
 
 osuapi = osu.Ossapi(18955, os.environ["OSU"])
-whitelist_id = [816691475844694047, 767102460673916958, 439788095483936768, 417334153457958922, 902371374033670224, 691572882148425809, 293189829989236737, 826509766893371392, 835455268946051092, 901115550695063602, 712342308565024818]
-apirequests_id = whitelist_id.copy() + [666655393853866004, 830071104088440875, 699420041103540264, 767102460673916958, 462098932571308033]
 
 ranks = {
   'D': '<:D_:1054751662394318888>',
@@ -280,7 +278,7 @@ class Nonsense(commands.Cog):
     try:
       if str(before.id) in cache_exec_msgs:
         if "#pbt" in after.content:
-          if after.author.id in apirequests_id:
+          if after.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
             if (code := re.search(r"(```py\n(.|\n)+```)", after.content)) != 0:
               code = code.group()[6:-4]
               body = {"source": str(code),
@@ -297,7 +295,7 @@ class Nonsense(commands.Cog):
               await fmsg.edit(embed = e)
               cachemsg(after.id, cache_exec_msgs[str(before.id)])
               return
-    except:
+    except Exception:
       pass
 
   @commands.Cog.listener()
@@ -306,7 +304,7 @@ class Nonsense(commands.Cog):
       return
     try:
       if "#pbt" in msg.content:
-        if msg.author.id in apirequests_id:
+        if msg.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
           if (code := re.search(r"(```py\n(.|\n)+```)", msg.content)):
             code = code.group()[6:-4]
             body = {"source": str(code),
@@ -394,7 +392,7 @@ class Nonsense(commands.Cog):
                 rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
               await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
 
-    except:
+    except Exception:
       pass
 
     if str(msg.channel.id) in list(callsInProgress.keys()):
@@ -408,10 +406,29 @@ class Nonsense(commands.Cog):
           if not msg.reference is None:
             rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
             rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-          await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator}{' [🐍]' if msg.author.id == 439788095483936768 else ''}{' [✅]' if msg.author.id in apirequests_id else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+          await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
         except discord.Forbidden:
-          await channelConfirm.send(f"{msg.author.name}#{msg.author.discriminator}{' [🐍]' if msg.author.id == 439788095483936768 else ''}{' [✅]' if msg.author.id in apirequests_id else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
+          await channelConfirm.send(f"{msg.author.name}#{msg.author.discriminator}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
 
+  @commands.message_command(name="Compile (PY)")
+  async def pycomp(self, inter, msgid: discord.Message):
+    await inter.response.defer()
+    msg = await inter.bot.get_channel(msgid.channel.id).fetch_message(msgid.id)
+    if msg.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
+      if (code := re.search(r"(```py\n(.|\n)+```)", msg.content)):
+        code = code.group()[6:-4]
+        body = {"source": str(code),
+                    "options": {"compilerOptions": {
+                            "skipAsm": False,
+                            "executorRequest": True},
+                    "filters": {"execute": True}}, "lang": "python"}
+        ms = time.perf_counter_ns()
+        response = rq.post("https://godbolt.org/api/compiler/python311/compile", json = body)
+        ms = round(((before := time.perf_counter_ns()) - ms) / 1000000, (3 if round((before := time.perf_counter_ns()) - ms / 1000000) < 1 else None))
+        e = discord.Embed(url = "https://godbolt.org/", title = "Python 3.11 Compilation", description = ("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") if len("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") < 4096 else "```Response too long to display!```", color = random.randint(0, 16667215))
+        e.set_footer(text = f"{inter.author.name}#{inter.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
+        await inter.edit_original_response(embed = e)
+        return
 
   @commands.slash_command()
   async def call(self, inter):
@@ -429,6 +446,12 @@ class Nonsense(commands.Cog):
       await inter.send(f"This channel is already in the call queue!", ephemeral = True)
       return
 
+    if queue:
+      if g := inter.guild.get_channel(queue[0]):
+        if inter.guild.id == g.guild.id:
+          await inter.send("You can't call 2 channels in same server", ephemeral = True)
+          return
+
     if inter.channel.id not in queueremember:
       queueremember.append(inter.channel.id)
 
@@ -440,8 +463,8 @@ class Nonsense(commands.Cog):
       channel = queue.pop()
       if CallChannel(inter).link(channel)[1]:
         gotten = inter.bot.get_channel(channel)
-        await gotten.send(f"Connection with `{esc_md(inter.guild.name)}` has been made. Say hi!\n> 🛑 **DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM**\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
-        await inter.send(f"Connection with `{esc_md(gotten.guild.name)}` has been made. Say hi!\n> 🛑 **DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM**\n> Also be nice to others, that means: No swearing, No ANY KIND of racism, No insulting eachother!")
+        await gotten.send(f"Connection with `{esc_md(inter.guild.name)}` has been made. Say hi!\n> ⚠️ **DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM**\n> \n> Be nice to others, that means: No swearing, ANY kind of racism, and insulting eachother!")
+        await inter.send(f"Connection with `{esc_md(gotten.guild.name)}` has been made. Say hi!\n> ⚠️ **DO NOT CLICK ANY LINKS, THEY MAY LEAD YOU TO SCAM**\n> \n> Be nice to others, that means: No swearing, ANY kind of racism, and insulting eachother!")
       else:
         await inter.bot.get_channel(channel).send("Something went wrong. Try again later.")
         await inter.send("Something went wrong. Try again later.")
@@ -451,6 +474,11 @@ class Nonsense(commands.Cog):
     '''
     Hang up a call if you are in one
     '''
+    if inter.channel.id in queue and inter.channel.id in queueremember:
+      queue.pop()
+      await inter.send("This channel is no longer in queue")
+      return
+
     if str(inter.channel.id) in callsInProgress and inter.channel.id in queueremember:
       channel = callsInProgress[str(inter.channel.id)][0]
       if CallChannel(inter).unlink(int(channel))[1]:
@@ -549,7 +577,7 @@ class Nonsense(commands.Cog):
     if not url.startswith(("https://", "http://")): url = "https://" + url
     furl = None
     await inter.response.defer(ephemeral = ephemeral)
-    if inter.author.id in apirequests_id:
+    if inter.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
       param = {}
       if not params is None:
         for i in params.split(","):
@@ -736,7 +764,7 @@ class Nonsense(commands.Cog):
     try:
       r = popcat.shower_thoughts()
       e = discord.Embed(description = r, color = random.randint(0, 16777215))
-    except:
+    except Exception:
       e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
@@ -750,7 +778,7 @@ class Nonsense(commands.Cog):
     try:
       r = popcat.fact()
       e = discord.Embed(description = r, color = random.randint(0, 16777215))
-    except:
+    except Exception:
       e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
@@ -768,7 +796,7 @@ class Nonsense(commands.Cog):
     try:
       r = popcat.translate(translate_to, text)
       e = discord.Embed(title = f"Translating to {translate_to.capitalize()}", description = r, color = random.randint(0, 16777215))
-    except:
+    except Exception:
       e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
@@ -782,7 +810,7 @@ class Nonsense(commands.Cog):
     try:
       r = popcat.joke()
       e = discord.Embed(description = r, color = random.randint(0, 16777215))
-    except:
+    except Exception:
       e = discord.Embed(title = "Error", description = "Something went wrong", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
@@ -845,7 +873,7 @@ class Nonsense(commands.Cog):
     beatmapid: Beatmap id (INT)
     """
     info = osuapi.beatmap(beatmap_id = beatmapid)
-    ranks = ["🕐 Pending", "⏫ Ranked", "✅ Approved", "✅ Qualified", "❤️ Loved", ":grave: Graveyard" "🕐 WIP"]
+    ranks = ["🕐 Pending", "⏫ Ranked", "✅ Approved", "✅ Qualified", "❤️ Loved", "💀 Graveyard", "🕐 WIP"]
     m, s = divmod(info.total_length, 60)
     h, m = divmod(m, 60)
     e = discord.Embed(url = str(info.url), title = f'{info.beatmapset().artist} - {info.beatmapset().title} [{info.version}]', description = (f'Source: `{info.beatmapset().source}`' + '\n' if info.beatmapset().source else '') + '\n' + f'Status: `{ranks[info.status.value]}`' + '\n' + f'Submitted: <t:{int(datetime.datetime.fromisoformat(str(info.beatmapset().submitted_date)).timestamp())}:R>' + '\n' + f'Last updated: <t:{int(datetime.datetime.fromisoformat(str(info.beatmapset().last_updated)).timestamp())}:R>', color = random.randint(0, 16777215))
@@ -868,11 +896,12 @@ class Nonsense(commands.Cog):
     try:
       info = osuapi.user(user = user)
       rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
-      e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`"  + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16777215))
+      e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`" + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16777215))
       e.add_field(name = "Joined:", value = f"<t:{int(info.join_date.timestamp())}:R>", inline = True)
-      e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
+      if info.last_visit:
+        e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
       if not info.is_bot:
-        e.add_field(name = "Statistics:", value = f"Performance Points: `{round(info.statistics.pp)}`" + "\n" +  f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`", inline = False)
+        e.add_field(name = "Statistics:", value = f"Performance Points: `{round(info.statistics.pp)}`" + "\n" + f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`", inline = False)
       if info.cover.url:
         e.set_image(url = str(info.cover.url))
       e.set_thumbnail(url = str(info.avatar_url))
@@ -1160,7 +1189,7 @@ class Nonsense(commands.Cog):
       e.add_field(name = "Example:", value = rjson['list'][0]['example'], inline = False)
       e.set_footer(text = f"👍: {rjson['list'][0]['thumbs_up']} / 👎: {rjson['list'][0]['thumbs_down']} | Author: {rjson['list'][0]['author']}")
       await inter.send(embed = e)
-    except:
+    except Exception:
       e = discord.Embed(title = "Error", description = "Something went wrong...", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
@@ -1243,7 +1272,7 @@ class Nonsense(commands.Cog):
       await message.remove_reaction(emoji, self.bot.user)
       await sent.delete()
       return
-    except:
+    except Exception:
       await message.remove_reaction(emoji, self.bot.user)
       await sent.delete()
 
@@ -1279,7 +1308,7 @@ class Nonsense(commands.Cog):
           after = time.perf_counter_ns()
           e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) / 1000000, (3 if round((after - before) / 1000000) < 1 else None))}ms")
           await inter.edit_original_message(embed = e)
-      elif inter.author.id in whitelist_id:
+      elif inter.author.id in self.bot.DEV + self.bot.TP:
         if send_way == "Normal":
           if any(i in code for i in blacklist):
             e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))
@@ -1325,7 +1354,7 @@ class Nonsense(commands.Cog):
     try:
       e = discord.Embed(title = "BFEval:", description = f"```bf\n{code}\n```\nResult: ```\n{runbf(code)}\n```", color = random.randint(0, 16777215)) 
       await inter.send(embed = e, ephemeral = ephemeral)
-    except:
+    except Exception:
       e = discord.Embed(title = "Error", description = f"Something went wrong. Try again...", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
   

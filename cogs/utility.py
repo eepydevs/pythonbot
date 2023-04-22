@@ -1,5 +1,7 @@
 #cog by maxy#2866
 import json
+
+import disnake
 import disnake as discord
 from disnake.ext import commands
 import random
@@ -11,7 +13,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.10.1" # major.sub.minor/fix
+botbuild = "10.10.2" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -279,7 +281,7 @@ class Utility(commands.Cog):
   async def slashbotinfo(self, inter):
     await inter.response.defer()
     
-    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [maxy#2866](https://github.com/1randomguyspecial).",  color = random.randint(0, 16777215))
+    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [maxy#2866](https://github.com/1randomguyspecial).", color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
     e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'DanBot Hosting'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
     e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/1randomguyspecial/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/1randomguyspecial/projects/2)\n[🧰 Disnake Github page](https://github.com/DisnakeDev/disnake)\n[🐍 Python official page](https://www.python.org)", inline = False)
@@ -420,19 +422,19 @@ class Utility(commands.Cog):
           
     role_list.reverse()
     b = ", ".join(role_list)
-    e = discord.Embed(title = f"Member info: {member} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Member info: {member}{' [ 🐍 ]' if member.id == 439788095483936768 else ''}{' [ 🔧 ]' if member in self.bot.DEV else ''}{' [ ❤️ ]' if member.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if member in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if member in self.bot.CONTRIB else ''} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
     if member.avatar != None:
       e.set_thumbnail(url = str(member.avatar))
     e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
     e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
-    if member.activity != None:
-      e.add_field(name = "Activity", value = f"{member.activity.type[0].capitalize()} **{member.activity.name}**", inline = False)
+    if member.activities:
+      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}{f' {a.emoji}' if a.emoji else ''} **{a.name}**" + ((f"\n> - {a.details}" if a.details else '') if a.type != disnake.ActivityType.custom else '')) for a in member.activities), inline = False)
+    if member.top_role != None:
+      e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
     if len(role_list) != 0:
       e.add_field(name = f"Roles ({len(role_list)}):", value = "".join([b]) if len("".join([b])) < 1024 else "Too many roles to show", inline = False)
     else:
       e.add_field(name = "Roles (0)", value = "None")
-    if member.top_role != None:
-      e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
     if member.guild_permissions.administrator:
       e.add_field(name = "Administrator?", value = "True", inline = False)
     else:
@@ -553,7 +555,7 @@ class Utility(commands.Cog):
         e = discord.Embed(title = "Success", description = f"Note named `{name}` is created!", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
   
-  @note.sub_command(description =  "Replaces whole note text")
+  @note.sub_command(description = "Replaces whole note text")
   async def overwrite(inter, *, name: str = commands.Param(autocomplete = suggest_note), text):
     '''
     Replaces whole note text

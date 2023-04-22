@@ -555,16 +555,16 @@ class Economy(commands.Cog):
                     rng = random.randint(100, max)
                     db["balance"][str(member.id)] -= rng
                     db["balance"][str(inter.author.id)] += rng
-                    e = discord.Embed(title = "Success", description = f"You stole {rng} 💵 from {member}!",  color = random.randint(0, 16777215))
+                    e = discord.Embed(title = "Success", description = f"You stole {rng} 💵 from {member}!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
                   except ValueError:
-                    e = discord.Embed(title = "Error", description = "This person is too poor to be robbed!",  color = random.randint(0, 16777215))
+                    e = discord.Embed(title = "Error", description = "This person is too poor to be robbed!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
                 else:
                   rng = random.randint(250, 1000)
                   db["balance"][str(member.id)] += rng
                   db["balance"][str(inter.author.id)] -= rng
-                  e = discord.Embed(title = "Fail", description = f"You got caught and lost {rng} 💵 !",  color = random.randint(0, 16777215))
+                  e = discord.Embed(title = "Fail", description = f"You got caught and lost {rng} 💵 !", color = random.randint(0, 16777215))
                   await inter.send(embed = e)
               else:
                 chance = random.randint(0, 100)
@@ -575,17 +575,17 @@ class Economy(commands.Cog):
                     rng = random.randint(100, max)
                     db["balance"][str(member.id)] -= rng
                     db["balance"][str(inter.author.id)] += rng
-                    e = discord.Embed(title = "Success", description = f"You stole {rng} 💵 from {member.name}!",  color = random.randint(0, 16777215))
+                    e = discord.Embed(title = "Success", description = f"You stole {rng} 💵 from {member.name}!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
                   except ValueError:
-                    e = discord.Embed(title = "Error", description = "This person is too poor to be robbed!",  color = random.randint(0, 16777215))
+                    e = discord.Embed(title = "Error", description = "This person is too poor to be robbed!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
                 else:
                   db["balance"][str(inter.author.id)] = 0
                   rng = random.randint(250, 1000)
                   db["balance"][str(member.id)] += rng
                   db["balance"][str(inter.author.id)] -= rng
-                  e = discord.Embed(title = "Fail", description = f"You got caught and lost {rng} 💵 !",  color = random.randint(0, 16777215))
+                  e = discord.Embed(title = "Fail", description = f"You got caught and lost {rng} 💵 !", color = random.randint(0, 16777215))
                   await inter.send(embed = e)
             else:
               e = discord.Embed(title = "Error", description = "Leave peaceful person alone!", color = random.randint(0, 16777215))

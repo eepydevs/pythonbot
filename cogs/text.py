@@ -110,9 +110,9 @@ def morsifyen(text):
   table = {"A": ".-", "B": "-...", "C": "-.-.", "D": "-..", "E": ".", "F": "..-.", "G": "--.", "H": "....", "I": "..", "J": ".---", "K": "-.-", "L": ".-..", "M": "--", "N": "-.", "O": "---", "P": ".--.", "Q": "--.-", "R": ".-.", "S": "...", "T": "-", "U": "..-", "V": "...-", "W": ".--", "X": "-..-", "Y": "-.--", "Z": "--..", "/": "-..-.", "1": ".----", "2": "..---", "3": "...--", "4": "....-", "5": ".....", "6": "-....", "7": "--...", "8": "---..", "9": "----.", "0": "-----", ",": "--..--", ".": ".-.-.-", "?": "..--..", "!": "-.-.--", " ": "/"}
   textt = text.upper()
   result = []
-  for l in textt:
-    if l in table:
-      result.append(f"{table[l]} ")
+  for letter in textt:
+    if letter in table:
+      result.append(f"{table[letter]} ")
   return str().join(result)
 
 def morsifyde(text):
@@ -120,9 +120,9 @@ def morsifyde(text):
   textt = text.replace("_", "-")
   result = []
   if all([True if i in ".-/ " else False for i in textt]):
-    for l in textt.split(" "):
-      if l in table:
-        result.append(table[l])
+    for letter in textt.split(" "):
+      if letter in table:
+        result.append(table[letter])
     return str().join(result)
   else:
     return "none"
@@ -130,9 +130,9 @@ def morsifyde(text):
 def braillede(text):
   table = {"⠟": "Q", "⠺": "W", "⠑": "E", "⠗": "R", "⠞": "T", "⠽": "Y", "⠥": "U", "⠊": "I", "⠕": "O", "⠏": "P", "⠁": "A", "⠎": "S", "⠙": "D", "⠋": "F", "⠛": "G", "⠓": "H", "⠚": "J", "⠅": "K", "⠇": "L", "⠵": "Z", "⠭": "X", "⠉": "C", "⠧": "V", "⠃": "B", "⠝": "N", "⠍": "M", "⠖": "!", "⠢": "?", "⠲": ".", "⠂": ",", " ": " "}
   result = []
-  for l in text:
-    if l in table:
-      result.append(table[l])
+  for letter in text:
+    if letter in table:
+      result.append(table[letter])
   if result:
     return str().join(result)
   else: return "none"
@@ -141,9 +141,9 @@ def brailleen(text):
   table = {"Q": "⠟", "W": "⠺", "E": "⠑", "R": "⠗", "T": "⠞", "Y": "⠽", "U": "⠥", "I": "⠊", "O": "⠕", "P": "⠏", "A": "⠁", "S": "⠎", "D": "⠙", "F": "⠋", "G": "⠛", "H": "⠓", "J": "⠚", "K": "⠅", "L": "⠇", "Z": "⠵", "X": "⠭", "C": "⠉", "V": "⠧", "B": "⠃", "N": "⠝", "M": "⠍", "!": "⠖", "?": "⠢", ".": "⠲", ",": "⠂", " ": " "}  
   textt = text.upper()
   result = []
-  for l in textt:
-    if l in table:
-      result.append(table[l])
+  for letter in textt:
+    if letter in table:
+      result.append(table[letter])
   if result:
     if str().join(result):
       return str().join(result)
@@ -153,9 +153,9 @@ def brailleen(text):
 def binde(text):
   table = {"00110001": "1", "00110010": "2", "00110011": "3", "00110100": "4", "00110101": "5", "00110110": "6", "00110111": "7", "00111000": "8", "00111001": "9", "00110000": "0", "01010001": "Q", "01010111": "W", "01000101": "E", "01010010": "R", "01010100": "T", "01011001": "Y", "01010101": "U", "01001001": "I", "01001111": "O", "01010000": "P", "01000001": "A", "01010011": "S", "01000100": "D", "01000110": "F", "01000111": "G", "01001000": "H", "01001010": "J", "01001011": "K", "01001100": "L", "01011010": "Z", "01011000": "X", "01000011": "C", "01010110": "V", "01000010": "B", "01001110": "N", "01001101": "M", "00111111": "?", "00100001": "!", "00101100": ",", "00101110": ".", "00100000": " "}
   result = []
-  for l in text.split(" "):
-    if l in table:
-      result.append(table[l])
+  for letter in text.split(" "):
+    if letter in table:
+      result.append(table[letter])
   if result:
     return str().join(result)
   else: return "none"
@@ -164,9 +164,9 @@ def binen(text):
   table = {"1": "00110001", "2": "00110010", "3": "00110011", "4": "00110100", "5": "00110101", "6": "00110110", "7": "00110111", "8": "00111000", "9": "00111001", "0": "00110000", "Q": "01010001", "W": "01010111", "E": "01000101", "R": "01010010", "T": "01010100", "Y": "01011001", "U": "01010101", "I": "01001001", "O": "01001111", "P": "01010000", "A": "01000001", "S": "01010011", "D": "01000100", "F": "01000110", "G": "01000111", "H": "01001000", "J": "01001010", "K": "01001011", "L": "01001100", "Z": "01011010", "X": "01011000", "C": "01000011", "V": "01010110", "B": "01000010", "N": "01001110", "M": "01001101", "?": "00111111", "!": "00100001", ",": "00101100", ".": "00101110", " ": "00100000"}
   textt = text.upper()
   result = []
-  for l in textt:
-    if l in table:
-      result.append(table[l])
+  for letter in textt:
+    if letter in table:
+      result.append(table[letter])
   if result:
     if str().join(result):
       return " ".join(result)

@@ -261,7 +261,7 @@ class Moderation(commands.Cog):
     if number >= 100: number = 100
     await inter.channel.purge(limit = number)
     pquote = random.choice(purgequotes)
-    e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color =  random.randint(0, 16777215))
+    e = discord.Embed(title = "Success", description = f"Purged the channel successfully! {pquote}", color = random.randint(0, 16777215))
     await inter.send(embed = e, delete_after = 5)
   #pin command
   @commands.slash_command()

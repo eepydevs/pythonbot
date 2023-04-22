@@ -1,6 +1,6 @@
-ossapi==3.1.6
+ossapi==3.1.9
 disnake==2.8.1
-psutil==5.9.4
+psutil==5.9.5
 python-dotenv==1.0.0
 webcolors==1.13
 roblox==2.0.0
@@ -10,3 +10,4 @@ asyncio==3.4.3
 async-timeout==4.0.2
 redis==4.5.4
 gdshortener==1.0.1
+topggpy==1.4.0

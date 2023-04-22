@@ -127,7 +127,7 @@ class Debug(commands.Cog):
     await inter.send("Shutdown", ephemeral = True)
     try:
       await bot.close()
-    except:
+    except Exception:
       print("something went wrong")
     sys.exit()
     

@@ -911,7 +911,7 @@ class RedisDB(dict):
       try:
           if self._var != json.loads(self._redis.hget(self._name, self._key)):
               self._redis.hset(self._name, self._key, json.dumps(self._var))
-      except:
+      except Exception:
           self._backup.data = self._var
           self._backup.save()
 
@@ -983,7 +983,7 @@ class Upload():
       if self.__delete_after:
         time.sleep(self.__delete_after)
       os.remove(f"{self._path}{self._filename}")
-    except:
+    except Exception:
       pass
     return None
 
@@ -994,8 +994,8 @@ def dividers(array: list, divider: str = " | "):
       ft.append(i)
   return divider.join(ft) if divider else ""
 
-#db = None
-#try:
-db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = True)
-#except:
-#  db = Database()
+db = None
+try:
+  db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = True)
+except Exception:
+ db = Database()

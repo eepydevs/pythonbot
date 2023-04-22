@@ -1,7 +1,8 @@
 # Python bot, mostly funny bot with useful commands
 
 ![total_files](https://img.shields.io/github/directory-file-count/1randomguyspecial/pythonbot?label=total%20files) ![total_lines](https://img.shields.io/tokei/lines/github/1randomguyspecial/pythonbot) ![repo_size](https://img.shields.io/github/repo-size/1randomguyspecial/pythonbot) \
-![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot)  ![last_commit](https://img.shields.io/github/last-commit/1randomguyspecial/pythonbot/main)
+![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot) ![last_commit](https://img.shields.io/github/last-commit/1randomguyspecial/pythonbot/main) \
+[![codefactor](https://img.shields.io/codefactor/grade/github/1randomguyspecial/pythonbot/main?label=codefactor&logo=codefactor)](https://www.codefactor.io/repository/github/1randomguyspecial/pythonbot)
 
 ## Links
 
