@@ -30,7 +30,7 @@ Economy: `shop(items, buy, sell)`, `item(use, info)`, `balance`, `beg`, `work`, 
 
 Image: `image(jail, unforgivable, sadcat, cars, pooh, wanted, whowouldwin, gun, drake, ship, bidentweet, pikachu, colorify, drip, clown, advert, blur, invert, grayscale, joke_overhead, pet, caution, alert, facts_book)`, `screenshot`
 
-Nonsense: `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`, `api(request, snip, delete)`, `shower_thoughts`, `jokes`, `facts`, `call(start, hangup)`
+Nonsense: `urban`, `md`, `copy-person`, `react`, `execbf`, `calc`, `button`, `select`, `someone`, `api(request, snip, delete)`, `shower_thoughts`, `jokes`, `facts`, `call(start, hangup)`, `peek`, `clipboard(copy, paste, show)`
 
 Stats/Info: `bot(ping, credits, info, sideprojects, invite)`, `osu(beatmap, user, rs, top_plays, score, ppacc, acc)`, `tetrio(stats, user)`, `roblox(user, id, group)`, `info(steam, github, color, element, subreddit)`
 
@@ -43,6 +43,10 @@ Fun: `meme`, `say`, `choice`, `8ball`, `coinflip`, `random`, `dice`, `minigame(m
 Manage channels: `channel(create, setting(imageonly))`, `purge`, `pin`
 
 Manage nicknames: `afk` (changing nickname) (optional)
+
+View Channels: `peek`
+
+Read Message History: `peek`
 
 Manage webhooks: `copy-person`, `tupper`, `call(start, hangup)`
 

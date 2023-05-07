@@ -13,7 +13,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.10.2" # major.sub.minor/fix
+botbuild = "10.10.3" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -315,14 +315,14 @@ class Utility(commands.Cog):
   #bot credits command
   @bot.sub_command(name = "credits", description = "Shows contributor list")
   async def credits(self, inter):
-    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\ngodslayerakp#3587 - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone#4486`\n> `inventionpro#6814`\n> `LarsIsHere#3320`", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\ngodslayerakp#3587 - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone#4486`\n> `inventionpro#6814`", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   @bot.sub_command(description = "Shows side projects im working on")
   async def sideprojects(self, inter):
     e = discord.Embed(title = "Side projects im working on", description = "Some of projects may not be mine", color = random.randint(0, 16777215))
     e.add_field(name = "Telicards [BOT] (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/4bZJ2pnVgS)", inline = False)
-    e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm `Inspiration` and a `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\nNo support server", inline = False)
+    e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm `Inspiration` and a `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\n[Support server](https://discord.gg/SXcXZN4tkM)", inline = False)
     await inter.send(embed = e)
 
   #invite command
@@ -428,7 +428,7 @@ class Utility(commands.Cog):
     e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
     e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
     if member.activities:
-      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}{f' {a.emoji}' if a.emoji else ''} **{a.name}**" + ((f"\n> - {a.details}" if a.details else '') if a.type != disnake.ActivityType.custom else '')) for a in member.activities), inline = False)
+      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}{f' {a.emoji}' if a.emoji else ''} **{a.name}**" + ((f"\n> - {a.details}" if a.details else '') if a.type != discord.ActivityType.custom else '') + ((f"\n> - {a.state}" if a.state else '') if a.type != discord.ActivityType.custom else '')) for a in member.activities), inline = False)
     if member.top_role != None:
       e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
     if len(role_list) != 0:

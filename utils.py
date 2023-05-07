@@ -932,7 +932,6 @@ async def Webhook(ctx, channel = None):
         return webhook
     return (await ctx.channel.create_webhook(name="PythonBot Webhook"))
 
-
 # noinspection PyBroadException
 class Upload():
   def __init__(self, url: str, filename: str, path: str = "./", _chunk_size: int = 1024, _delete_after: float = 0):
@@ -994,8 +993,12 @@ def dividers(array: list, divider: str = " | "):
       ft.append(i)
   return divider.join(ft) if divider else ""
 
+dontsave = True
+if os.environ["TEST"] != "y":
+  dontsave = False
+
 db = None
 try:
-  db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = True)
+  db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = dontsave)
 except Exception:
- db = Database()
+  db = Database()

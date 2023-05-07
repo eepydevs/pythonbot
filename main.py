@@ -98,7 +98,7 @@ async def update_rolelists():
 @tasks.loop(minutes = 30)
 async def top_gg_updstats():
   try:
-    bot.topgg.update_stats()
+    await bot.topgg.post_guild_count()
     print(f"Successfully updated guild count: {len(bot.guilds)}")
   except Exception as e:
     print(f"Something went wrong: {e.__class__.__name__}: {e}")
@@ -110,6 +110,7 @@ for filename in os.listdir('./cogs'):
 
 
 update_reminders.start()
-top_gg_updstats.start()
+if os.environ["TEST"] != "y":
+  top_gg_updstats.start()
 update_rolelists.start()
 bot.run(os.environ["DISCORD_TOKEN"])

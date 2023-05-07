@@ -28,8 +28,10 @@ popcat = PopcatAPI()
 vgdshort = gdshortener.VGDShortener()
 
 osuapi = osu.Ossapi(18955, os.environ["OSU"])
+comp_prefix = os.environ["COMP_PREFIX"]
 
 ranks = {
+  "F": '<:F_:1100068426245996635>',
   'D': '<:D_:1054751662394318888>',
   'C': '<:C_:1054751660431392768>',
   'B': '<:B_:1054751658879483934>',
@@ -45,6 +47,8 @@ cache_exec_msgs = {}
 calls_links = {}
 queue = []
 queueremember = []
+
+clipboard = {}
 
 
 crblx = rblx.Client(os.environ["RBLXS"])
@@ -277,7 +281,7 @@ class Nonsense(commands.Cog):
   async def on_message_edit(self, before, after):
     try:
       if str(before.id) in cache_exec_msgs:
-        if "#pbt" in after.content:
+        if comp_prefix in after.content:
           if after.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
             if (code := re.search(r"(```py\n(.|\n)+```)", after.content)) != 0:
               code = code.group()[6:-4]
@@ -303,7 +307,7 @@ class Nonsense(commands.Cog):
     if msg.author.bot or msg.author.discriminator == 0000:
       return
     try:
-      if "#pbt" in msg.content:
+      if comp_prefix in msg.content:
         if msg.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
           if (code := re.search(r"(```py\n(.|\n)+```)", msg.content)):
             code = code.group()[6:-4]
@@ -429,6 +433,101 @@ class Nonsense(commands.Cog):
         e.set_footer(text = f"{inter.author.name}#{inter.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
         await inter.edit_original_response(embed = e)
         return
+
+  # @commands.slash_command()
+  # async def clipboard(self, inter):
+  #   if str(inter.author.id) not in clipboard:
+  #     clipboard[str(inter.author.id)] = ""
+  #
+  # @clipboard.sub_command()
+  # async def copy(self, inter, message_id: discord.Message = None):
+  #   '''
+  #   Lets you copy contents of any or last message
+  #
+  #   Parameters
+  #   ----------
+  #   message_id: Message id. (Default: Last message)
+  #   '''
+  #   await inter.response.defer(ephemeral = True)
+  #   if message_id is None:
+  #     message = await inter.channel.history(limit = 1).flatten()
+  #     message_id = message[0]
+  #   clipboard[str(inter.author.id)] = message_id
+  #   e = discord.Embed(title = "Success!", description = f"You have successfully copied the message: {message_id.jump_url}", color = random.randint(0, 16667215))
+  #   await inter.send(embed = e)
+  #
+  # make option to switch between owner and inter.author
+  # make it available to send as webhook for trusted people+
+  # @clipboard.sub_command()
+  # async def paste(self, inter):
+  #   '''
+  #   Pastes your copied message if you have one
+  #
+  #   '''
+  #   if str(inter.author.id) in clipboard:
+  #     await inter.send(clipboard[str(inter.author.id)].content)
+  #   else:
+  #     e = discord.Embed(title = "Error", description = "You don't have anything in clipboard!", color = random.randint(0, 16667215))
+  #     await inter.send(embed = e, ephemeral = True)
+  #
+  # improve of how the showed message looks like
+  # @clipboard.sub_command()
+  # async def show(self, inter):
+  #   '''
+  #   Shows you the last message you have copied if you have one
+  #   '''
+  #   if str(inter.author.id) in clipboard:
+  #     e = discord.Embed(title = "Your last copied message", description = clipboard[str(inter.author.id)].content, color = random.randint(0, 16667215))
+  #     await inter.send(embed = e, ephemeral = True)
+  #   else:
+  #     e = discord.Embed(title = "Error", description = "You don't have anything in clipboard!", color = random.randint(0, 16667215))
+  #     await inter.send(embed = e, ephemeral = True)
+
+  @commands.slash_command()
+  @commands.bot_has_permissions(read_message_history = True, view_channel = True)
+  async def peek(self, inter, channel: discord.TextChannel, offset: int = 0):
+    '''
+    Peek in some channels!
+
+    Parameters
+    ----------
+    channel: Mention channel
+    offset: Offset messages up. Max: 240
+    '''
+    if channel.permissions_for(inter.author).view_channel and channel.permissions_for(inter.author).read_message_history:
+      await inter.response.defer(ephemeral = True)
+      if offset > 240:
+        offset = 240
+      elif offset < 0:
+        offset = 0
+      messages = await channel.history(limit = 250).flatten()
+      if len(messages) < offset:
+        offset = len(messages) - 11
+      result = []
+      idx = 0
+      prevuser = None
+      prevmsgatch = None
+      msgs = messages[offset:offset + 10][::-1]
+      while idx < 10:
+        msg = msgs[idx]
+        msgref = None
+        atch = ' '.join([f"[ [{i.filename}]({i.url}) ]" for i in msg.attachments])
+        refatch = None
+        if msg.reference:
+          msgref = msg.reference.resolved
+          if msgref:
+            if msgref.attachments:
+              refatch = [f"[ [{i.filename}]({i.url}) ]" for i in msgref.attachments][0]
+        if idx != 0:
+          prevuser = msgs[idx - 1].author
+          prevmsgatch = msgs[idx - 1].attachments
+        result.append((('\n' if prevmsgatch or msg.author != prevuser or msgref else '') + (f"\n╭━ **<t:{int(msgref.created_at.timestamp())}:t> [{esc_md(msgref.author.name)}{f'#{msgref.author.discriminator}]({msgref.jump_url})' if msgref.author.discriminator != '0000' else ''}**: {msgref.content[0:49]}" if msgref else '') + ((f' {refatch if msgref.attachments else ""}') if msgref else '') + (f"\n**<t:{int(msg.created_at.timestamp())}:t> [{esc_md(msg.author.name)}{f'#{msg.author.discriminator}]({msg.jump_url})' if msg.author.discriminator != '0000' else ''}:**" if msg.author != prevuser or msgref  else '') + ('\n> ' if msg.content else '')) + (msg.content.replace('\n', '\n> ') if msg.content else '') + f"{' `[EMBED]`' if msg.embeds else ''}" + (f"\n> {atch}" if msg.attachments else ''))
+        idx += 1
+      e = discord.Embed(title = f"Messages in #{channel.name} ({offset + 1}-{offset + 10})", description = str().join(result), color = random.randint(0, 16777215))
+      await inter.send(embed = e)
+    else:
+      e = discord.Embed(title = "Error", description = "You can't view that channel.", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @commands.slash_command()
   async def call(self, inter):
@@ -577,7 +676,7 @@ class Nonsense(commands.Cog):
     if not url.startswith(("https://", "http://")): url = "https://" + url
     furl = None
     await inter.response.defer(ephemeral = ephemeral)
-    if inter.author.id in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
+    if inter.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB:
       param = {}
       if not params is None:
         for i in params.split(","):
@@ -923,7 +1022,7 @@ class Nonsense(commands.Cog):
     """
     accfc, ppaccfc, ppaccss = 0, 0, 0
     try:
-      if req := osuapi.user_scores(osuapi.user(user = user).id, "recent"):
+      if req := osuapi.user_scores(osuapi.user(user = user).id, "recent", include_fails = True):
         await inter.response.defer()
         if index < 1:
           index = 1
@@ -1235,21 +1334,25 @@ class Nonsense(commands.Cog):
     member: Mention a person to copy
     content: Input text here
     '''
-    if channel == None:
-      channel = inter.channel
-    await inter.send(f"Successfully sent `{content}` as `{member}`", ephemeral = True) 
-    channel_webhooks = await channel.webhooks()
-    webhook_count = 0
+    if inter.author in self.bot.DEV + self.bot.TP:
+      if channel == None:
+        channel = inter.channel
+      await inter.send(f"Successfully sent `{content}` as `{member}`", ephemeral = True)
+      channel_webhooks = await channel.webhooks()
+      webhook_count = 0
 
-    for webhook in channel_webhooks:
-        if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
-            await webhook.send(
-                content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none()
-            )
-            return
+      for webhook in channel_webhooks:
+          if webhook.user.id == inter.bot.user.id and webhook.name == "PythonBot Webhook":
+              await webhook.send(
+                  content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none()
+              )
+              return
 
-    new_webhook = await channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
-    await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none())
+      new_webhook = await channel.create_webhook(name="PythonBot Webhook", reason="PythonBot webhook usage in commands")
+      await new_webhook.send(content=content, username=member.display_name, avatar_url=member.avatar, allowed_mentions=discord.AllowedMentions.none())
+    else:
+      e = discord.Embed(title = "Error", description = "You don't have permission to use this command", color = random.randint(0, 16777215))
+      await inter.send(embed = e, ephemeral = True)
 
   @commands.slash_command()
   async def react(self, inter, emoji:discord.Emoji, message:discord.Message):
@@ -1308,7 +1411,7 @@ class Nonsense(commands.Cog):
           after = time.perf_counter_ns()
           e.set_footer(text = f"python {'.'.join(str(i) for i in list(sys.version_info)[0:3])} | {round((after - before) / 1000000, (3 if round((after - before) / 1000000) < 1 else None))}ms")
           await inter.edit_original_message(embed = e)
-      elif inter.author.id in self.bot.DEV + self.bot.TP:
+      elif inter.author in self.bot.DEV + self.bot.TP:
         if send_way == "Normal":
           if any(i in code for i in blacklist):
             e = discord.Embed(title = "Error", description = "```'NoneType' is not callable```", color = random.randint(0, 16777215))

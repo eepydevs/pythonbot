@@ -222,7 +222,7 @@ class Moderation(commands.Cog):
   @commands.slash_command(name = "unban", description = "Unban people")
   @commands.has_permissions(ban_members = True)
   @commands.bot_has_permissions(ban_members = True)
-  async def unban(inter, member: discord.Member, reason = "None"):
+  async def unban(inter, member: discord.User, reason = "None"):
     '''
     Unban people
 
