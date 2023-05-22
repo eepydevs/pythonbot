@@ -103,6 +103,10 @@ async def top_gg_updstats():
   except Exception as e:
     print(f"Something went wrong: {e.__class__.__name__}: {e}")
 
+@tasks.loop(minutes = 1)
+async def update_ping():
+  db["ping"] = int(bot.latency * 1000)
+    
 #load cogs
 for filename in os.listdir('./cogs'):
   if filename.endswith('.py') and filename not in []:
@@ -113,4 +117,5 @@ update_reminders.start()
 if os.environ["TEST"] != "y":
   top_gg_updstats.start()
 update_rolelists.start()
+update_ping.start()
 bot.run(os.environ["DISCORD_TOKEN"])
