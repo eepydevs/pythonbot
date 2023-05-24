@@ -223,26 +223,26 @@ def runbf(str):
   codeiStack = []
   strp = []
   while codei < len(str):
-    l = str[codei]
+    codeil = str[codei]
     #increase
-    if l == '+':
+    if codeil == '+':
       array[i] = ((array[i] + 1) % 255)
     #decrease
-    elif l == '-':
+    elif codeil == '-':
       array[i] = ((array[i] - 1) % 255)
     #go one cell right
-    elif l == ">":
+    elif codeil == ">":
       i += 1
     #go one cell left
-    elif l == "<":
+    elif codeil == "<":
       i -= 1
     #input ascii character in strp array
-    elif l == ".":
+    elif codeil == ".":
       strp.append(chr(array[i]))
     #join every letter in strp array and print
-    elif l == '[':
+    elif codeil == '[':
       codeiStack.append(codei)
-    elif l == ']':
+    elif codeil == ']':
       if array[i] != 0:
         #restart the loop
         codei = codeiStack[-1]
@@ -393,7 +393,7 @@ class Nonsense(commands.Cog):
               rmsg = ''
               if not msg.reference is None:
                 rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-                rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+                rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "") + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
               await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
 
     except Exception:
@@ -409,7 +409,7 @@ class Nonsense(commands.Cog):
           rmsg = ''
           if not msg.reference is None:
             rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-            rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
+            rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "") + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
           await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
         except discord.Forbidden:
           await channelConfirm.send(f"{msg.author.name}#{msg.author.discriminator}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
@@ -521,7 +521,7 @@ class Nonsense(commands.Cog):
         if idx != 0:
           prevuser = msgs[idx - 1].author
           prevmsgatch = msgs[idx - 1].attachments
-        result.append((('\n' if prevmsgatch or msg.author != prevuser or msgref else '') + (f"\n╭━ **<t:{int(msgref.created_at.timestamp())}:t> [{esc_md(msgref.author.name)}{f'#{msgref.author.discriminator}]({msgref.jump_url})' if msgref.author.discriminator != '0000' else ''}**: {msgref.content[0:49]}" if msgref else '') + ((f' {refatch if msgref.attachments else ""}') if msgref else '') + (f"\n**<t:{int(msg.created_at.timestamp())}:t> [{esc_md(msg.author.name)}{f'#{msg.author.discriminator}]({msg.jump_url})' if msg.author.discriminator != '0000' else ''}:**" if msg.author != prevuser or msgref  else '') + ('\n> ' if msg.content else '')) + (msg.content.replace('\n', '\n> ') if msg.content else '') + f"{' `[EMBED]`' if msg.embeds else ''}" + (f"\n> {atch}" if msg.attachments else ''))
+        result.append((('\n' if prevmsgatch or msg.author != prevuser or msgref else '') + (f"\n╭━ **<t:{int(msgref.created_at.timestamp())}:t> [{esc_md(msgref.author.name)}{f'#{msgref.author.discriminator}]({msgref.jump_url})' if msgref.author.discriminator != '0000' else ''}**: {msgref.content[0:49]}" if msgref else '') + ((f' {refatch if msgref.attachments else ""}') if msgref else '') + (f"\n**<t:{int(msg.created_at.timestamp())}:t> [{esc_md(msg.author.name)}{f'#{msg.author.discriminator}]({msg.jump_url})' if msg.author.discriminator != '0000' else ''}:**" if msg.author != prevuser or msgref else '') + ('\n> ' if msg.content else '')) + (msg.content.replace('\n', '\n> ') if msg.content else '') + f"{' `[EMBED]`' if msg.embeds else ''}" + (f"\n> {atch}" if msg.attachments else ''))
         idx += 1
       e = discord.Embed(title = f"Messages in #{channel.name} ({offset + 1}-{offset + 10})", description = str().join(result), color = random.randint(0, 16777215))
       await inter.send(embed = e)
