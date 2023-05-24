@@ -329,15 +329,15 @@ class diff_calc:
 	def main(file):
 		map = file
 		objects = []
-		radius = (512 / 16) * (1. - 0.7 * (map.cs - 5) / 5);
+		radius = (512 / 16) * (1. - 0.7 * (map.cs - 5) / 5)
 		class consts:
 			decay_base = [0.3,0.15]
 
 			almost_diameter = 90
 
-			aim_angle_bonus_begin = math.pi / 3;
-			speed_angle_bonus_begin = 5 * math.pi / 6;
-			timing_threshold = 107;
+			aim_angle_bonus_begin = math.pi / 3
+			speed_angle_bonus_begin = 5 * math.pi / 6
+			timing_threshold = 107
 
 			stream_spacing = 110
 			single_spacing = 125
@@ -618,7 +618,7 @@ class pp_calc1:
 		if used_mods.so:
 			final_multiplier *= 0.95
 		res.pp = math.pow(math.pow(aim_value,1.1) + math.pow(speed_value,1.1) + math.pow(acc_value, 1.1), 1.0 / 1.1) * final_multiplier
-		return res;
+		return res
 
 	def pp_calc_acc(aim, speed, b, acc_percent, used_mods = mods(), combo = 0xFFFF, misses = 0,score_version = 1):
 		misses = min(b.num_objects,misses)
@@ -633,7 +633,7 @@ class pp_calc1:
 
 		if c100 > b.num_objects - misses:
 			c100 = 0
-			c50 = round(-6.0 * ((acc_percent * 0.01 - 1.0) * b.num_objects + misses) * 0.2);
+			c50 = round(-6.0 * ((acc_percent * 0.01 - 1.0) * b.num_objects + misses) * 0.2)
 
 			c50 = min(max300, c50)
 		else:
@@ -711,7 +711,7 @@ class calc:
 				mod.td = 1
 
 
-	def pp(l: str, acc: float = 0, misses: int = 0, c100: int = 0, c50: int = 0, mod_s: str = '', combo: int = 0, sv: int = 1):
+	def pp(lstr: str, acc: float = 0, misses: int = 0, c100: int = 0, c50: int = 0, mod_s: str = '', combo: int = 0, sv: int = 1):
 		try:
 			if mod_s != "":
 				mod_s = mod_s.upper()
@@ -719,7 +719,7 @@ class calc:
 				for m in mod_s:
 					calc.set_mods(calc.mod, m)
 					calc.mod.update()
-			map = bm.Beatmap(requests.get(l).text.splitlines())
+			map = bm.Beatmap(requests.get(lstr).text.splitlines())
 			if combo == 0 or combo > map.max_combo:
 				combo = map.max_combo
 			map.apply_mods(calc.mod)
