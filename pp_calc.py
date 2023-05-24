@@ -355,7 +355,7 @@ class diff_calc:
 				self.radius = float(radius)
 				self.ho = base_object
 				self.strains = [0, 0]
-				self.norm_start  = 0
+				self.norm_start = 0
 				self.norm_end = 0
 				self.prev = prev
 				self.delta_time = 0
