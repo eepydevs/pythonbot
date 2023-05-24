@@ -223,26 +223,26 @@ def runbf(str):
   codeiStack = []
   strp = []
   while codei < len(str):
-    l = str[codei]
+    codeil = str[codei]
     #increase
-    if l == '+':
+    if codeil == '+':
       array[i] = ((array[i] + 1) % 255)
     #decrease
-    elif l == '-':
+    elif codeil == '-':
       array[i] = ((array[i] - 1) % 255)
     #go one cell right
-    elif l == ">":
+    elif codeil == ">":
       i += 1
     #go one cell left
-    elif l == "<":
+    elif codeil == "<":
       i -= 1
     #input ascii character in strp array
-    elif l == ".":
+    elif codeil == ".":
       strp.append(chr(array[i]))
     #join every letter in strp array and print
-    elif l == '[':
+    elif codeil == '[':
       codeiStack.append(codei)
-    elif l == ']':
+    elif codeil == ']':
       if array[i] != 0:
         #restart the loop
         codei = codeiStack[-1]
