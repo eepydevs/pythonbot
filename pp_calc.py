@@ -240,7 +240,7 @@ class bm:
 				if valid != True:
 					print("ERROR: Unsupported gamemode")
 					raise()
-			except:
+			except Exception:
 				print("ERROR: Processing beatmap failed")
 				raise()
     
@@ -729,4 +729,5 @@ class calc:
 			else:
 				pp = pp_calc1.pp_calc_acc(diff[0], diff[1], diff[3], acc, calc.mod, combo, misses, sv)
 			return round(pp.pp, 2)
-		except: return 0
+		except Exception:
+			return 0
