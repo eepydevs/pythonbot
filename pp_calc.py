@@ -383,7 +383,7 @@ class diff_calc:
 					self.angle = abs(math.atan2(det,dot))
 				if(prev != None):
 					self.delta_time = (int(self.ho.time) - int(prev.ho.time)) / map.speed
-					if(self.ho.h_type !=  3):
+					if(self.ho.h_type != 3):
 						# Calculate speed
 						self.strains[0] = prev.strains[0]*math.pow(consts.decay_base[0],self.delta_time / 1000.0) + self.calculate_speed(prev)*consts.weight_scaling[0]
 						# Calculate aim
