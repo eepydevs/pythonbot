@@ -328,8 +328,8 @@ class Nonsense(commands.Cog):
               await fmsg.edit(embed = e)
               cachemsg(after.id, cache_exec_msgs[str(before.id)])
               return
-    except Exception:
-      pass
+    except Exception as e:
+      print(f"{e.__class__.__name__}: {e}")
 
   @commands.Cog.listener()
   async def on_message(self, msg):
@@ -443,8 +443,8 @@ class Nonsense(commands.Cog):
           except discord.Forbidden:
             await channelConfirm.send(f"@{msg.author.name}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
 
-    except Exception:
-      pass
+    except Exception as e:
+      print(f"{e.__class__.__name__}: {e}")
 
   @commands.message_command(name="Compile (PY)")
   async def pycomp(self, inter, msgid: discord.Message):
