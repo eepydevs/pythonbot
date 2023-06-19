@@ -1021,8 +1021,8 @@ class Upload():
       if self.__delete_after:
         time.sleep(self.__delete_after)
       os.remove(f"{self._path}{self._filename}")
-    except Exception:
-      pass
+    except Exception as e:
+      print(f"{e.__class__.__name__}: {e}")
     return None
 
 def dividers(array: list, divider: str = " | "):
