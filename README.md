@@ -2,7 +2,7 @@
 
 ![total_files](https://img.shields.io/github/directory-file-count/maxy-dev/pythonbot?label=total%20files) ![total_lines](https://img.shields.io/tokei/lines/github/1randomguyspecial/pythonbot) ![repo_size](https://img.shields.io/github/repo-size/maxy-dev/pythonbot) \
 ![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot) ![last_commit](https://img.shields.io/github/last-commit/maxy-dev/pythonbot/main) \
-[![codefactor](https://img.shields.io/codefactor/grade/github/1randomguyspecial/pythonbot/main?label=codefactor&logo=codefactor)](https://www.codefactor.io/repository/github/naxy-dev/pythonbot)
+[![codefactor](https://img.shields.io/codefactor/grade/github/maxy-dev/pythonbot/main?label=codefactor&logo=codefactor)](https://www.codefactor.io/repository/github/maxy-dev/pythonbot)
 
 ## Links
 
