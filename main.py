@@ -41,8 +41,8 @@ async def on_message(message):
         e = discord.Embed(title = f"{member.name} is AFK", description = f"Reason: `{db['afk'][str(member.id)]['reason']}`\nSince: <t:{db['afk'][str(member.id)]['time']}:R>", color = random.randint(0, 16777215))
         await message.channel.send(embed = e)
       return
-  except Exception:
-    pass
+  except Exception as e:
+    print(f"{e.__class__.__name__}: {e}")
 
 @bot.event
 async def on_message_delete(message):
@@ -53,7 +53,8 @@ async def on_message_delete(message):
           e = discord.Embed(title = "Ghost ping detected!", description = f"{message.content}", color = random.randint(0, 16777215))
           e.set_footer(text = f"Message from: {message.author}")
           await message.channel.send(embed = e)
-  except Exception: pass
+  except Exception as e:
+    print(f"{e.__class__.__name__}: {e}")
 
 #when connected event lol
 @bot.event
