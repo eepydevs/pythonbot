@@ -9,6 +9,7 @@ import json
 import os
 import atexit
 import random
+import asyncio
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -751,22 +752,6 @@ class Singleton(type):
       cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
     return cls._instances[cls]
 
-class RedisManager(metaclass = Singleton):
-  def __init__(self, name: str = "main", key: str = None, *, host: str, port: int, password: str, client_name: str, charset: str = "utf-8", decode_responses: bool = True):
-    self._redis = rd.Redis(host = host, port = port, password = password, client_name = client_name, charset = charset, decode_responses = decode_responses)
-    self._name = name
-    self._key = key if key else name
-
-  def __enter__(self) -> dict:
-    if self._key not in self._redis.keys():
-      self._redis.hset(self._name, self._name, "{}")
-    self._var = json.loads(self._redis.hget(self._name, self._key))
-    return self._var
-
-  def __exit__(self, exc_type, exc_value, exc_traceback):
-    if self._var != json.loads(self._redis.hget(self._name, self._key)):
-      self._redis.hset(self._name, self._key, json.dumps(self._var))
-
 class Database(dict):
   def __init__(self, directory: str = "./", filename: str = "db.json"):
       self.__fullpath = directory + filename
@@ -864,6 +849,59 @@ class JsonFile(object):
   def data(self, value):
       self.__data = value
 
+class RedisDBLive(dict):
+  def __init__(self, name: str = "main", key: str = None, *, host: str, port: int, password: str, client_name: str, charset: str = "utf-8", decode_responses: bool = True, dont_save: bool = False):
+    super().__init__()
+    self._redis = rd.Redis(host = host, port = port, password = password, client_name = client_name, charset = charset, decode_responses = decode_responses, health_check_interval = 1000)
+    atexit.register(self.__del)
+    self._backup = JsonFile("backup.json")
+    self.__ds = dont_save
+    self._name = name
+    self._var = {}
+    self._key = key if key else name
+    self.__load()
+
+  def __getitem__(self, item):
+    # if self._var == {}:
+    #   self._var = json.loads(self._redis.hget(self._name, self._key))
+    return self._var[item]
+
+  def __setitem__(self, key, value):
+    self._var[key] = value
+    if not self.__ds:
+      self._redis.hset(self._name, self._key, json.dumps(self._var))
+
+  def __contains__(self, item):
+    # if self._var == {}:
+    #   self._var = json.loads(self._redis.hget(self._name, self._key))
+    return item in self._var
+
+  def __repr__(self):
+    return self._var.__repr__()
+      
+  def __del(self):
+    if not self.__ds:
+      try:
+        self._redis.hset(self._name, self._key, json.dumps(self._var))
+      except Exception as e:
+        print(e)
+        self._var["crashed"] = True
+        self._backup.data = self._var
+        self._backup.save()
+    self._redis.close()
+
+  def __load(self):
+    if self._var == {}:
+      if "crashed" in self._backup.data:
+        if self._backup.data["crashed"]:
+          del self._backup.data["crashed"]
+          self._var = self._backup.data
+        else:
+          self._var = json.loads(self._redis.hget(self._name, self._key))
+      else:
+        self._var = json.loads(self._redis.hget(self._name, self._key))
+
+
 class RedisDB(dict):
   def __init__(self, name: str = "main", key: str = None, *, host: str, port: int, password: str, client_name: str, charset: str = "utf-8", decode_responses: bool = True, dont_save: bool = False):
     self._redis = rd.Redis(host = host, port = port, password = password, client_name = client_name, charset = charset, decode_responses = decode_responses, health_check_interval = 1000)
@@ -918,6 +956,7 @@ class RedisDB(dict):
   def __del(self):
       if not self.__ds:
           self._save()
+      self._redis.close()
 
 async def Webhook(ctx, channel = None):
   if ctx != None:
@@ -993,12 +1032,12 @@ def dividers(array: list, divider: str = " | "):
       ft.append(i)
   return divider.join(ft) if divider else ""
 
-dontsave = True
+dontsave = False
 if os.environ["TEST"] != "y":
-  dontsave = False
+  dontsave = True
 
 db = None
 try:
-  db = RedisDB(host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = dontsave)
+  db = RedisDBLive("bot", host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = dontsave)
 except Exception:
   db = Database()

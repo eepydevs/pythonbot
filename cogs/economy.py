@@ -1,4 +1,4 @@
-#cog by maxy#2866
+#cog by @maxy_dev (maxy#2866)
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
@@ -285,21 +285,21 @@ class Economy(commands.Cog):
         upd = db["balance"]
         upd[str(inter.author.id)] = 0
         db["balance"] = upd
-        e = discord.Embed(title = f"{inter.author}'s Balance", description = f"Wallet: {db['balance'][str(inter.author.id)]} 💵", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"@{inter.author.name}'s Balance", description = f"Wallet: {db['balance'][str(inter.author.id)]} 💵", color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:
         wallet = db["balance"][str(inter.author.id)]
-        e = discord.Embed(title = f"{inter.author}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"@{inter.author.name}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
         await inter.send(embed = e)
     else:
       if not str(member.id) in db["balance"]:
         db["balance"][str(member.id)] = 0
         wallet = db["balance"][str(member.id)]
-        e = discord.Embed(title = f"{member}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"@{member.name}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:
         wallet = db["balance"][str(member.id)]
-        e = discord.Embed(title = f"{member}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"@{member.name}'s Balance", description = f"Wallet: {wallet} 💵", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
   #beg command
@@ -427,7 +427,7 @@ class Economy(commands.Cog):
                 if str(member.id) in db["balance"]:
                   db["balance"][str(inter.author.id)] -= payment
                   db["balance"][str(member.id)] += payment
-                  e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
+                  e = discord.Embed(title = "Success", description = f"@{member.name} got {payment} 💵 !", color = random.randint(0, 16777215))
                   if str(inter.author.id) in db["debug"]:
                     e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}, {db['balance'][str(member.id)]}")
                   await inter.send(embed = e)
@@ -435,7 +435,7 @@ class Economy(commands.Cog):
                   db["balance"][str(member.id)] = 0
                   db["balance"][str(inter.author.id)] -= payment
                   db["balance"][str(member.id)] += payment
-                  e = discord.Embed(title = "Success", description = f"{member} got {payment} 💵 !", color = random.randint(0, 16777215))
+                  e = discord.Embed(title = "Success", description = f"@{member.name} got {payment} 💵 !", color = random.randint(0, 16777215))
                   if str(inter.author.id) in db["debug"]:
                     e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}, {db['balance'][str(member.id)]}")
                   await inter.send(embed = e)
@@ -509,15 +509,13 @@ class Economy(commands.Cog):
       db["balance"][str(inter.author.id)] = 0
       db["balance"][str(inter.author.id)] += 1000
     e = discord.Embed(title = "Daily", description = "You got 1000 💵 !", color = random.randint(0, 16777215))
-    if str(inter.author.id) in db["debug"]:
-      e.add_field(name = "Debug", value = f"Variables value:\n{db['balance'][str(inter.author.id)]}")
     await inter.send(embed = e)
 
   #leaderboard command
   @commands.slash_command(description = "See other rich people in leaderboard")
   @commands.guild_only()
   async def leaderboard(self, inter):
-    leaderboard = tuple(f"{index}. `{member}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+    leaderboard = tuple(f"{index}. `@{member.name}`: {amount} 💵" for index, (member, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.guild.get_member(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
     color = random.randint(0, 16777215)
     e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
     await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
@@ -526,7 +524,7 @@ class Economy(commands.Cog):
   @commands.slash_command(description = "See other rich people in leaderboard")
   @commands.guild_only()
   async def globalleaderboard(self, inter):
-    leaderboard = tuple(f"{index}. `{user}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
+    leaderboard = tuple(f"{index}. `@{user.name}`: {amount} 💵" for index, (user, amount) in enumerate(sorted(filter(lambda i: i[0] != None, ((inter.bot.get_user(int(i[0])), i[1]) for i in db["balance"].items())), key = lambda i: i[1], reverse = True), start = 1))
     color = random.randint(0, 16777215)
     e = discord.Embed(title = "Leaderboard", description = "\n".join(leaderboard[0:9]), color = color)
     await inter.send(embed = e, view = lbbuttons(inter, color, leaderboard))
@@ -555,7 +553,7 @@ class Economy(commands.Cog):
                     rng = random.randint(100, max)
                     db["balance"][str(member.id)] -= rng
                     db["balance"][str(inter.author.id)] += rng
-                    e = discord.Embed(title = "Success", description = f"You stole {rng} 💵 from {member}!", color = random.randint(0, 16777215))
+                    e = discord.Embed(title = "Success", description = f"You stole {rng} 💵 from @{member.name}!", color = random.randint(0, 16777215))
                     await inter.send(embed = e)
                   except ValueError:
                     e = discord.Embed(title = "Error", description = "This person is too poor to be robbed!", color = random.randint(0, 16777215))
@@ -772,18 +770,18 @@ class Economy(commands.Cog):
     if member is None:
       if str(inter.author.id) in db["inventory"] and db["inventory"][str(inter.author.id)] != {}:
         inventory = "\n".join(f"{index}. `{name}`: {amount}" for index, (name, amount) in enumerate(db["inventory"][str(inter.author.id)].items(), start = 1))
-        e = discord.Embed(title = f"Inventory: {inter.author}", description = inventory, color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Inventory: @{inter.author.name}", description = inventory, color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:
-        e = discord.Embed(title = f"Inventory: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Inventory: @{inter.author.name}", description = "You have nothing right now", color = random.randint(0, 16777215))
         await inter.send(embed = e)
     else:
       if str(member.id) in db["inventory"] and db["inventory"][str(member.id)] != {}:
         inventory = "\n".join(f"{index}. `{name}`: {amount}" for index, (name, amount) in enumerate(db["inventory"][str(member.id)].items(), start = 1))
-        e = discord.Embed(title = f"Inventory: {member}", description = inventory, color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Inventory: @{member.name}", description = inventory, color = random.randint(0, 16777215))
         await inter.send(embed = e)
       else:
-        e = discord.Embed(title = f"Inventory: {member}", description = "They have nothing right now", color = random.randint(0, 16777215))
+        e = discord.Embed(title = f"Inventory: @{member.name}", description = "They have nothing right now", color = random.randint(0, 16777215))
         await inter.send(embed = e)
 
   #hack command
@@ -863,28 +861,28 @@ class Economy(commands.Cog):
             if imagelink != "":
               e.set_image(url = imagelink)
             await member.send(embed = e)
-            e = discord.Embed(title = "Success", description = f"Sent `{text}` to `{member}`!", color = random.randint(0, 16777215))
+            e = discord.Embed(title = "Success", description = f"Sent `{text}` to `@{member.name}`!", color = random.randint(0, 16777215))
             await inter.send(embed = e)
             try:
               message = await inter.bot.wait_for("message", check = lambda message: message.author == member and message.channel == member.dm_channel, timeout = 300)
-              e = discord.Embed(title = f"Response from mailed user ({member})", description = message.content, color = random.randint(0, 16777215))
+              e = discord.Embed(title = f"Response from mailed user (@{membername})", description = message.content, color = random.randint(0, 16777215))
               if message.attachments:
                 e.set_image(message.attachments[0].url)
               await inter.send(embed = e)
             except asyncio.TimeoutError:
-              e = discord.Embed(title = f"No response from mailed user ({member})", color = random.randint(0, 16777215))
+              e = discord.Embed(title = f"No response from mailed user (@{member.name})", color = random.randint(0, 16777215))
               await inter.send(embed = e, ephemeral = True)
           else:
-            e = discord.Embed(title = "Error", description = f"Sorry you can't message {member}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
+            e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
             await inter.send(embed = e, ephemeral = True)
         else:
-          e = discord.Embed(title = "Error", description = f"Sorry you can't message {member}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
       else:
-        e = discord.Embed(title = "Error", description = f"Sorry you can't message {member}\nYou have no smartphone!", color = random.randint(0, 16777215))
+        e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\nYou have no smartphone!", color = random.randint(0, 16777215))
         await inter.send(embed = e, ephemeral = True)
     else:
-      e = discord.Embed(title = "Error", description = f"Sorry you can't message {member}\nYou have no smartphone!", color = random.randint(0, 16777215))
+      e = discord.Embed(title = "Error", description = f"Sorry you can't message {member.name}\nYou have no smartphone!", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
 
   #profile command

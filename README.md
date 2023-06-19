@@ -1,8 +1,8 @@
 # Python bot, mostly funny bot with useful commands
 
-![total_files](https://img.shields.io/github/directory-file-count/1randomguyspecial/pythonbot?label=total%20files) ![total_lines](https://img.shields.io/tokei/lines/github/1randomguyspecial/pythonbot) ![repo_size](https://img.shields.io/github/repo-size/1randomguyspecial/pythonbot) \
-![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot) ![last_commit](https://img.shields.io/github/last-commit/1randomguyspecial/pythonbot/main) \
-[![codefactor](https://img.shields.io/codefactor/grade/github/1randomguyspecial/pythonbot/main?label=codefactor&logo=codefactor)](https://www.codefactor.io/repository/github/1randomguyspecial/pythonbot)
+![total_files](https://img.shields.io/github/directory-file-count/maxy-dev/pythonbot?label=total%20files) ![total_lines](https://img.shields.io/tokei/lines/github/1randomguyspecial/pythonbot) ![repo_size](https://img.shields.io/github/repo-size/maxy-dev/pythonbot) \
+![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot) ![last_commit](https://img.shields.io/github/last-commit/maxy-dev/pythonbot/main) \
+[![codefactor](https://img.shields.io/codefactor/grade/github/1randomguyspecial/pythonbot/main?label=codefactor&logo=codefactor)](https://www.codefactor.io/repository/github/naxy-dev/pythonbot)
 
 ## Links
 
@@ -13,7 +13,10 @@
 [![DonationAlerts](https://img.shields.io/badge/Support%20me%20on-DonationAlerts!-yellow)](https://www.donationalerts.com/r/maxy1) \
 [![python bot repo](https://img.shields.io/badge/Github%20repo-Python%20Bot-blue?logo=github&logoColor=white&labelColor=24282d)](https://github.com/1randomguyspecial/pythonbot)
 
-### [![api](https://img.shields.io/badge/-Economy%20API-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/): [![api balance](https://img.shields.io/badge/-api%2Fbalance-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance)/[![api inventory](https://img.shields.io/badge/-api%2Finventory-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/inventory)
+### [![api](https://img.shields.io/badge/API-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/) 
+- [![api balance](https://img.shields.io/badge/-api%2Fbalance-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance) `userid`
+- [![api inventory](https://img.shields.io/badge/-api%2Finventory-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/inventory) `userid`
+- [![api_ping](https://img.shields.io/badge/-api%2Fping-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/ping)
 
 To search particular user use `userid` parameter \
 Example: [![api inventory](https://img.shields.io/badge/-%2Fbalance%3Fuserid%3D439788095483936768-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance?userid=439788095483936768)
@@ -22,7 +25,7 @@ Example: [![api inventory](https://img.shields.io/badge/-%2Fbalance%3Fuserid%3D4
 
 Lists only **__PUBLIC__** commands
 
-Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `afk`, `emoji`, `quote`, `server(whois, suggest, info, roleinfo, hasrole, poll, discrim)`, `translate`
+Utility: `note(list, create, overwrite, add, newline, read, read_raw, delete)`, `tupper(create, say, delete, edit)`, `bookmarks(add, remove, show)`, `qrcode(create, read)`, `find(user, member)`, `embed`, `sendemoji`, `afk`, `emoji`, `quote`, `server(whois, suggest, info, roleinfo, hasrole, poll)`, `translate`
 
 Text: `text(encode(braille, binary, morse), decode(braille, binary, morse),flipify, reversify, strokify, fuwwify, ifyify, izeize, brickify, shoutify, spoilerize, indicatorify, ifyinglyedy, repleach)`
 
@@ -56,4 +59,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/04/07, 9:11 pm (UTC+03, MSK), v10.10.0
+## Last updated: 2023/05/31, 2:33 pm (UTC+03, MSK), v10.10.4

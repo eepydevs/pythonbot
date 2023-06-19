@@ -1,4 +1,4 @@
-#cog by maxy#2866
+#cog by @maxy_dev (maxy#2866)
 import disnake as discord
 from disnake.ext import commands
 from enum import Enum
@@ -12,6 +12,11 @@ import asyncio
 import json
 import math
 import ast
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+from matplotlib.ticker import MultipleLocator as ML
+from matplotlib.ticker import ScalarFormatter as SF
+from cycler import cycler
 from webcolors import hex_to_rgb
 import roblox as rblx
 from roblox.thumbnails import AvatarThumbnailType
@@ -67,7 +72,31 @@ if "bookmarks" not in db:
 
 if "apifavs" not in db:
   db["apifavs"] = {}
-    
+
+def ranksGraph(id, ranks_list: list, hrank: int, crank: int):
+  mpl.rcParams["axes.prop_cycle"] = cycler("color", ["#f7d12e"])
+  fig, ax = plt.subplots(edgecolor = "#2a2226")
+  ax.set_facecolor("#2a2226")
+  ax.spines["top"].set_visible(False)
+  ax.spines["right"].set_visible(False)
+  ax.spines["bottom"].set_visible(False)
+  ax.spines["left"].set_visible(False)
+  ax.xaxis.set_major_locator(ML(10))
+  ax.xaxis.set_minor_locator(ML(5))
+  ax.xaxis.set_minor_formatter(SF())
+  ax.grid(visible = True, which = "major", axis = "both", color = "#564454")
+  ax.tick_params(axis = "both", which = "both", color = "#564454", labelcolor = "#e2d2e0")
+  ax.invert_yaxis()
+  ax.invert_xaxis()
+  fig.set_size_inches(7.6, 2.4)
+  fig.set_facecolor("#2a2226")
+  plt.plot([i for i in range(90, 0, -1)], [i for i in ranks_list])
+  plt.title("Rank in last 90 days", loc = "right", fontsize = 9, color = "#e2d2e0")
+  plt.title(f"Highest rank: #{hrank}", loc = "left", fontsize = 9, color = "#e2d2e0")
+  plt.title(f"Current rank: #{crank}", loc = "center", fontsize = 12, color = "#e2d2e0")
+  plt.ylabel("Rank", color = "#e2d2e0")
+  fig.savefig(f"./image/osugraph{id}.png", dpi = 100)
+
 def esc_md(text: str):
   return text.replace('_', '\_').replace('*', '\*').replace('`', '\`').replace('~', '\~')
 
@@ -223,26 +252,26 @@ def runbf(str):
   codeiStack = []
   strp = []
   while codei < len(str):
-    codeil = str[codei]
+    letter = str[codei]
     #increase
-    if codeil == '+':
+    if letter == '+':
       array[i] = ((array[i] + 1) % 255)
     #decrease
-    elif codeil == '-':
+    elif letter == '-':
       array[i] = ((array[i] - 1) % 255)
     #go one cell right
-    elif codeil == ">":
+    elif letter == ">":
       i += 1
     #go one cell left
-    elif codeil == "<":
+    elif letter == "<":
       i -= 1
     #input ascii character in strp array
-    elif codeil == ".":
+    elif letter == ".":
       strp.append(chr(array[i]))
     #join every letter in strp array and print
-    elif codeil == '[':
+    elif letter == '[':
       codeiStack.append(codei)
-    elif codeil == ']':
+    elif letter == ']':
       if array[i] != 0:
         #restart the loop
         codei = codeiStack[-1]
@@ -294,7 +323,7 @@ class Nonsense(commands.Cog):
               response = rq.post("https://godbolt.org/api/compiler/python311/compile", json = body)
               ms = round(((beforems := time.perf_counter_ns()) - ms) / 1000000, (3 if round((beforems) - ms / 1000000) < 1 else None))
               e = discord.Embed(url = "https://godbolt.org/", title = "Python 3.11 Compilation", description = ("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") if len("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") < 4096 else "```Response too long to display!```", color = random.randint(0, 16667215))
-              e.set_footer(text = f"{after.author.name}#{after.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
+              e.set_footer(text = f"@{after.author.name} | {ms}ms | python 3.11 | godbolt.org")
               fmsg = await after.channel.fetch_message(cache_exec_msgs[str(before.id)])
               await fmsg.edit(embed = e)
               cachemsg(after.id, cache_exec_msgs[str(before.id)])
@@ -304,7 +333,7 @@ class Nonsense(commands.Cog):
 
   @commands.Cog.listener()
   async def on_message(self, msg):
-    if msg.author.bot or msg.author.discriminator == 0000:
+    if msg.author.bot:
       return
     try:
       if comp_prefix in msg.content:
@@ -320,7 +349,7 @@ class Nonsense(commands.Cog):
             response = rq.post("https://godbolt.org/api/compiler/python311/compile", json = body)
             ms = round(((before := time.perf_counter_ns()) - ms) / 1000000, (3 if round((before := time.perf_counter_ns()) - ms / 1000000) < 1 else None))
             e = discord.Embed(url = "https://godbolt.org/", title = "Python 3.11 Compilation", description = ("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") if len("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") < 4096 else "```Response too long to display!```", color = random.randint(0, 16667215))
-            e.set_footer(text = f"{msg.author.name}#{msg.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
+            e.set_footer(text = f"@{msg.author.name} | {ms}ms | python 3.11 | godbolt.org")
             message = await msg.channel.send(embed = e)
             cachemsg(msg.id, message.id)
             return
@@ -339,7 +368,7 @@ class Nonsense(commands.Cog):
             e = discord.Embed(url = getmsg.jump_url, title = f"Msg-link Embed (Click to jump)", description = getmsg.content, color = random.randint(0, 16777215), timestamp = getmsg.created_at)
             if getmsg.attachments:
               e.set_image(getmsg.attachments[0])
-            e.set_author(name = str(getmsg.author.name) + (f"#{getmsg.author.discriminator}" if int(getmsg.author.discriminator) != 0000 else '') , icon_url = getmsg.author.avatar)
+            e.set_author(name = str(getmsg.author.name), icon_url = getmsg.author.avatar)
             e.set_footer(text = f'#{dividers([getmsg.channel.name, getmsg.guild.name if getmsg.guild != msg.guild else "", "Generated by Python Bot#7254"])}')
             embeds.append(e)
 
@@ -348,7 +377,7 @@ class Nonsense(commands.Cog):
               e = discord.Embed(url = getmsgref.jump_url, title = f"[Msg-link] Replying to (Click to jump)", description = getmsgref.content, color = random.randint(0, 16777215), timestamp = getmsgref.created_at)
               if getmsgref.attachments:
                 e.set_image(getmsgref.attachments[0])
-              e.set_author(name = str(getmsgref.author.name) + (f"#{getmsgref.author.discriminator}" if int(getmsgref.author.discriminator) != 0000 else ''), icon_url = getmsgref.author.avatar)
+              e.set_author(name = str(getmsgref.author.name), icon_url = getmsgref.author.avatar)
               e.set_footer(text = f'#{dividers([getmsg.channel.name, getmsg.guild.name if getmsg.guild != msg.guild else "", "Generated by Python Bot#7254"])}')
               embeds.append(e)
               embedcount += 1
@@ -356,8 +385,11 @@ class Nonsense(commands.Cog):
         if embeds:
           content = " ".join(links)
           webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None))))
+          msgref = None
+          if msg.reference:
+            msgref = msg.reference.resolved
           await msg.delete()
-          await webhook.send(content = content if content else None, embeds = embeds, username = msg.author.display_name, avatar_url = msg.author.avatar, allowed_mentions = discord.AllowedMentions.none())
+          await webhook.send(content = (f'[Replying to `@{msgref.author.name}`]({msgref.jump_url})\n\n' if msgref else "") + content if content else None, embeds = embeds, username = msg.author.display_name, avatar_url = msg.author.avatar, allowed_mentions = discord.AllowedMentions.none())
           return
 
       if str(msg.channel.id) in db["channelsetting"]["imageonly"] and not msg.attachments:
@@ -393,26 +425,26 @@ class Nonsense(commands.Cog):
               rmsg = ''
               if not msg.reference is None:
                 rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-                rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "") + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-              await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+                rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "") + f"\n@{msg.reference.resolved.author.name}\n" if not msg.reference is None else "")
+              await webhook.send(content = ((rmsg if len(rmsg) < 1499 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"@{msg.author.name} ({msg.guild.name})", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+
+      if str(msg.channel.id) in list(callsInProgress.keys()):
+        channel = callsInProgress[str(msg.channel.id)][0]
+        if channelConfirm := self.bot.get_channel(int(channel)):
+          atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
+          try:
+            webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), channelConfirm))
+            rlatch = None
+            rmsg = ''
+            if not msg.reference is None:
+              rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
+              rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "")   + f"\n@{msg.reference.resolved.author.name}\n" if not msg.reference is None else "")
+            await webhook.send(content = ((rmsg if len(rmsg) < 1499 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"@{msg.author.name}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
+          except discord.Forbidden:
+            await channelConfirm.send(f"@{msg.author.name}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
 
     except Exception:
       pass
-
-    if str(msg.channel.id) in list(callsInProgress.keys()):
-      channel = callsInProgress[str(msg.channel.id)][0]
-      if channelConfirm := self.bot.get_channel(int(channel)):
-        atch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.attachments])
-        try:
-          webhook = (await utils.Webhook((commands.Context(message = msg, bot = self.bot, view = None)), channelConfirm))
-          rlatch = None
-          rmsg = ''
-          if not msg.reference is None:
-            rlatch = ' '.join([f"[{i.filename}]({i.url})" for i in msg.reference.resolved.attachments])
-            rmsg = ("> " + "\n> ".join(msg.reference.resolved.content.split("\n")) + (("\n> " + f"[ {rlatch} ]") if rlatch else "") + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")
-          await webhook.send(content = ((rmsg if len(rmsg) < 1999 else ('> `Too many replies to show!`' + f"\n@{msg.reference.resolved.author.name}{('#' + msg.reference.resolved.author.discriminator) if int(msg.reference.resolved.author.discriminator) != 0000 else ''}\n" if not msg.reference is None else "")) + msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], username=f"{msg.author.name}#{msg.author.discriminator}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}", avatar_url=msg.author.avatar, allowed_mentions=discord.AllowedMentions.none())
-        except discord.Forbidden:
-          await channelConfirm.send(f"{msg.author.name}#{msg.author.discriminator}{' [ 🐍 ]' if msg.author.id == 439788095483936768 else ''}{' [ 🔧 ]' if msg.author in self.bot.DEV else ''}{' [ ❤️ ]' if msg.author.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if msg.author in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if msg.author in self.bot.CONTRIB else ''}: " + (msg.content + (('\n' + f"[ {atch} ]") if msg.attachments else ''))[0:1999], allowed_mentions = discord.AllowedMentions.none())
 
   @commands.message_command(name="Compile (PY)")
   async def pycomp(self, inter, msgid: discord.Message):
@@ -430,7 +462,7 @@ class Nonsense(commands.Cog):
         response = rq.post("https://godbolt.org/api/compiler/python311/compile", json = body)
         ms = round(((before := time.perf_counter_ns()) - ms) / 1000000, (3 if round((before := time.perf_counter_ns()) - ms / 1000000) < 1 else None))
         e = discord.Embed(url = "https://godbolt.org/", title = "Python 3.11 Compilation", description = ("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") if len("```\n" + "\n".join(response.text.split("\n")[3:]) + "\n```") < 4096 else "```Response too long to display!```", color = random.randint(0, 16667215))
-        e.set_footer(text = f"{inter.author.name}#{inter.author.discriminator} | {ms}ms | python 3.11 | godbolt.org")
+        e.set_footer(text = f"@{inter.author.name} | {ms}ms | python 3.11 | godbolt.org")
         await inter.edit_original_response(embed = e)
         return
 
@@ -521,7 +553,7 @@ class Nonsense(commands.Cog):
         if idx != 0:
           prevuser = msgs[idx - 1].author
           prevmsgatch = msgs[idx - 1].attachments
-        result.append((('\n' if prevmsgatch or msg.author != prevuser or msgref else '') + (f"\n╭━ **<t:{int(msgref.created_at.timestamp())}:t> [{esc_md(msgref.author.name)}{f'#{msgref.author.discriminator}]({msgref.jump_url})' if msgref.author.discriminator != '0000' else ''}**: {msgref.content[0:49]}" if msgref else '') + ((f' {refatch if msgref.attachments else ""}') if msgref else '') + (f"\n**<t:{int(msg.created_at.timestamp())}:t> [{esc_md(msg.author.name)}{f'#{msg.author.discriminator}]({msg.jump_url})' if msg.author.discriminator != '0000' else ''}:**" if msg.author != prevuser or msgref else '') + ('\n> ' if msg.content else '')) + (msg.content.replace('\n', '\n> ') if msg.content else '') + f"{' `[EMBED]`' if msg.embeds else ''}" + (f"\n> {atch}" if msg.attachments else ''))
+        result.append((('\n' if prevmsgatch or msg.author != prevuser or msgref else '') + ((f"\n╭━ **<t:{int(msgref.created_at.timestamp())}:t> [@{esc_md(msgref.author.name)}]({msgref.jump_url})**: " + msgref.content[0:49].replace("\n", " ")) if msgref else '') + ((f' {refatch if msgref.attachments else ""}') if msgref else '') + (f"\n**<t:{int(msg.created_at.timestamp())}:t> [@{esc_md(msg.author.name)}]({msg.jump_url}):**" if msg.author != prevuser or msgref else '') + ('\n> ' if msg.content else '')) + (msg.content.replace('\n', '\n> ') if msg.content else '') + f"{' `[EMBED]`' if msg.embeds else ''}" + (f"\n> {atch}" if msg.attachments else ''))
         idx += 1
       e = discord.Embed(title = f"Messages in #{channel.name} ({offset + 1}-{offset + 10})", description = str().join(result), color = random.randint(0, 16777215))
       await inter.send(embed = e)
@@ -628,7 +660,7 @@ class Nonsense(commands.Cog):
 
     await inter.response.defer(ephemeral = True)
     try:
-      await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `{inter.author.name}#{inter.author.discriminator}`")
+      await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `@{inter.author.name}`")
       await inter.guild.get_channel(1077214640754405417).send(f"se!api payment {user.id} {inter.author.id} {inter.channel.id} {amount}")
       e = discord.Embed(title = f"Waiting for confirmation", description = f"Waiting for you to accept or cancel payment", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
@@ -993,6 +1025,7 @@ class Nonsense(commands.Cog):
     user: User name or id
     """
     try:
+      await inter.response.defer()
       info = osuapi.user(user = user)
       rgb = tuple(hex_to_rgb(info.profile_colour)) if info.profile_colour else None 
       e = discord.Embed(url = f"https://osu.ppy.sh/users/{info.id}", title = esc_md(str(info.username)) + (f" `[#{info.statistics.global_rank}]`" if info.statistics.global_rank else "") + ((" `[" + "❤️" * info.support_level + "]`") if info.is_supporter else "") + (" `[🐍]`" if info.id == 13628906 else "") + (" `[PPY]`" if info.id == 2 else "") + (" `[DEV]`" if info.id in [2, 989377, 3562660, 1040328, 2387883, 102, 10751776, 718454, 102335, 941094, 307202, 1857058] else "") + (" `[GMT]`" if info.is_moderator or info.is_admin else "") + (" `[SPT]`" if info.id in [3242450, 5428812, 941094, 2295078, 444506, 1040328, 1857058, 3469385] else "") + (" `[BOT]`" if info.is_bot else "") + (" `[🟢]`" if info.is_online else ""), description = f"Country: `{info.country.name}` :flag_{info.country_code.lower()}: {(f'`[#{info.statistics.country_rank}]`' if info.statistics.global_rank else '')}" + ("\n" + f"Formerly known as: `{', '.join(str(i) for i in list(info.previous_usernames))}`" if list(info.previous_usernames) else "") + "\n" + ((f"Discord: `{info.discord}`" + "\n") if info.discord else "") + (f"Plays with `{', '.join(str(style.name.lower().title()) for style in list(info.playstyle))}`" if info.playstyle else ""), color = discord.Color.from_rgb(r = rgb[0], g = rgb[1], b = rgb[2]) if info.profile_colour else random.randint(0, 16777215))
@@ -1001,8 +1034,15 @@ class Nonsense(commands.Cog):
         e.add_field(name = "Last visited:", value = f"<t:{int(info.last_visit.timestamp())}:R>")
       if not info.is_bot:
         e.add_field(name = "Statistics:", value = f"Performance Points: `{round(info.statistics.pp)}`" + "\n" + f"Ranked Score: `{info.statistics.ranked_score}`" + "\n" + f"Hit Accuracy: `{info.statistics.hit_accuracy}%`" + "\n" + f"Play Count: `{info.statistics.play_count}`" + "\n" + f"Total Score: `{info.statistics.total_score}`" + "\n" + f"Total Hits: `{info.statistics.total_hits}`" + "\n" + f"Maximum Combo: `{info.statistics.maximum_combo}`" + "\n" + f"Replays watched by others: `{info.statistics.replays_watched_by_others}`", inline = False)
-      if info.cover.url:
-        e.set_image(url = str(info.cover.url))
+      if ranks := info.rank_history:
+        ranksGraph(info.id, ranks.data, info.rank_highest.rank, info.statistics.global_rank)
+        with open(f"./image/osugraph{info.id}.png", "rb") as file:
+          msg = await inter.bot.get_channel(1060317600057393317).send(file = discord.File(file))
+          e.set_image(msg.attachments[0].url)
+        os.remove(f"./image/osugraph{info.id}.png")
+      else:
+        if info.cover.url:
+          e.set_image(url = str(info.cover.url))
       e.set_thumbnail(url = str(info.avatar_url))
       e.set_footer(text = f"ID: {info.id}")
       await inter.send(embed = e)
@@ -1034,14 +1074,14 @@ class Nonsense(commands.Cog):
         if info.pp and info.mode.value == "osu":
           if not info.perfect and info.mode.value == 'osu':
             accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
-            #ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            #ppfc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
           if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
-            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccss = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         elif not info.pp and info.mode.value == "osu":
           acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
-          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppifranked = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppaccifranked = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f'%(info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f'%(accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f'%(info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
         e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
         e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
@@ -1077,14 +1117,14 @@ class Nonsense(commands.Cog):
         if info.pp and info.mode.value == "osu":
           if not info.perfect and info.mode.value == 'osu':
             accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
-            # ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            # ppfc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
           if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
-            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccss = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         elif not info.pp and info.mode.value == "osu":
           acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
-          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppifranked = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+          ppaccifranked = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f' % (info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f" (`{ppaccfc}PP` for `{'%.2f' % (accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + (f" (`{round(info.weight.pp, 2)}PP ({round(info.weight.percentage, 2)}%) weighted`)" if info.pp and info.mode.value == 'osu' else "") + f" - **`{'%.2f' % (info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
         e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
         e.set_footer(text = f"Beatmap ID: {info.beatmap.beatmapset_id} > {info.beatmap.id}")
@@ -1114,17 +1154,17 @@ class Nonsense(commands.Cog):
         if info.pp and info.mode.value == "osu":
           if not info.perfect and info.mode.value == 'osu':
             accfc = calc_acc(info.statistics.count_300 + info.statistics.count_geki + info.statistics.count_miss, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50)
-            # ppfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-            ppaccfc = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (
+            # ppfc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, mod_s = (str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
+            ppaccfc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = accfc, mod_s = (
               str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
           if info.perfect and info.mode.value == 'osu' and round(info.accuracy * 100, 2) != 100.00:
-            ppaccss = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (
+            ppaccss = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = 100.00, mod_s = (
               str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         elif not info.pp and info.mode.value == "osu":
           acc = calc_acc(info.statistics.count_300 + info.statistics.count_geki, info.statistics.count_100 + info.statistics.count_katu, info.statistics.count_50, info.statistics.count_miss)
-          ppifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (
+          ppifranked = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', acc = acc, mod_s = (
             str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
-          ppaccifranked = pp.pp(l = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (
+          ppaccifranked = pp.pp(lstr = f'https://osu.ppy.sh/osu/{info.beatmap.id}', c100 = info.statistics.count_100 + info.statistics.count_katu, c50 = info.statistics.count_50, misses = info.statistics.count_miss, mod_s = (
             str(info.mods)) if str(info.mods) != 'NM' else '', combo = osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo)
         e = discord.Embed(url = f"https://osu.ppy.sh/b/{info.beatmap.id}", title = f"{info.beatmap.beatmapset().title} [{info.beatmap.version}] {('+' + str(info.mods) + ' ') if str(info.mods) != 'NM' else ''}[{info.beatmap.difficulty_rating}⭐]", description = f"> {ranks[info.rank.value]} - **`{'%.2f' % (info.pp) if info.pp else ppifranked}PP{('/' + str(ppaccifranked) + 'PP') if not ppifranked == ppaccifranked else ''}`**" + (" (If ranked) " if not info.pp else '') + (f"(`{ppaccfc}PP` for `{'%.2f' % (accfc)}%` FC)" if info.pp and info.mode.value == 'osu' and not info.perfect else "") + (f"(`{ppaccss}PP` for {ranks['X'] if str(info.mods) == 'NM' else ranks['XH']})" if info.pp and info.mode.value == 'osu' and info.perfect and round(info.accuracy * 100, 2) != 100 else "") + f" - **`{'%.2f' % (info.accuracy * 100)}%`**{' FC' if info.perfect else ''}\n> {info.score:,} - x{info.max_combo}/{osuapi.beatmap(beatmap_id = info.beatmap.id).max_combo} - [{info.statistics.count_300 + info.statistics.count_geki}/{info.statistics.count_100 + info.statistics.count_katu}/{info.statistics.count_50}/{info.statistics.count_miss}]" + f"\n\n<t:{int(time.mktime(info.created_at.timetuple())) + (10800 if os.environ['HOSTTYPE'] == '0' else 0)}:R> on osu! Bancho", color = random.randint(0, 16777215))
         e.set_thumbnail(url = str(info.beatmap.beatmapset().covers.list_2x))
@@ -1153,7 +1193,7 @@ class Nonsense(commands.Cog):
     elif acc < 0.00: acc = 0.00
     try:
       info = osuapi.beatmap(beatmap_id = id)
-      ppacc = pp.pp(l = f'https://osu.ppy.sh/osu/{id}', acc = acc, mod_s = (str(mods)) if str(mods) != 'NM' else '')
+      ppacc = pp.pp(lstr = f'https://osu.ppy.sh/osu/{id}', acc = acc, mod_s = (str(mods)) if str(mods) != 'NM' else '')
       e = discord.Embed(url = f"https://osu.ppy.sh/osu/{id}",title = f"PP calculation for: {info.beatmapset().title} [{info.version}] {('+' + str(mods).upper() + ' ') if str(mods).upper() != 'NM' else ''}[{info.difficulty_rating}⭐]", description = f"**`{ppacc}PP`** - `{acc}%`", color = random.randint(0, 16777215))
       await inter.send(embed = e)
     except ValueError:

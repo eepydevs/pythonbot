@@ -4,7 +4,7 @@ import random
 import sys
 import os
 import datetime, time
-from utils import RedisManager, PopcatAPI, Upload, db
+from utils import PopcatAPI, Upload, db
 from disnake.ext import commands, tasks
 from dotenv import load_dotenv
 from pp_calc import calc as pp
@@ -29,8 +29,8 @@ async def on_message(message):
     if str(message.author.id) in db["afk"]:
       if not "[afk]" in message.content.lower():
         if "serverid" in db["afk"][str(message.author.id)] and db["afk"][str(message.author.id)]["serverid"] != message.guild.id:
-            if bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.guild_permissions.manage_nicknames and bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.top_role > message.author.top_role and message.author.roles[1:]:
-              await bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).get_member(message.author.id).edit(nick = db["afk"][str(message.author.id)]["bname"])
+          if bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.guild_permissions.manage_nicknames and bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).me.top_role > message.author.top_role and message.author.roles[1:]:
+            await bot.get_guild(db["afk"][str(message.author.id)]["serverid"]).get_member(message.author.id).edit(nick = db["afk"][str(message.author.id)]["bname"])
         else:
           if message.guild.me.guild_permissions.manage_nicknames and message.guild.me.top_role > message.author.top_role and message.author.roles[1:]:
             await message.author.edit(nick = db["afk"][str(message.author.id)]["bname"])
@@ -63,12 +63,15 @@ async def on_connection():
 #when bot is online event
 @bot.event
 async def on_ready():
-  await asyncio.sleep(3)
+  print("bot connected")
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game("Restarted"))
   bot.TP = list(bot.get_guild(910131051320475648).get_role(1098971358509154374).members)
   bot.DEV = list(bot.get_guild(910131051320475648).get_role(932937400706007060).members)
   bot.CONTRIB = list(bot.get_guild(910131051320475648).get_role(910131898376937502).members)
-  print("bot connected")
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("Restarted"))
+  try:
+    db["ping"] = int(bot.latency * 1000)
+  except Exception as e:
+    print(f"{e.__class__.__name__}: {e}")
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
   await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | Made in Python {pyver}!"))
@@ -94,24 +97,27 @@ async def update_rolelists():
     bot.DEV = list(bot.get_guild(910131051320475648).get_role(932937400706007060).members)
     bot.CONTRIB = list(bot.get_guild(910131051320475648).get_role(910131898376937502).members)
   except Exception as e:
-    print(f"Something went wrong: {e.__class__.__name__}: {e}")
+    print(f"{e.__class__.__name__}: {e}")
+
 @tasks.loop(minutes = 30)
 async def top_gg_updstats():
   try:
     await bot.topgg.post_guild_count()
     print(f"Successfully updated guild count: {len(bot.guilds)}")
   except Exception as e:
-    print(f"Something went wrong: {e.__class__.__name__}: {e}")
+    print(f"{e.__class__.__name__}: {e}")
 
-@tasks.loop(minutes = 1)
+@tasks.loop(seconds = 30)
 async def update_ping():
-  db["ping"] = int(bot.latency * 1000)
+  try:
+    db["ping"] = int(bot.latency * 1000)
+  except Exception as e:
+    print(f"{e.__class__.__name__}: {e}")
     
 #load cogs
 for filename in os.listdir('./cogs'):
   if filename.endswith('.py') and filename not in []:
     bot.load_extension(f'cogs.{filename[:-3]}')
-
 
 update_reminders.start()
 if os.environ["TEST"] != "y":

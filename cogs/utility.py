@@ -1,6 +1,5 @@
-#cog by maxy#2866
+#cog by @maxy_dev (maxy#2866)
 import json
-
 import disnake
 import disnake as discord
 from disnake.ext import commands
@@ -13,7 +12,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.10.3" # major.sub.minor/fix
+botbuild = "10.10.4" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -281,12 +280,11 @@ class Utility(commands.Cog):
   async def slashbotinfo(self, inter):
     await inter.response.defer()
     
-    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [maxy#2866](https://github.com/1randomguyspecial).", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [@maxy_dev](https://github.com/maxy-dev).", color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'DanBot Hosting'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
-    e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/1randomguyspecial/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/1randomguyspecial/projects/2)\n[🧰 Disnake Github page](https://github.com/DisnakeDev/disnake)\n[🐍 Python official page](https://www.python.org)", inline = False)
+    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'Daki.cc' if os.environ['HOSTTYPE'] == '3' else 'DanBot Hosting'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
+    e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/maxy-dev/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/maxy-dev/projects/2)\n[🧰 Disnake Github page](https://github.com/DisnakeDev/disnake)\n[🐍 Python official page](https://www.python.org)", inline = False)
     e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
-    #e.add_field(name = f"Message from Number1", value = f"Leaving reality, see ya\n\*insert [almond cruise](https://www.youtube.com/watch?v=Cn6rCm01ru4) song here\*", inline = False)
     await inter.edit_original_message(embed = e)
 
   #bot ping command
@@ -295,21 +293,24 @@ class Utility(commands.Cog):
     s4dutilping = -1
     fshping = -1
     await inter.response.defer()
-    if inter.guild.id == 866689038731313193 and not inter.guild.get_member(1030156986140074054).status == discord.Status.offline:
+    if inter.guild.id == 866689038731313193 and not (s4dutil := inter.guild.get_member(1030156986140074054)).status == discord.Status.offline:
       try:
-        await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `{inter.author.name}#{inter.author.discriminator}`")
+        await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `@{inter.author.name}` (`{inter.author.id}`)")
         await inter.guild.get_channel(1077214640754405417).send(f"s4d!check")
         message = await inter.bot.wait_for("message", check = lambda message: message.author.id == 1030156986140074054 and message.channel.id == 1077214640754405417 and not message.embeds, timeout = 3)
         s4dutilping = message.content
       except asyncio.TimeoutError:
-        s4dutilping = -1
+        if "ms" in s4dutil.activities[0].name.lower():
+          s4dutilping = int(s4dutil.activities[0].name.split(" ")[1])
+        else:
+          s4dutilping = -1
     fshexist = inter.guild.get_member(1068572316986003466)
     if fshexist and fshexist.status != discord.Status.offline:
       try:
         fshping = int(requests.get("https://fsh-bot.frostzzone.repl.co/api/ping?plain=1", timeout = 1.5).json())
-      except (json.JSONDecodeError, requests.ReadTimeout):
+      except (json.JSONDecodeError, requests.ReadTimeout, OverflowError):
         fshping = -1
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities" if int(s4dutilping) >= 0 else "\n> `S4D Utilities` Unavailable..." if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh" if fshping >= 0 else "\n> `Fsh` Unavailable..." if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities (`{int(s4dutilping)}ms`)" if 0 <= int(s4dutilping) <= 2147483646 else "\n> `S4D Utilities` Unavailable..." if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh (`{fshping}ms`)" if 0 <= fshping <= 2147483646 else "\n> `Fsh` Unavailable..." if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   #bot credits command
@@ -363,7 +364,7 @@ class Utility(commands.Cog):
   async def roleinfo(self, inter, role: discord.Role):
     e = discord.Embed(title = f"Role info: {role.name}", description = f"{role.mention}\n\nRole position: {-role.position + len(inter.guild.roles)}\nRole creation date: <t:{str(time.mktime(role.created_at.timetuple()))[:-2]}:R>\nCan be mentioned by other users?: {role.mentionable}\nIs separated from other roles?: {role.hoist}\n{('Icon link: ' + role.icon.url) if role.icon != None else ''}", color = role.color)
     if len(role.members) != 0:
-      rm = '\n'.join([f"{m}" for m in role.members[0:9]])
+      rm = '\n'.join([f"@{m.name}" for m in role.members[0:9]])
       e.add_field(name = f"{len(role.members) if len(role.members) < 10 else f'More than 10 ({len(role.members)})'} People have this role:", value = rm)
     if role.icon != None:
       e.set_thumbnail(url = role.icon.url)
@@ -380,7 +381,7 @@ class Utility(commands.Cog):
     ----------
     role: Role here
     '''
-    board = tuple(f"{index}. `{member}`" for index, member in enumerate(role.members, start = 1))
+    board = tuple(f"{index}. `@{member.name}`" for index, member in enumerate(role.members, start = 1))
     color = role.color
     e = discord.Embed(title = f"Role board: {role.name}", description = "\n".join(board[0:9]), color = color)
     await inter.send(embed = e, view = rbbuttons(inter, color, board, role.name))
@@ -394,7 +395,7 @@ class Utility(commands.Cog):
     ----------
     text: Tell your suggestion here
     '''
-    e = discord.Embed(title = f"Suggestion from: {inter.author}", description = f"{text}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Suggestion from: @{inter.author.name}", description = f"{text}", color = random.randint(0, 16777215))
     e.set_thumbnail(url = str(inter.author.avatar))
     await inter.send(embed = e)
     msg = await inter.original_message()
@@ -422,13 +423,13 @@ class Utility(commands.Cog):
           
     role_list.reverse()
     b = ", ".join(role_list)
-    e = discord.Embed(title = f"Member info: {member}{' [ 🐍 ]' if member.id == 439788095483936768 else ''}{' [ 🔧 ]' if member in self.bot.DEV else ''}{' [ ❤️ ]' if member.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if member in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if member in self.bot.CONTRIB else ''} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Member info: @{member.name}{' [ 🐍 ]' if member.id == 439788095483936768 else ''}{' [ 🔧 ]' if member in self.bot.DEV else ''}{' [ ❤️ ]' if member.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if member in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if member in self.bot.CONTRIB else ''} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
     if member.avatar != None:
       e.set_thumbnail(url = str(member.avatar))
     e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
     e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
     if member.activities:
-      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}{f' {a.emoji}' if a.emoji else ''} **{a.name}**" + ((f"\n> - {a.details}" if a.details else '') if a.type != discord.ActivityType.custom else '') + ((f"\n> - {a.state}" if a.state else '') if a.type != discord.ActivityType.custom else '')) for a in member.activities), inline = False)
+      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}" + ((f' {a.emoji}' if a.emoji else '') if a.type != discord.ActivityType.streaming else '') + f" **{a.name}**" + ((("\n> - " + a.details.replace('\n', '')) if a.details else '') if a.type != discord.ActivityType.custom else '') + ((("\n> - " + a.state.replace("\n", "")) if a.state else '') if a.type != discord.ActivityType.custom and a.type != discord.ActivityType.streaming else '')) for a in member.activities), inline = False)
     if member.top_role != None:
       e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
     if len(role_list) != 0:
@@ -439,7 +440,8 @@ class Utility(commands.Cog):
       e.add_field(name = "Administrator?", value = "True", inline = False)
     else:
       e.add_field(name = "Administrator?", value = "False", inline = False)
-    e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
+    if member.avatar:
+      e.add_field(name = "Icon url:", value = f"[Link here]({str(member.avatar)[:-10]})", inline = False)
     e.set_footer(text = f"ID: {member.id}")
     await inter.send(embed = e)
        
@@ -468,34 +470,12 @@ class Utility(commands.Cog):
     options: Example: Hello option 1!, Hello option 2!, Hello option 3!
     '''  
     optionstuple = options.split(',')[:10]
-    e = discord.Embed(title = f"Poll from {inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i].strip()}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Poll from @{inter.author.name}: {name}", description = '\n'.join(f'{pollemojis[i]} {optionstuple[i].strip()}' for i in range(len(optionstuple))), color = random.randint(0, 16777215))
     #await inter.send("Successfully sent poll", ephemeral = True)
     await inter.send(embed = e)
     msg = await inter.original_message()
     for i in range(len(optionstuple)):
       await msg.add_reaction(pollemojis[i])
-
-  @server.sub_command()
-  async def discrim(self, inter, discriminator = None):
-    '''
-    See people with same discriminator as you!
-    '''
-    if discriminator is None:
-      discriminator = inter.author.discriminator
-    if discriminator[0:4].isnumeric:
-      discriminator = discriminator[0:4]
-      e = discord.Embed(title = f"Searching for discriminator {discriminator}", description = "\n".join(f"{m.name}#{m.discriminator}" for m in inter.guild.members if m.discriminator == str(discriminator)), color = random.randint(0, 16667215))
-    else:
-      e = discord.Embed(title = "Error", description = "Invalid discriminator", color = random.randint(0, 16667215))
-    await inter.send(embed = e)
-
-  """#servers command
-  @commands.slash_command(description = "See other servers' member counter")
-  async def servers(inter):
-    await inter.response.defer()
-    counter = "\n".join(f"{index}. `{guild.name}` by `{guild.owner.name}`: {guild.member_count}" for index, guild in enumerate(sorted(inter.bot.guilds, key = lambda guild: guild.me.joined_at.timestamp()), start = 1))
-    e = discord.Embed(title = "Servers' member counts:", description = f"Total: {len(inter.bot.users)}\n{counter}", color = random.randint(0, 16777215))
-    await inter.send(embed = e)"""
 
   #group smh
   @commands.slash_command(description = "Make notes with the bot")
@@ -507,10 +487,10 @@ class Utility(commands.Cog):
   async def list(self, inter):
     if str(inter.author.id) in db["notes"] and db["notes"][str(inter.author.id)] != {}:
       notes = "\n".join(f"{index}. `{name}`" for index, (name) in enumerate(db["notes"][str(inter.author.id)].keys(), start = 1))
-      e = discord.Embed(title = f"{inter.author}'s notes:", description = notes, color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"@{inter.author.name}'s notes:", description = notes, color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
     else:
-      e = discord.Embed(title = f"Notes: {inter.author}", description = "You have nothing right now", color = random.randint(0, 16777215))
+      e = discord.Embed(title = f"Notes: @{inter.author.name}", description = "You have nothing right now", color = random.randint(0, 16777215))
       await inter.send(embed = e, ephemeral = True)
   
   @note.sub_command(description = "Creates note")
@@ -699,7 +679,7 @@ class Utility(commands.Cog):
     text: Your text here
     '''
     e = discord.Embed(title = "Quote", description = f"{text}", color = random.randint(0, 16777215))
-    e.set_footer(text = f"{inter.author}", icon_url = str(inter.author.avatar))
+    e.set_footer(text = f"@{inter.author.name}", icon_url = str(inter.author.avatar))
     await inter.send(embed = e)
 
   #find command
@@ -724,7 +704,7 @@ class Utility(commands.Cog):
         name = member.name
         i = name.lower().find(user.lower())
         found = name.replace(name[i:len(user) + i], f"**__{name[i:len(user) + i]}__**")
-        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''}{' :beginner:' if member in inter.guild.members else ''}")
+        result.append(f"@{found}{' `[BOT]`' if member.bot else ''}{' :beginner:' if member in inter.guild.members else ''}")
   
     fields, fi, mul = [[]], 0, 1
     for i, m in enumerate(result):
@@ -758,7 +738,7 @@ class Utility(commands.Cog):
         name = member.name
         i = name.lower().find(qmember.lower())
         found = name.replace(name[i:len(qmember) + i], f"**__{name[i:len(qmember) + i]}__**")
-        result.append(f"{found}\#{member.discriminator}{' `[BOT]`' if member.bot else ''} {dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None], ', ')}{'⚫' if member.status == discord.Status.offline else ''}")
+        result.append(f"@{found}{' `[BOT]`' if member.bot else ''} {dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None], ', ')}{'⚫' if member.status == discord.Status.offline else ''}")
   
     fields, fi, mul = [[]], 0, 1
     for i, m in enumerate(result):

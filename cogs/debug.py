@@ -1,4 +1,4 @@
-#cog by maxy#2866
+#cog by @maxy_dev (maxy#2866)
 import asyncio
 import sys
 import disnake as discord
