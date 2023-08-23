@@ -11,3 +11,4 @@ async-timeout>=4.0.2
 redis>=4.5.5
 gdshortener>=1.0.1
 topggpy>=1.4.0
+matplotlib>=3.7.1

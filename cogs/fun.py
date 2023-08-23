@@ -84,7 +84,7 @@ class Fun(commands.Cog):
     await inter.response.send_message(f"{text}")
   
   #choose command slash
-  @commands.slash_command(name = "choice", description = "Usage: /choice thing 1, thing2, 3 thing")
+  @commands.slash_command(name = "choice")
   async def slashchoice(inter, options):
     '''
     Let the bot choose something for you
@@ -97,7 +97,7 @@ class Fun(commands.Cog):
     await inter.response.send_message(embed = e)    
 
   #8ball command slash
-  @commands.slash_command(name = "8ball", description = "Usage: pb!eightball (text)")
+  @commands.slash_command(name = "8ball")
   async def slasheightball(inter, text):
     '''
     Ask 8ball a Y/N question

@@ -44,18 +44,6 @@ async def on_message(message):
   except Exception as e:
     print(f"{e.__class__.__name__}: {e}")
 
-@bot.event
-async def on_message_delete(message):
-  try:
-    if str(message.guild.id) in db["serversetting"]["gpd"]:
-      if message.mentions:
-        if not message.author.bot:
-          e = discord.Embed(title = "Ghost ping detected!", description = f"{message.content}", color = random.randint(0, 16777215))
-          e.set_footer(text = f"Message from: {message.author}")
-          await message.channel.send(embed = e)
-  except Exception as e:
-    print(f"{e.__class__.__name__}: {e}")
-
 #when connected event lol
 @bot.event
 async def on_connection():
@@ -65,7 +53,7 @@ async def on_connection():
 @bot.event
 async def on_ready():
   print("bot connected")
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game("Restarted"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game("🛑 Restarted 🛑"))
   bot.TP = list(bot.get_guild(910131051320475648).get_role(1098971358509154374).members)
   bot.DEV = list(bot.get_guild(910131051320475648).get_role(932937400706007060).members)
   bot.CONTRIB = list(bot.get_guild(910131051320475648).get_role(910131898376937502).members)
@@ -75,7 +63,7 @@ async def on_ready():
     print(f"{e.__class__.__name__}: {e}")
   bot.launch_time = datetime.datetime.utcnow()
   await asyncio.sleep(3)
-  await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | Made in Python {pyver}!"))
+  await bot.change_presence(status = discord.Status.online, activity = discord.Game(f"/ | 🛑 Deprecated since 24.08.2023 🛑"))
 
 @tasks.loop(seconds = 30)
 async def update_reminders():
@@ -108,7 +96,7 @@ async def top_gg_updstats():
   except Exception as e:
     print(f"{e.__class__.__name__}: {e}")
 
-@tasks.loop(seconds = 30)
+@tasks.loop(minutes = 1)
 async def update_ping():
   try:
     db["ping"] = int(bot.latency * 1000)
@@ -117,8 +105,11 @@ async def update_ping():
     
 #load cogs
 for filename in os.listdir('./cogs'):
-  if filename.endswith('.py') and filename not in []:
-    bot.load_extension(f'cogs.{filename[:-3]}')
+  if filename.endswith('.py') and filename not in ["economy2.py"]:
+    try:
+      bot.load_extension(f'cogs.{filename[:-3]}')
+    except Exception as e:
+      print(f"{e.__class__.__name__}: {e}")
 
 update_reminders.start()
 if os.environ["TEST"] != "y":

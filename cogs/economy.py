@@ -873,10 +873,10 @@ class Economy(commands.Cog):
               e = discord.Embed(title = f"No response from mailed user (@{member.name})", color = random.randint(0, 16777215))
               await inter.send(embed = e, ephemeral = True)
           else:
-            e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
+            e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\n@{member.name} has no smartphone!", color = random.randint(0, 16777215))
             await inter.send(embed = e, ephemeral = True)
         else:
-          e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\n{member.name} has no smartphone!", color = random.randint(0, 16777215))
+          e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\n@{member.name} has no smartphone!", color = random.randint(0, 16777215))
           await inter.send(embed = e, ephemeral = True)
       else:
         e = discord.Embed(title = "Error", description = f"Sorry you can't message @{member.name}\nYou have no smartphone!", color = random.randint(0, 16777215))

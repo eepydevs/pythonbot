@@ -1,6 +1,7 @@
 # Python bot, mostly funny bot with useful commands
+# 🛑 DEPRECATED 🛑
 
-![total_files](https://img.shields.io/github/directory-file-count/maxy-dev/pythonbot?label=total%20files) ![total_lines](https://img.shields.io/tokei/lines/github/1randomguyspecial/pythonbot) ![repo_size](https://img.shields.io/github/repo-size/maxy-dev/pythonbot) \
+![total_files](https://img.shields.io/github/directory-file-count/maxy-dev/pythonbot?label=total%20files) ![repo_size](https://img.shields.io/github/repo-size/maxy-dev/pythonbot) \
 ![commits_per_month](https://img.shields.io/github/commit-activity/m/1randomguyspecial/pythonbot) ![last_commit](https://img.shields.io/github/last-commit/maxy-dev/pythonbot/main) \
 [![codefactor](https://img.shields.io/codefactor/grade/github/maxy-dev/pythonbot/main?label=codefactor&logo=codefactor)](https://www.codefactor.io/repository/github/maxy-dev/pythonbot)
 
@@ -13,13 +14,14 @@
 [![DonationAlerts](https://img.shields.io/badge/Support%20me%20on-DonationAlerts!-yellow)](https://www.donationalerts.com/r/maxy1) \
 [![python bot repo](https://img.shields.io/badge/Github%20repo-Python%20Bot-blue?logo=github&logoColor=white&labelColor=24282d)](https://github.com/1randomguyspecial/pythonbot)
 
-### [![api](https://img.shields.io/badge/API-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/) 
-- [![api balance](https://img.shields.io/badge/-api%2Fbalance-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance) `userid`
-- [![api inventory](https://img.shields.io/badge/-api%2Finventory-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/inventory) `userid`
-- [![api_ping](https://img.shields.io/badge/-api%2Fping-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/ping)
+### [![api](https://img.shields.io/badge/API-24282d?logo=vercel&logoColor=white)](https://pbot-api.vercel.app/api) 
+- [![api balance](https://img.shields.io/badge/-api%2Fbalance-24282d?logo=vercel&logoColor=white)](https://pbot-api.vercel.app//api/balance) `userid`
+- [![api bank](https://img.shields.io/badge/-api%2Fbank-24282d?logo=vercel&logoColor=white)](https://pbot-api.vercel.app//api/bank) `userid`
+- [![api inventory](https://img.shields.io/badge/-api%2Finventory-24282d?logo=vercel&logoColor=white)](https://pbot-api.vercel.app//api/inventory) `userid`
+- [![api_ping](https://img.shields.io/badge/-api%2Fping-24282d?logo=vercel&logoColor=white)](https://pbot-api.vercel.app//api/ping)
 
 To search particular user use `userid` parameter \
-Example: [![api inventory](https://img.shields.io/badge/-%2Fbalance%3Fuserid%3D439788095483936768-e7641b?logo=replit&logoColor=white)](https://pb.number2d.repl.co/api/balance?userid=439788095483936768)
+Example: [![api inventory](https://img.shields.io/badge/-%2Fbalance%3Fuserid%3D439788095483936768-24282d?logo=vercel&logoColor=white)](https://pbot-api.vercel.app//api/balance?userid=439788095483936768)
 
 ## Commands
 
@@ -59,4 +61,4 @@ Ban members: `ban`, `unban`
 
 Administrator: `setting`, `someone`
 
-## Last updated: 2023/05/31, 2:33 pm (UTC+03, MSK), v10.10.4
+## Last updated: 2023/08/23, 2:33 pm (UTC+03, MSK), v10.10.5

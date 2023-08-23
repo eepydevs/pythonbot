@@ -33,7 +33,7 @@ class Debug(commands.Cog):
         e = discord.Embed(title = "Error", description = f"```{str(error)[29:]}```", color = random.randint(0, 16777215))
     else:
       e = discord.Embed(title = "Error", description = f"{str(error)[:31]} <t:{int(time.time() + error.retry_after)}:R>", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    await inter.send(embed = e, ephemeral = True)
 
   #debug group
   @commands.slash_command()

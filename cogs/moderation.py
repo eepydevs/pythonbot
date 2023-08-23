@@ -15,7 +15,6 @@ if "warns" not in db:
 
 if "serversetting" not in db:
   db["serversetting"] = {}
-  db["serversetting"]["gpd"] = {}
   db["serversetting"]["nqn"] = {}
 
 if "channelsetting" not in db:
@@ -381,27 +380,18 @@ class Moderation(commands.Cog):
 
 
   #setting group
-  @commands.slash_command(name = "setting", description = "See current setting or change it. Available settings: gpd")
+  @commands.slash_command(name = "setting", description = "See current setting or change it. Available settings: nqn")
   async def slashsetting(inter, setting, switch = "info"):
     '''
     Switch settings
 
     Parameters
     ----------
-    setting: Available settings: gpd, nqn
+    setting: Available settings: nqn
     switch: basically anything
     '''
     if switch != "info":
       if inter.author.guild_permissions.administrator or inter.author.id == inter.bot.owner.id:
-        if setting == "gpd":
-          if str(inter.guild.id) in db["serversetting"]["gpd"] and db["serversetting"]["gpd"][str(inter.guild.id)]:
-            db["serversetting"]["gpd"][str(inter.guild.id)] = None
-            e = discord.Embed(title = "Success", description = "You disabled ghost ping detection for this server", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
-            db["serversetting"]["gpd"][str(inter.guild.id)] = "True"
-            e = discord.Embed(title = "Success", description = "You enabled ghost ping detection for this server", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
         if setting == "nqn":
           if str(inter.guild.id) in db["serversetting"]["nqn"] and db["serversetting"]["nqn"][str(inter.guild.id)]:
             db["serversetting"]["nqn"][str(inter.guild.id)] = None
@@ -412,13 +402,6 @@ class Moderation(commands.Cog):
             e = discord.Embed(title = "Success", description = "You enabled NQN feature for this server", color = random.randint(0, 16777215))
             await inter.send(embed = e)
       else:
-        if setting == "gpd":
-          if str(inter.guild.id) in db["serversetting"]["gpd"]:
-            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection enabled", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
-          else:
-            e = discord.Embed(title = "GPD Info:", description = "Your server has ghost ping detection disabled", color = random.randint(0, 16777215))
-            await inter.send(embed = e)
         if setting == "nqn":
           if str(inter.guild.id) in db["serversetting"]["nqn"]:
             e = discord.Embed(title = "NQN Info:", description = "Your server has NQN feature enabled", color = random.randint(0, 16777215))

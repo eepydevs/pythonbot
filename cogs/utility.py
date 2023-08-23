@@ -12,7 +12,7 @@ import asyncio
 import datetime, time
 from utils import dividers, db
 
-botbuild = "10.10.4" # major.sub.minor/fix
+botbuild = "10.10.5" # major.sub.minor/fix
 pyver = ".".join(str(i) for i in list(sys.version_info)[0:3])
 dnver = ".".join(str(i) for i in list(discord.version_info)[0:3])
 
@@ -279,24 +279,29 @@ class Utility(commands.Cog):
   @bot.sub_command(name = "info", description = "Shows bot's info")
   async def slashbotinfo(self, inter):
     await inter.response.defer()
-    
-    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [@maxy_dev](https://github.com/maxy-dev).", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "About Python Bot", description = f"Python Bot is a discord bot made by [@maxy_dev](https://github.com/maxy-dev).\n# 🛑 Python Bot is Deprecated 🛑\n## Python Bot was deprecated since 23.08.2023 (<t:1692781200:R>)\n## Be sure to check out my other projects at /bot sideprojects\n# Join the support server for new projects!", color = random.randint(0, 16777215))
     e.add_field(name = "Bot", value = f"Total amount of commands: {len(inter.bot.slash_commands)}\nBot statistics:\n> Servers connected: `{len(inter.bot.guilds)}`\n> Users connected: `{len(inter.bot.users)}`\n> Channels connected: `{sum(len(i.channels) for i in inter.bot.guilds) - sum(len(i.categories) for i in inter.bot.guilds)}`")
-    e.add_field(name = "Specs", value = f"Host: `{'Local (PC)' if os.environ['HOSTTYPE'] == '0' else 'Railway.app' if os.environ['HOSTTYPE'] == '1' else 'Daki.cc' if os.environ['HOSTTYPE'] == '3' else 'DanBot Hosting'}`\nCPU:\n> Cores: `{os.cpu_count()}`\n> Usage: `{'%.1f'%([x / psutil.cpu_count() * 100 for x in psutil.getloadavg()][1])}%` (5 min avg)\n> Frequency: `{round(psutil.cpu_freq()[0])}Mhz`\nRAM:\n> Virtual:\n> - Total: `{round(psutil.virtual_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.virtual_memory()[3] / 1024 / 1024)}MB / {'%.1f'%(psutil.virtual_memory()[2])}%`\n> - Free: `{round(psutil.virtual_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.virtual_memory()[2])}%`" + (f"\n> Swap: \n> - Total: `{round(psutil.swap_memory()[0] / 1024 / 1024)}MB`\n> - Usage: `{round(psutil.swap_memory()[1] / 1024 / 1024)}MB / {'%.1f'%(psutil.swap_memory()[3])}%`\n> - Free: `{round(psutil.swap_memory()[2] / 1024 / 1024)}MB / {'%.1f'%(100 - psutil.swap_memory()[3])}%`" if round(psutil.swap_memory()[0] / 1024 / 1024) else "") + f"\nOther:\n> Boot time: <t:{round(psutil.boot_time())}:R>", inline = False)
-    e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/maxy-dev/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/maxy-dev/projects/2)\n[🧰 Disnake Github page](https://github.com/DisnakeDev/disnake)\n[🐍 Python official page](https://www.python.org)", inline = False)
-    e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\nPython: `{pyver}`\nDisnake: `{dnver}`", inline = False)
-    await inter.edit_original_message(embed = e)
+    e.add_field(name = "Links", value = "[⚡ Support me on Boosty!](https://boosty.to/number1)\n[⚡ Support me on DonationAlerts!](https://www.donationalerts.com/r/maxy1)\n[🖥️ Python Bot Github page](https://github.com/maxy-dev/pythonbot)\n[📄 Python Bot To-Do board](https://github.com/users/maxy-dev/projects/2)", inline = False)
+    e.add_field(name = f"Versions", value = f"Bot: `{botbuild}`\n[🐍 Python: `{pyver}`](https://www.python.org)\n[🧰 Disnake: `{dnver}`](https://github.com/DisnakeDev/disnake)", inline = False)
+    view = discord.ui.View()
+    style = discord.ButtonStyle.gray
+    item1 = discord.ui.Button(style = style, label = "Support server", url = "https://discord.gg/jRK82RNx73")
+    view.add_item(item = item1)
+    await inter.edit_original_message(embed = e, view = view)
 
   #bot ping command
   @bot.sub_command(name = "ping", description = "Shows bot's ping")
   async def slashping(self, inter):
     s4dutilping = -1
     fshping = -1
+    ranbping = -1
     await inter.response.defer()
     if inter.guild.id == 866689038731313193 and not (s4dutil := inter.guild.get_member(1030156986140074054)).status == discord.Status.offline:
       try:
-        await inter.guild.get_channel(1077214640754405417).send(f"Requested by: `@{inter.author.name}` (`{inter.author.id}`)")
-        await inter.guild.get_channel(1077214640754405417).send(f"s4d!check")
+        em = discord.Embed(title=f"Requested by `@{inter.author.name}` (`{inter.author.id}`)", description=f"Command: `/bot ping`\nIn which channel it was used: {inter.channel.jump_url}", color=random.randint(0, 16777215))
+        em.set_thumbnail(url=inter.author.avatar)
+        em.set_footer(text=f"ID: {inter.author.id}")
+        await inter.guild.get_channel(1077214640754405417).send(f"s4d!check", embed = em)
         message = await inter.bot.wait_for("message", check = lambda message: message.author.id == 1030156986140074054 and message.channel.id == 1077214640754405417 and not message.embeds, timeout = 3)
         s4dutilping = message.content
       except asyncio.TimeoutError:
@@ -310,34 +315,43 @@ class Utility(commands.Cog):
         fshping = int(requests.get("https://fsh-bot.frostzzone.repl.co/api/ping?plain=1", timeout = 1.5).json())
       except (json.JSONDecodeError, requests.ReadTimeout, OverflowError):
         fshping = -1
-    e = discord.Embed(title = "Pong!", description = f"Bot ping: `{int(inter.bot.latency * 1000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities (`{int(s4dutilping)}ms`)" if 0 <= int(s4dutilping) <= 2147483646 else "\n> `S4D Utilities` Unavailable..." if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh (`{fshping}ms`)" if 0 <= fshping <= 2147483646 else "\n> `Fsh` Unavailable..." if fshexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
-    await inter.send(embed = e)
+    ranbexist = inter.guild.get_member(1072060636252606514)
+    if ranbexist and ranbexist.status != discord.Status.offline:
+      try:
+        ranbping = int(requests.get("https://randomizer-bot.ddededodediamante.repl.co/info", timeout=1.5).json()["ping"])
+      except (json.JSONDecodeError, requests.ReadTimeout, OverflowError):
+        ranbping = -1
+    pingstart = time.time_ns()
+    e = discord.Embed(title = "Loading", description = "Loading...", color = random.randint(0, 16777215))
+    msg = await inter.send(embed = e)
+    pingend = time.time_ns()
+    e = discord.Embed(title = "Pong!", description = f"API latency: `{int(inter.bot.latency * 1000)}ms`\nLatency: `{(int(pingend - pingstart) // 1000000)}ms`" + (f"\n> `{abs(int(s4dutilping) - int(inter.bot.latency * 1000))}ms` {'more' if int(s4dutilping) < int(inter.bot.latency * 1000) else 'less'} than S4D Utilities (`{int(s4dutilping)}ms`)" if 0 <= int(s4dutilping) <= 2147483646 else "\n> `S4D Utilities` Unavailable..." if inter.guild.id == 866689038731313193 else "") + (f"\n> `{abs(fshping - int(inter.bot.latency * 1000))}ms` {'more' if fshping < int(inter.bot.latency * 1000) else 'less'} than Fsh (`{fshping}ms`)" if 0 <= fshping <= 2147483646 else "\n> `Fsh` Unavailable..." if fshexist else "") + (f"\n> `{abs(int(ranbping) - int(inter.bot.latency * 1000))}ms` {'more' if int(ranbping) < int(inter.bot.latency * 1000) else 'less'} than Randomizer Bot (`{int(ranbping)}ms`)" if 0 <= int(ranbping) <= 2147483646 else "\n> `Randomizer Bot` Unavailable..." if ranbexist else "") + f"\nUp since: <t:{int(inter.bot.launch_time.timestamp())}:R>", color = random.randint(0, 16777215))
+    await inter.edit_original_message(embed = e)
 
   #bot credits command
   @bot.sub_command(name = "credits", description = "Shows contributor list")
   async def credits(self, inter):
-    e = discord.Embed(title = "Contributors/credits list", description = "[Bricked#7106](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[Senjienji#8317](https://github.com/Senjienji) - Helper, Tester\n[Dark dot#5012](https://replit.com/@adthoughtsind) - Contributor, Tester\nflguynico#8706 - Contributor, Tester\n[R3DZ3R#8150](https://github.com/R3DZ3R) - Contributor\nmillionxsam#4967 - Contributor\ngodslayerakp#3587 - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone#4486`\n> `inventionpro#6814`", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Contributors/credits list", description = "[brckd](https://replit.com/@Bricked) - Scripter, Helper, Tester\n[senjienji](https://github.com/Senjienji) - Helper, Tester\n[hitbyathunder](https://www.youtube.com/channel/UC8WiOgf5AGwTQ5bLJ5ya8og) - Contributor, Tester, Servers provider\n[darkdot.me](https://replit.com/@adthoughtsind) - Contributor, Tester\nthatonecrazyyeet (aka flguynico) - Contributor, Tester\n[artifyber (aka R3DZ3R)](https://github.com/R3DZ3R) - Contributor\nmillionxsam - Contributor\ngodslayerakp - Contributor\n\nfsh for being fsh still fshing and continuing to fsh\n**Devs of fsh:**\n> `frostzzone`\n> `inventionpro`", color = random.randint(0, 16777215))
     await inter.send(embed = e)
 
   @bot.sub_command(description = "Shows side projects im working on")
   async def sideprojects(self, inter):
     e = discord.Embed(title = "Side projects im working on", description = "Some of projects may not be mine", color = random.randint(0, 16777215))
-    e.add_field(name = "Telicards [BOT] (by Telcaum#9774)", value = "> PVP Card game\nIm a `Dev` and `Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/4bZJ2pnVgS)", inline = False)
-    e.add_field(name = "Fsh [BOT] (by frostzzone#4486, inventionpro#6814)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm `Inspiration` and a `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\n[Support server](https://discord.gg/SXcXZN4tkM)", inline = False)
+    e.add_field(name = "Link Embedder **(by maxy_dev)**", value = "> Embeds your discord links absolutely for free!\nIm the **`Main Dev`**\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1132729065980297296&permissions=536996864&scope=bot%20applications.commands)\n[Support server](https://discord.gg/jRK82RNx73)", inline = False)
+    e.add_field(name = "Enhanced Searcher **(by maxy_dev)**", value = "> Searches messages better than discord\nIm the **`Main Dev`**\nNo invite yet\n[Support server](https://discord.gg/jRK82RNx73)", inline = False)
+    e.add_field(name = "Post Bridger **(by maxy_dev)**", value = "> Connects multiple channels together\nIm the **`Main Dev`**\nNo invite yet\n[Support server](https://discord.gg/jRK82RNx73)", inline = False)
+    e.add_field(name = "Telicards (by telcaum)", value = "> PVP Card game\nIm a `Former Dev` and `Former Designer`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1069308287239077898&permissions=277025769536&scope=applications.commands%20bot)\n[Support server](https://discord.gg/4bZJ2pnVgS)", inline = False)
+    e.add_field(name = "Fsh (by frostzzone, inventionpro)", value = "> Fsh this bot!! Its Fshing Fsh!!!\nIm `Inspiration` and a `Helper`\n[Invite it to your server](https://discord.com/api/oauth2/authorize?client_id=1068572316986003466&permissions=8&scope=applications.commands%20bot)\n[Support server](https://discord.gg/SXcXZN4tkM)", inline = False)
     await inter.send(embed = e)
 
   #invite command
-  @bot.sub_command(name = "invite", description = "See invites  to bot support server and invite bot to your server")
+  @bot.sub_command(name = "invite", description = "See invites to bot support server and invite bot to your server")
   async def slashinvite(inter):
-    e = discord.Embed(title = "Invites", description = "Click the buttons below!", color = random.randint(0, 16777215))
+    e = discord.Embed(title = "Invites", description = "Click the buttons below!\n# 🛑 Python Bot is Deprecated 🛑\n## Python Bot was deprecated since 24.08.2023 (<t:1692867600:R>)\n## Be sure to check out my other projects at /bot sideprojects\n# Join the support server for new projects!", color = random.randint(0, 16777215))
     view = discord.ui.View()
     style = discord.ButtonStyle.gray
-    item = discord.ui.Button(style = style, label = "Invite bot to your server", url = "https://discord.com/api/oauth2/authorize?client_id=912745278187126795&permissions=1239836650583&scope=bot%20applications.commands")
-    item1 = discord.ui.Button(style = style, label = "Invite to support server", url = "https://discord.gg/jRK82RNx73")
-    item2 = discord.ui.Button(style = style, label = "Invite to Guilded support server", url = "https://www.guilded.gg/i/keNWeOPp?cid=bec0dc7b-4b97-41c7-aaa4-513d3e53f5e7&intent=chat")
-    view.add_item(item = item)
+    item1 = discord.ui.Button(style = style, label = "Support server", url = "https://discord.gg/jRK82RNx73")
     view.add_item(item = item1)
-    view.add_item(item = item2)
     await inter.send(embed = e, view = view)
 
   @commands.slash_command()
@@ -423,13 +437,13 @@ class Utility(commands.Cog):
           
     role_list.reverse()
     b = ", ".join(role_list)
-    e = discord.Embed(title = f"Member info: @{member.name}{' [ 🐍 ]' if member.id == 439788095483936768 else ''}{' [ 🔧 ]' if member in self.bot.DEV else ''}{' [ ❤️ ]' if member.id == int(os.environ['BOYKISSER']) else ''}{' [ ✅ ]' if member in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if member in self.bot.CONTRIB else ''} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
+    e = discord.Embed(title = f"Member info: @{member.name}{' [ 🐍 ]' if member.id == 439788095483936768 else ''}{' [ 🔧 ]' if member in self.bot.DEV else ''}{' [ ✅ ]' if member in self.bot.DEV + self.bot.TP + self.bot.CONTRIB else ''}{' [ 🛠️ ]' if member in self.bot.CONTRIB else ''} ({dividers([statusemotes['desktop'].get(str(member.desktop_status).lower(), '') if str(member.desktop_status) != 'offline' else None, statusemotes['mobile'].get(str(member.mobile_status).lower(), '') if str(member.mobile_status) != 'offline' else None, statusemotes['web'].get(str(member.web_status).lower(), '') if str(member.web_status) != 'offline' else None])}{'⚫' if member.status == discord.Status.offline else ''})", description = f"{member.mention}", color = random.randint(0, 16777215))
     if member.avatar != None:
       e.set_thumbnail(url = str(member.avatar))
     e.add_field(name = "Joined", value = f"<t:{str(time.mktime(member.joined_at.timetuple()))[:-2]}:R>", inline = True)
     e.add_field(name = "Registered", value = f"<t:{str(time.mktime(member.created_at.timetuple()))[:-2]}:R>", inline = True)
     if member.activities:
-      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}" + ((f' {a.emoji}' if a.emoji else '') if a.type != discord.ActivityType.streaming else '') + f" **{a.name}**" + ((("\n> - " + a.details.replace('\n', '')) if a.details else '') if a.type != discord.ActivityType.custom else '') + ((("\n> - " + a.state.replace("\n", "")) if a.state else '') if a.type != discord.ActivityType.custom and a.type != discord.ActivityType.streaming else '')) for a in member.activities), inline = False)
+      e.add_field(name = "Activity(/ies)", value = "\n".join((f"> {a.type[0].capitalize()}" + ((f' {a.emoji}' if hasattr(a, "emoji") else '') if a.type != discord.ActivityType.streaming else '') + f" **{a.name}**" + ((("\n> - " + a.details.replace('\n', '')) if hasattr(a, "details") else '') if a.type != discord.ActivityType.custom else '') + ((("\n> - " + a.state.replace("\n", "")) if a.state else '') if hasattr(a, "state") else '')) for a in member.activities), inline = False)
     if member.top_role != None:
       e.add_field(name = "Top role:", value = member.top_role.mention, inline = False)
     if len(role_list) != 0:

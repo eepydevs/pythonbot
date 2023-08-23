@@ -266,8 +266,9 @@ class PopcatAPI():
         dict: All the info
     """
     r = rq.get(f"{self.BASE_URL}github/{query}").json()
-    r["created_at"] = self.__convert_iso8601(r["created_at"])
-    r["updated_at"] = self.__convert_iso8601(r["updated_at"])
+    if "error" not in r:
+      r["created_at"] = self.__convert_iso8601(r["created_at"])
+      r["updated_at"] = self.__convert_iso8601(r["updated_at"])
     return r
 
   def weather(self, query: str) -> dict:
@@ -1032,12 +1033,13 @@ def dividers(array: list, divider: str = " | "):
       ft.append(i)
   return divider.join(ft) if divider else ""
 
-dontsave = False
+dontsave = True
 if os.environ["TEST"] != "y":
-  dontsave = True
+  dontsave = False
 
 db = None
 try:
-  db = RedisDBLive("bot", host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = dontsave)
-except Exception:
+  db = RedisDBLive("bot", "bot", host = os.environ["REDISHOST"], port = os.environ["REDISPORT"], password = os.environ["REDISPASSWORD"], client_name = None, dont_save = dontsave)
+  db["ping"] = 100
+except (Exception, rd.exceptions.TimeoutError):
   db = Database()
